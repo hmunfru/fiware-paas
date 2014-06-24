@@ -68,8 +68,7 @@ public interface ApplicationInstanceResource {
     List<ApplicationInstance> findAll(@QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize,
             @QueryParam("orderBy") String orderBy, @QueryParam("orderType") String orderType,
             @QueryParam("status") List<Status> status, @PathParam("vdc") String vdc,
-            @PathParam("environmentInstance") String environmentInstance,
-            @PathParam("productInstance") String productInstance, @QueryParam("applicationName") String applicationName)
+            @PathParam("environmentInstance") String environmentInstance)
             throws APIException;
 
     /**

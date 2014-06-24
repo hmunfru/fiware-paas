@@ -60,6 +60,7 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Task;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
+import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationInstanceDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationReleaseDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ArtifactDto;
@@ -150,7 +151,11 @@ public class ApplicationInstanceITest {
         assertEquals(Task.TaskStates.RUNNING, task.getStatus());
         
         EnvironmentInstance env = environmentInstanceManager.load(vdc, BLUEPRINT_NAME);
+        List<Status> status = new ArrayList();
+        status.add(Status.INSTALLED);
+        List<ApplicationInstance> apps = applicationInstanceResource.findAll(new Integer(1), new Integer(2), "", "",status, vdc, BLUEPRINT_NAME);
         
+        assertNotNull (apps);
         ProductRelease productRelease = new ProductRelease (PRODUCT_NAME, PRODUCT_VERSION);
         ArtifactDto artifactDto = new ArtifactDto (ARTIFACT_NAME, ARTIFACT_PATH, productRelease.toDto());
         ArrayList<ArtifactDto> artifactsDto = new ArrayList<ArtifactDto> ();

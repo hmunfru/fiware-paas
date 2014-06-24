@@ -154,6 +154,7 @@ public class ApplicationInstanceManagerImpl implements ApplicationInstanceManage
     }
 
     public List<ApplicationInstance> findByCriteria(ApplicationInstanceSearchCriteria criteria) {
+    	log.debug("Find by criteria");
         return applicationInstanceDao.findByCriteria(criteria);
     }
 

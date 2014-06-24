@@ -15,6 +15,7 @@
         <property name="environmentInstanceManager" ref="environmentInstanceManager"/>
         <property name="applicationInstanceAsyncManager" ref="applicationInstanceAsyncManager"/>
         <property name="applicationInstanceManager" ref="applicationInstanceManager"/>
+        <property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>
       
     </bean>
 

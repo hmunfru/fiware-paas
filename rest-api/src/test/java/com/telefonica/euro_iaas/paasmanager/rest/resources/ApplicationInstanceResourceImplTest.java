@@ -88,6 +88,7 @@ public class ApplicationInstanceResourceImplTest {
     public TaskManager taskManager;
     public Task task;
 
+
     @Before
     public void setUp() throws Exception {
     	applicationInstanceResource = new ApplicationInstanceResourceImpl ();
@@ -99,7 +100,7 @@ public class ApplicationInstanceResourceImplTest {
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         taskManager = mock(TaskManager.class);
         validator = mock (ApplicationInstanceResourceValidator.class);
-
+        systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         
         applicationInstanceResource.setApplicationInstanceAsyncManager(applicationInstanceAsyncManager);
         applicationInstanceResource.setApplicationInstanceManager(applicationInstanceManager);
@@ -108,6 +109,7 @@ public class ApplicationInstanceResourceImplTest {
         applicationInstanceResource.setEnvironmentInstanceManager(environmentInstanceManager);
         applicationInstanceResource.setTaskManager(taskManager);
         applicationInstanceResource.setValidator(validator);
+        applicationInstanceResource.setSystemPropertiesProvider(systemPropertiesProvider);
 
 
         when(systemPropertiesProvider.getProperty(any(String.class))).thenReturn("");

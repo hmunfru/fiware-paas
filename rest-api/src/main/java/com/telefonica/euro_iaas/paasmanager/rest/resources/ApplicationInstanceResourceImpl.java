@@ -33,7 +33,9 @@ import javax.ws.rs.WebApplicationException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
@@ -51,9 +53,11 @@ import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.Task;
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationReleaseDto;
+import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationInstanceSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.ApplicationInstanceResourceValidator;
+import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
  * Default ApplicationInstanceResource implementation.
@@ -65,7 +69,7 @@ import com.telefonica.euro_iaas.paasmanager.rest.validation.ApplicationInstanceR
 @Scope("request")
 public class ApplicationInstanceResourceImpl implements ApplicationInstanceResource {
 
-    private static Logger log = LoggerFactory.getLogger(ApplicationInstanceResourceImpl.class.getName());
+    private static Logger log = LoggerFactory.getLogger(ApplicationInstanceResourceImpl.class);
 
     private ApplicationInstanceAsyncManager applicationInstanceAsyncManager;
 
@@ -80,6 +84,9 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
     private EnvironmentInstanceManager environmentInstanceManager;
 
     private ApplicationInstanceResourceValidator validator;
+    
+    @Autowired
+    private SystemPropertiesProvider systemPropertiesProvider;
 
     /**
      * 
@@ -92,8 +99,15 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
                 + " with artificats " + applicationReleaseDto.getArtifactsDto().size());
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentInstance);
+        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
+            claudiaData.setUser(getCredentials());
+        }
+        
         Task task = null;
         try {
+        	log.debug("Validating install "+  applicationReleaseDto.getApplicationName() + " "
+                    + applicationReleaseDto.getVersion());
+        	log.debug(validator.toString());
             validator.validateInstall(vdc, environmentInstance, applicationReleaseDto);
             log.debug("Application validated");
         } catch (Exception ex) {
@@ -106,6 +120,8 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
                 MessageFormat.format("Deploying application {0} in environment instance {1}",
                         applicationRelease.getName(), environmentInstance), vdc);
 
+        log.debug (MessageFormat.format("Deploying application {0} in environment instance {1}",
+                applicationRelease.getName(), environmentInstance), vdc);
         applicationInstanceAsyncManager.install(claudiaData, environmentInstance, applicationRelease, task, callback);
 
         return task;
@@ -113,16 +129,14 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
     }
 
     public List<ApplicationInstance> findAll(Integer page, Integer pageSize, String orderBy, String orderType,
-            List<Status> status, String vdc, String environmentInstance, String productInstanceName,
-            String applicationName) {
-
+            List<Status> status, String vdc, String environmentInstance) {
+    	log.debug ("Find applications for " + environmentInstance + " page " + page + " pageSize " + pageSize + " orderby" + orderBy
+    			+ " orderType " + orderType);
         ApplicationInstanceSearchCriteria criteria = new ApplicationInstanceSearchCriteria();
 
         criteria.setVdc(vdc);
         criteria.setEnvironmentInstance(environmentInstance);
-        // criteria.setApplicationName(applicationName);
-        // criteria.setProductInstanceName(productInstanceName);
-        // criteria.setStatus(status);
+
 
         if (page != null && pageSize != null) {
             criteria.setPage(page);
@@ -134,7 +148,7 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
         if (!StringUtils.isEmpty(orderType)) {
             criteria.setOrderBy(orderType);
         }
-
+        log.debug("Find criteria for application instance");
         List<ApplicationInstance> appInstances = applicationInstanceManager.findByCriteria(criteria);
 
         return appInstances;
@@ -144,6 +158,9 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
     public Task uninstall(String org, String vdc, String environmentName, String applicationName, String callback) {
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
+        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
+            claudiaData.setUser(getCredentials());
+        }
             
         try {
              validator.validateUnInstall(vdc, environmentName, applicationName);
@@ -183,6 +200,25 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
         task.setVdc(vdc);
         return taskManager.createTask(task);
     }
+    
+    public void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
+    	log.debug ("add credentials");
+        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
+        	log.debug ("set users");
+            claudiaData.setUser(getCredentials());
+            claudiaData.getUser().setTenantId(claudiaData.getVdc());
+        }
+
+    }
+    
+    public PaasManagerUser getCredentials() {
+        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
+            return (PaasManagerUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } else {
+            return null;
+        }
+
+    }
 
     /**
      * @param validator
@@ -214,6 +250,10 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
 
     public void setApplicationReleaseManager(ApplicationReleaseManager applicationReleaseManager) {
         this.applicationReleaseManager = applicationReleaseManager;
+    }
+    
+    public void setSystemPropertiesProvider(SystemPropertiesProvider systemPropertiesProvider) {
+        this.systemPropertiesProvider = systemPropertiesProvider;
     }
 
 }

@@ -36,6 +36,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,10 +50,12 @@ import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationInstanceSearchCriteria;
 
+
 @Transactional(propagation = Propagation.REQUIRED)
 public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationInstance, String> implements
         ApplicationInstanceDao {
 
+	 private static Logger log = LoggerFactory.getLogger(ApplicationInstanceDaoJpaImpl.class);
     public List<ApplicationInstance> findAll() {
         return super.findAll(ApplicationInstance.class);
     }
@@ -145,6 +149,7 @@ public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationIn
      */
     private List<ApplicationInstance> filterByVDCandEnvironmentInstance(List<ApplicationInstance> applicationInstances,
             String vdc, String environmentInstanceName) {
+    	log.debug("filterByVDCandEnvironmentInstance " + vdc + " " + environmentInstanceName+ " " + applicationInstances.size());
         List<ApplicationInstance> result = new ArrayList<ApplicationInstance>();
         for (ApplicationInstance applicationInstance : applicationInstances) {
             if (applicationInstance.getEnvironmentInstance().getName().equals(environmentInstanceName)

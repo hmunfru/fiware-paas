@@ -101,21 +101,26 @@ public class ApplicationInstanceAsyncManagerImpl implements ApplicationInstanceA
                     + " installed successfully " + " on Environment " + environmentInstanceName);
         } catch (EntityNotFoundException e) {
             String errorMsg = e.getMessage();
+            log.error(errorMsg);
             updateErrorTask(environmentInstanceName, ENVIRONMENT_INSTANCE_PATH, task, errorMsg, e);
         } catch (ProductReleaseNotFoundException prNFE) {
             String errorMsg = prNFE.getMessage();
+            log.error(errorMsg);
             updateErrorTask(prNFE.getProductRelease().getName(), PRODUCT_RELEASE_PATH, task, errorMsg, prNFE);
         } catch (InvalidEntityException iee) {
             String errorMsg = iee.getMessage();
+            log.error(errorMsg);
             updateErrorTask(applicationRelease.getName(), APPLICATION_RELEASE_PATH, task, errorMsg, iee);
         } catch (AlreadyExistsEntityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	String errorMsg = "Error installing an application. Description:" + e.getMessage();
+            log.error(errorMsg);
         } catch (ProductInstallatorException e) {
             String errorMsg = "Error installing an application. Description:" + e.getMessage();
+            log.error(errorMsg);
             updateErrorTask("Error installing an application", PRODUCT_RELEASE_PATH, task, errorMsg, e);
         } catch (TaskNotFoundException e) {
             String errorMsg = "Error installing an application. Description:" + e.getMessage();
+            log.error(errorMsg);
             updateErrorTask("Error installing an application", PRODUCT_RELEASE_PATH, task, errorMsg, e);
         } finally {
             notifyTask(callback, task);
@@ -137,12 +142,15 @@ public class ApplicationInstanceAsyncManagerImpl implements ApplicationInstanceA
                     + " on Environment " + environmentInstanceName);
         } catch (EntityNotFoundException e) {
             String errorMsg = e.getMessage();
+            log.error(errorMsg);
             updateErrorTask(environmentInstanceName, ENVIRONMENT_INSTANCE_PATH, task, errorMsg, e);
         } catch (ProductInstallatorException e) {
             String errorMsg = e.getMessage();
+            log.error(errorMsg);
             updateErrorTask(environmentInstanceName, ENVIRONMENT_INSTANCE_PATH, task, errorMsg, e);
         } catch (TaskNotFoundException e) {
             String errorMsg = e.getMessage();
+            log.error(errorMsg);
             updateErrorTask(environmentInstanceName, ENVIRONMENT_INSTANCE_PATH, task, errorMsg, e);
         }
 
@@ -158,13 +166,10 @@ public class ApplicationInstanceAsyncManagerImpl implements ApplicationInstanceA
         try {
             loadedTask = taskManager.load(task.getId());
         } catch (EntityNotFoundException e) {
+        	log.error(e.getMessage());
             throw new TaskNotFoundException(e.getMessage(), task);
         }
 
-        // Uncommented - Could not commit JPA transaction; nested exception is
-        // javax.persistence.RollbackException: Transaction marked as
-        // rollbackOnly
-        // loadedTask.setResult(new TaskReference(piResource));
         loadedTask.setEndTime(new Date());
         loadedTask.setStatus(TaskStates.SUCCESS);
         taskManager.updateTask(loadedTask);

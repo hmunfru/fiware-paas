@@ -47,6 +47,7 @@ public class ApplicationInstanceResourceValidatorImpl implements ApplicationInst
     public void validateInstall(String vdc, String environmentInstance, ApplicationReleaseDto applicationReleaseDto)
             throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException {
 
+    	log.debug ("Validate Instanll " + vdc + " " + environmentInstance + " " + applicationReleaseDto.getApplicationName());
         if ((applicationReleaseDto.getApplicationName() == null) || (applicationReleaseDto.getVersion() == null))
             throw new InvalidApplicationReleaseException("Application Name is not provided");
 
@@ -54,10 +55,12 @@ public class ApplicationInstanceResourceValidatorImpl implements ApplicationInst
         try {
             applicationInstanceManager
                     .load(vdc, applicationReleaseDto.getApplicationName() + "-" + environmentInstance);
+            log.error("Application " + applicationReleaseDto.getApplicationName() + "-" + environmentInstance + " already installed");
             throw new InvalidApplicationReleaseException("Application already installed");
         } catch (EntityNotFoundException e) {
 
         }
+        log.debug ("Application validated");
 
     }
     

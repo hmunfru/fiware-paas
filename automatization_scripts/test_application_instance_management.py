@@ -63,16 +63,16 @@ instance_request = EnvironmentInstanceRequest(config['keystone_url'], config['pa
     config['user'], config['password'],
     config['vdc'], config['sdc_url'])
 
-environment_name = 'git65'
-blueprintname = 's95'
-application = 'app95'
+environment_name = 'dd'
+blueprintname = 'dddd'
+application = 'dddd'
+network='dffdd'
 
 print('Create a blueprint Template tomcat/mysql: ')
-g.add_environment(environment_name, 'description')
+#g.add_environment(environment_name, 'description')
 
 tier_name = 'tomcat5'
-g.add_tier_environment(environment_name, tier_name, "tomcat=6")
-#g.add_tier_environment_network(environment_name, tier_name, "tomcat=6", "network4")
+#g.add_tier_environment_network(environment_name, tier_name, "Trento", "tomcat=6", network)
 print("  OK")
 tier_name = 'mysql'
 #g.add_tier_environment(environment_name,tier_name, "mysql=1.2.4")
@@ -82,7 +82,7 @@ env = g.get_environment(environment_name)
 
 print('Deploy an environment Instance' + blueprintname )
 blueprint_instance = EnvironmentInstance(blueprintname, 'description', env, 'INIT')
-instance_request.add_blueprint_instance(blueprint_instance)
+#instance_request.add_blueprint_instance(blueprint_instance)
 print ('OK')
 
 print('Deploy an application Instance' + application )
