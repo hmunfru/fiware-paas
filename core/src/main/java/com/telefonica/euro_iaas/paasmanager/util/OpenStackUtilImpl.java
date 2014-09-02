@@ -135,10 +135,6 @@ public class OpenStackUtilImpl implements OpenStackUtil {
         String idRouter = openStackConfigUtil.getPublicRouter(user, region, networkId);
         PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
 
-        log.debug("tenantid " + adminUser.getTenantId());
-        log.debug("token " + adminUser.getToken());
-        log.debug("user name " + adminUser.getUserName());
-
         log.debug("Adding an interface from network " + net.getNetworkName() + " to router " + idRouter);
         String response;
 

@@ -97,6 +97,6 @@ public interface ApplicationInstanceResource {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     Task uninstall(@PathParam("org") String org, @PathParam("vdc") String vdc,
             @PathParam("environmentInstance") String environmentInstance, @PathParam("name") String name,
-            @HeaderParam("callback") String callback);
+            @HeaderParam("callback") String callback) throws APIException;
 
 }

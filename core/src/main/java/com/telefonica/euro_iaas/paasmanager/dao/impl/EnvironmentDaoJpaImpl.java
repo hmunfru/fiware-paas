@@ -159,8 +159,18 @@ public class EnvironmentDaoJpaImpl extends AbstractBaseDao<Environment, String> 
 
 
 	@Override
-	public Environment load(String arg0) throws EntityNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+	public Environment load(String envName) throws EntityNotFoundException {
+		 Query query = getEntityManager().createQuery(
+	                "select p from Environment p left join " + "fetch p.tiers where p.name = :name and p.vdc = :vdc");
+	        query.setParameter("name", envName);
+	        query.setParameter("vdc", "");
+	        Environment environment = null;
+	        try {
+	            environment = (Environment) query.getResultList().get(0);
+	        } catch (Exception e) {
+	            throw new EntityNotFoundException(Environment.class, "name", envName);
+	        }
+	        // return filterEqualTiers(environment);
+	        return environment;
 	}
 }

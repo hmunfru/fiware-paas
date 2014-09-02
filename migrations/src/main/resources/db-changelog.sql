@@ -1,4 +1,4 @@
---liquibase formatted sql
+---liquibase formatted sql
 
 --changeset jesuspg:1-1
 CREATE TABLE artifact_attribute (
@@ -273,7 +273,7 @@ ALTER TABLE tierinstance DROP COLUMN networks;
 ALTER TABLE artifact DROP COLUMN artifacttype_id;
 
 -- changeset henar:5-1 --
-ALTER TABLE networkinstance ADD COLUMN external BOOL NOT NULL
+ALTER TABLE networkinstance ADD COLUMN external BOOL NOT NULL;
 
 
 -- changeset henar:5-2 --
@@ -291,11 +291,13 @@ ALTER TABLE subnetworkinstance ADD COLUMN vdc VARCHAR(255);
 ALTER TABLE tier ADD COLUMN affinity VARCHAR(128);
 DROP TABLE artifacttype;
 DROP TABLE configuration;
+DROP TABLE service_attribute;
 DROP TABLE service;
+ALTER TABLE applicationrelease drop constraint fk_applicationrelease_applicationtype;
 DROP TABLE applicationtype;
-ALTER TABLE productrelease DELETE COLUMN productType;
-ALTER TABLE applicationrelease DELETE COLUMN applicationType;
-DROP TABLE productype;
+ALTER TABLE productrelease DROP COLUMN producttype_id;
+ALTER TABLE applicationrelease DROP COLUMN applicationtype_id;
+-- DROP TABLE productype;
 
 -- changeset henar:5-3 --
 ALTER TABLE tierinstance ADD COLUMN floatingip VARCHAR(128);
@@ -305,9 +307,9 @@ ALTER TABLE network ADD COLUMN federatednetwork VARCHAR(128);
 ALTER TABLE network ADD COLUMN federatedRange VARCHAR(128);
 ALTER TABLE networkinstance ADD COLUMN federatednetwork VARCHAR(128);
 ALTER TABLE networkinstance ADD COLUMN federatedRange VARCHAR(128);
-UPDATE network set federatednetwork=false where federatednetwork is NULL
-UPDATE networkinstance set federatednetwork=false where federatednetwork is NULL
-UPDATE networkinstance set federatedRange='' where federatedRange is NULL
-UPDATE network set federatedRange='' where federatedRange is NULL
+UPDATE network set federatednetwork=false where federatednetwork is NULL;
+UPDATE networkinstance set federatednetwork=false where federatednetwork is NULL;
+UPDATE networkinstance set federatedRange='' where federatedRange is NULL;
+UPDATE network set federatedRange='' where federatedRange is NULL;
 
 

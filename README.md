@@ -2,47 +2,25 @@
 [![Build Status](https://travis-ci.org/telefonicaid/fiware-paas.svg)](https://travis-ci.org/telefonicaid/fiware-paas) [![Coverage Status](https://coveralls.io/repos/jesuspg/fiware-paas/badge.png?branch=develop)](https://coveralls.io/r/jesuspg/fiware-paas?branch=develop) [![help stackoverflow](http://b.repl.ca/v1/help-stackoverflow-orange.png)](http://www.stackoverflow.com)
 
 
-
 This is the repository of the PaaS Manager developed in the FI-WARE and 4CaaSt project. The PaaS Manager GE provides a
-new layer over the IaaS layer (Openstack) in the aim of easing the task of deploying applications on a Cloud infrastructure.
-Therefore, it orchestrates the provisioning of the required virtual resources at IaaS level, and then, the installation and configuration
-of the whole software stack of the application by the SDC GE, taking into account the underlying virtual infrastructure.
-It provides a flexible mechanism to perform the deployment, enabling multiple deployment architectures:
+new layer over the IaaS layer (Openstack) in the aim of easing the task of deploying applications on a Cloud infrastructure. 
+Therefore, it orchestrates the provisioning of the required virtual resources at IaaS level, and then, the installation and configuration 
+of the whole software stack of the application by the SDC GE, taking into account the underlying virtual infrastructure. 
+It provides a flexible mechanism to perform the deployment, enabling multiple deployment architectures: 
 everything in a single VM or server, several VMs or servers, or elastic architectures based on load balancers and different software tiers.
-
 
 
 ## Requirements
 In order to execute the PaaS Manager, it is needed to have previously installed the following software:
-- Tomcat 7.X.X
-- PostgreSQL
+- Tomcat 7.X.X 
+- PostgreSQL 
 
-## Building instructions
-It is a a maven application:
-
-- Compile, launch test and build all modules
-
-        $ mvn clean install
-- Create a zip with distribution in target/paas-manager-server-dist.zip
-
-        $ mvn assembly:assembly -DskipTests
-
-- You can generate a rpm o debian packages (using profiles in pom)
-
-    for debian/ubuntu:
-
-        $ mvn install -Pdebian -DskipTests
-        (created target/paas-manager-server-XXXXX.deb)
-
-    for centOS:
-
-        $ mvn install -Prpm -DskipTests
-        (created target/rpm/paasmanager/RPMS/noarch/paasmanager-XXXX.noarch.rpm)
-
+#### Building Requirements
+It is a a maven application, it is just need to execute mvn clean install
 
 ## Installation instruction (for CentOS)
 ### Database configuration
-
+    
     $ yum install postgresql postgresql-server postgresql-contrib
 
 
@@ -88,33 +66,48 @@ Reload configuration
 
     $ service postgresql reload
 
-###Configure Paas-manager application
+[edit] Apache Tomcat configuration
+### Tomcat configuration
+Install Tomcat 7 together with standard Tomcat samples, documentation, and management web apps:
 
-Once the prerequisites are satisfied, you shall modify the context file at $PAASMANAGER_HOME/webapps/paasmanager.xml ($PAASMANAGER_HOME tipically is /opt/fiware-paas):
+    $ yum install tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps
+Start/Stop/Restart Tomcat 7 as a service. startp:
+    
+    $ sudo service tomcat7 start
+stop:
 
-See the snipet bellow to know how it works:
+    $ sudo service tomcat7 stop
+restart:
 
+    $ sudo service tomcat7 restart
+Add Tomcat 7 service to the autostart
 
-    <New id="paasmanager" class="org.eclipse.jetty.plus.jndi.Resource">
-        <Arg>jdbc/paasmanager</Arg>
-        <Arg>
-
-            <New class="org.postgresql.ds.PGSimpleDataSource">
-                <Set name="User"> <database user> </Set>
-                <Set name="Password"> <database password> </Set>
-                <Set name="DatabaseName"> <database name>   </Set>
-                <Set name="ServerName"> <IP/hostname> </Set>
-                <Set name="PortNumber">5432</Set>
-            </New>
-
-        </Arg>
-    </New>
+    $ sudo chkconfig tomcat7 on
 
 
+Once the prerequisites are satisfied, you shall create the context file as $CATALINA_HOME/conf/Catalina/localhost/paasmanager.xml (substituting PATH_TO_WEBAPP to the corresponding directory):
+
+    <Context path="/paasmanager" docBase="PATH_TO_WEBAPP" reloadable="true" debug="5">
+      <Resource name="jdbc/paasmanager" auth="Container" type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
+       url="jdbc:postgresql://localhost:5432/paasmanager"
+       username="postgres" password="postgres"
+       maxActive="20" maxIdle="10" maxWait="-1"/> 
+    </Context>
+    
+Include the library postgresql-8.4-702.jdbc4.jar in $CATALINA_HOME/lib
+Configure the profile fiware in the catalina.properties. So that, open the file $CATALINA_HOME/conf/catalina.properties and write at the end
+ spring.profiles.active=fiware
+
+Start tomcat
+
+    $ sudo service tomcat7 start
 
 #### Acceptance tests
+
 
 #### References
 * [FIWARE.OpenSpecification.Cloud.PaaS](http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.OpenSpecification.Cloud.PaaS)
 * [PaaS_Open_RESTful_API_Specification_(PRELIMINARY)](http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/PaaS_Open_RESTful_API_Specification_(PRELIMINARY))
 * [PaaS_Manager_-_Installation_and_Administration_Guide](http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/PaaS_Manager_-_Installation_and_Administration_Guide)
+
+

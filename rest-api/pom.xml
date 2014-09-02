@@ -10,7 +10,11 @@
     <parent>
         <groupId>com.telefonica.euro_iaas</groupId>
         <artifactId>paas-manager-server</artifactId>
+<<<<<<< HEAD
         <version>1.2.0-SNAPSHOT</version>
+=======
+        <version>1.1.0</version>
+>>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
     </parent>
 
     <dependencies>
@@ -27,24 +31,52 @@
         </dependency>
 
         <!--JERSEY DEPENDENCIES -->
-
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>${jersey2.version}</version>
-
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-spring</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-spring3</artifactId>
-            <version>${jersey2.version}</version>
-        </dependency>
+        <!-- FOR ENTITY-MANAGER -->
 
+
+        <!--/JERSEY DEPENDENCIES -->
         <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey2.version}</version>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
         </dependency>
 
 
@@ -116,14 +148,13 @@
 
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${javax.servlet.version}</version>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <version>2.3.1</version>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -132,21 +163,8 @@
             <version>1.2</version>
         </dependency>
 
+
         <!-- jetty -->
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-runner</artifactId>
-            <version>9.1.4.v20140401</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javax.servlet.jsp.jstl</artifactId>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                </exclusion>
-
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
 
         <!--
         <dependency>
