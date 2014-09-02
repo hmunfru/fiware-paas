@@ -65,6 +65,7 @@ puppet:
    agent:
      server: "{puppet_master}"
      runinterval: "60"
+     pluginsync: true
 
 
 
