@@ -64,7 +64,7 @@ import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
  */
 public class ApplicationInstanceResourceImplTest {
 
-<<<<<<< HEAD
+
     private ApplicationInstanceResourceImpl applicationInstanceResource;
     private EnvironmentInstanceManager environmentInstanceManager;
     private ApplicationReleaseManager applicationReleaseManager;
@@ -85,24 +85,7 @@ public class ApplicationInstanceResourceImplTest {
      * Initialize the Unit Test.
      * @throws Exception
      */
-=======
-    public ApplicationInstanceResourceImpl applicationInstanceResource;
-    public EnvironmentInstanceManager environmentInstanceManager;
-    public ApplicationReleaseManager applicationReleaseManager;
-    public ApplicationInstanceManager applicationInstanceManager;
-    public ApplicationInstanceAsyncManager applicationInstanceAsyncManager;
-    public SystemPropertiesProvider systemPropertiesProvider;
-    public EnvironmentInstanceAsyncManager environmentInstanceAsyncManager;
-    public ApplicationInstanceResourceValidator validator;
-    public String vdc = "vdc";
-    public String org = "org";
-    public String callback = "callback";
-    public Environment environment;
-    public Set<Tier> tiers;
-    public TaskManager taskManager;
-    public Task task;
 
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
     @Before
     public void setUp() throws Exception {
         applicationInstanceResource = new ApplicationInstanceResourceImpl();
@@ -127,13 +110,12 @@ public class ApplicationInstanceResourceImplTest {
 
     }
 
-<<<<<<< HEAD
+
     /**
      * Test the operation of installing an application.
      * @throws Exception
      */
-=======
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
+
     @Test
     public void testInstallApplication() throws Exception {
 
@@ -158,12 +140,10 @@ public class ApplicationInstanceResourceImplTest {
 
     }
 
-<<<<<<< HEAD
+
     /**
      * Test the operation of finding all application instance resource (not implemented).
      */
-=======
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
     @Test
     public void testFindAll() {
         // applicationInstanceResource.findAll(page, pageSize, orderBy, orderType, status, vdc, environmentInstance,
@@ -171,13 +151,11 @@ public class ApplicationInstanceResourceImplTest {
 
     }
 
-<<<<<<< HEAD
     /**
      * Test the operation of find a specific application instance.
      * @throws EntityNotFoundException
      */
-=======
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
+
     @Test
     public void testLoad() throws EntityNotFoundException {
         ApplicationInstance app = new ApplicationInstance();
@@ -187,13 +165,12 @@ public class ApplicationInstanceResourceImplTest {
 
     }
 
-<<<<<<< HEAD
+
     /**
      * Test the operation of uninstall an applicaiton.
      * @throws EntityNotFoundException
      */
-=======
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
+
     @Test
     public void testUninstall() throws EntityNotFoundException, APIException {
         EnvironmentInstance env = new EnvironmentInstance();

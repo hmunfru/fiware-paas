@@ -153,7 +153,7 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
 
     }
 
-<<<<<<< HEAD
+
     /**
      * Uninstall an specific application in a environment instance.
      * @param org   The organization.
@@ -164,23 +164,18 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
      * @return  The task to follow the execution of the task.
      * @throws APIException The exception if the information cannot be found.
      */
-    public Task uninstall(String org, String vdc, String environmentName, String applicationName, String callback)
-        throws APIException {
-=======
+
     public Task uninstall(String org, String vdc, String environmentName, String applicationName, String callback)
             throws APIException {
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
+
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
 
         try {
-<<<<<<< HEAD
+
              validator.validateUnInstall(vdc, environmentName, applicationName);
              log.info("Application validated");
-=======
-            validator.validateUnInstall(vdc, environmentName, applicationName);
-            log.debug("Application validated");
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
+
         } catch (Exception ex) {
             throw new APIException(ex);
         }

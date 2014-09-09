@@ -6,11 +6,7 @@
     <artifactId>paas-manager-server</artifactId>
     <packaging>pom</packaging>
     <name>paas-manager-server</name>
-<<<<<<< HEAD
     <version>1.2.0-SNAPSHOT</version>
-=======
-    <version>1.1.0</version>
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
 
 
     <properties>
@@ -66,6 +62,7 @@
         <!-- dependencies-->
 
         <jersey.version>1.18.1</jersey.version>
+        <jersey2.version>2.9</jersey2.version>
 
         <logback.version>1.0.13</logback.version>
         <slf4j.version>1.6.1</slf4j.version>
@@ -76,6 +73,9 @@
         <!-- hibernate -->
         <hibernate.version>4.1.7.Final</hibernate.version>
 
+        <!-- javax.servlet -->
+        <javax.servlet.version>3.1.0</javax.servlet.version>
+
         <!-- ehcache -->
         <ehcache.version>2.7.4</ehcache.version>
 
@@ -84,7 +84,7 @@
         <copyright.year>2012</copyright.year>
         <junit.version>4.11</junit.version>
         <jmock.version>2.5.1</jmock.version>
-        <jvm.version>1.6</jvm.version>
+        <jvm.version>1.7</jvm.version>
         <maven-surefire-plugin.version>2.12.2</maven-surefire-plugin.version>
 
 
@@ -169,12 +169,12 @@
             <dependency>
                 <groupId>com.telefonica.euro_iaas</groupId>
                 <artifactId>commons-dao</artifactId>
-                <version>1.2.3</version>
+                <version>1.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.telefonica.euro_iaas</groupId>
                 <artifactId>commons-properties</artifactId>
-                <version>1.1.2</version>
+                <version>1.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -286,44 +286,6 @@
                     <descriptor>src/assembly/distribution.xml</descriptor>
                 </configuration>
             </plugin>
-<<<<<<< HEAD
-=======
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${cobertura-maven-plugin.version}</version>
-                <configuration>
-                    <format>xml</format>
-                    <maxmem>256m</maxmem>
-                    <!-- aggregated reports for multi-module projects -->
-                    <aggregate>true</aggregate>
-                    <instrumentation>
-                        <ignores>
-                            <ignore>org.openstack.docs.common.api.v1.*</ignore>
-                        </ignores>
-                        <excludes>
-                            <exclude>**/*Test*.class</exclude>
-                            <exclude>**/model/**.class</exclude>
-                            <exclude>org/openstack/**/*</exclude>
-                            <exclude>org/w3/**/*</exclude>
-                        </excludes>
-                    </instrumentation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <configuration>
-                    <repoToken>BV4ME2rnc4ws6yQ5GQiSpLOmwPzYDcE3r</repoToken>
-                    <sourceEncoding>UTF-8</sourceEncoding>
-
-                </configuration>
-            </plugin>
-
-
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
         </plugins>
 
         <pluginManagement>

@@ -24,17 +24,15 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.exception;
 
-import javax.servlet.ServletException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-<<<<<<< HEAD
 
 /**
  * Launch an exception when we detect an error in the API.
  */
 public class APIException extends WebApplicationException {
-=======
-public class APIException extends ServletException {
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
 
     private String message;
     private String publicMessage;
@@ -49,7 +47,9 @@ public class APIException extends ServletException {
      */
     public APIException(Throwable cause) {
 
-        super(cause);
+        super(Response.status(new ErrorResponseCode(cause).getHttpCode()).entity(new ErrorResponseConverter(cause))
+                .type(MediaType.APPLICATION_JSON).build());
+
         this.cause = cause;
 
     }
@@ -62,14 +62,10 @@ public class APIException extends ServletException {
      */
     public APIException(Throwable cause, int error) {
 
-<<<<<<< HEAD
         super(Response.status(error).entity(new ErrorResponseConverter(cause))
                                     .type(MediaType.APPLICATION_JSON)
                                     .build());
 
-=======
-        this.cause = cause;
->>>>>>> 8bcf8950c3b9b76c9c87057a52eacf41e685a86e
         this.httpCode = error;
 
     }
