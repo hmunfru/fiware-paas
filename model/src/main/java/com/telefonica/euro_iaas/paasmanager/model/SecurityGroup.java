@@ -38,7 +38,7 @@ import net.sf.json.JSONObject;
 
 /**
  * Security Group entity for iptables.
- * 
+ *
  * @author henar
  */
 @Entity
@@ -67,7 +67,7 @@ public class SecurityGroup {
 
     /**
      * Constructor.
-     * 
+     *
      * @param name
      * @param description
      */
@@ -78,7 +78,7 @@ public class SecurityGroup {
 
     /**
      * Add rule in the security group.
-     * 
+     *
      * @param rule
      */
     public void addRule(Rule rule) {
@@ -90,7 +90,7 @@ public class SecurityGroup {
 
     /**
      * Delete a rule in the security group.
-     * 
+     *
      * @param rule
      */
     public void deleteRule(Rule rule) {
@@ -102,7 +102,7 @@ public class SecurityGroup {
 
     /**
      * From json.
-     * 
+     *
      * @param jsonNode
      */
     @SuppressWarnings("unchecked")
@@ -155,12 +155,16 @@ public class SecurityGroup {
     public void setRules(List<Rule> rules) {
         this.rules = rules;
     }
-    
-    public Long getId () {
-    	return id;
+
+    public Long getId() {
+        return id;
     }
-    
-    public List<Rule> cloneRules (){
+
+    /**
+     * Clone the list of rules associated to a security group and return it.
+     * @return
+     */
+    public List<Rule> cloneRules() {
         List<Rule> rules = new ArrayList<Rule>();
         for (Rule rule : this.getRules()) {
             rules.add(rule);
@@ -170,7 +174,7 @@ public class SecurityGroup {
 
     /**
      * Json.
-     * 
+     *
      * @return
      */
     public String toJSON() {
@@ -182,19 +186,19 @@ public class SecurityGroup {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[SecurityGroup]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[idSecurityGroup = ").append(this.idSecurityGroup).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[description = ").append(this.description).append("]");
-       sb.append("[rules = ").append(this.rules).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[SecurityGroup]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[idSecurityGroup = ").append(this.idSecurityGroup).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[description = ").append(this.description).append("]");
+        sb.append("[rules = ").append(this.rules).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

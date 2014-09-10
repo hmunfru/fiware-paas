@@ -29,37 +29,49 @@ import javax.persistence.Embeddable;
 
 /**
  * Represents a host where a OS is running. It is formed by
- * 
+ *
  * @author jesus M. Movilla
  */
 
 @Embeddable
 public class VM {
 
-    /** The ip where the host is located. */
+    /**
+     * The ip where the host is located.
+     */
     @Column(length = 128)
     private String ip = "";
-    
+
     @Column(length = 128)
     private String floatingip = "";
 
-    /** The computer's hostname. */
+    /**
+     * The computer's hostname.
+     */
     @Column(length = 128)
     private String hostname = "";
 
-    /** The domain. */
+    /**
+     * The domain.
+     */
     @Column(length = 128)
     private String domain = "";
 
-    /** the fqn. ***/
+    /**
+     * the fqn. **
+     */
     @Column(length = 512)
     private String fqn = "";
 
-    /** the OSType. ***/
+    /**
+     * the OSType. **
+     */
     @Column(length = 8)
     private String osType = "";
 
-    /** the VAPP. ***/
+    /**
+     * the VAPP. **
+     */
     @Column(length = 512)
     private String vmid = "";
 
@@ -204,7 +216,7 @@ public class VM {
     public String getIp() {
         return ip;
     }
-    
+
     /**
      * @return the ip
      */
@@ -242,56 +254,49 @@ public class VM {
     }
 
     /**
-     * @param domain
-     *            the domain to set
+     * @param domain the domain to set
      */
     public void setDomain(String domain) {
         this.domain = domain;
     }
 
     /**
-     * @param fqn
-     *            the fqn to set
+     * @param fqn the fqn to set
      */
     public void setFqn(String fqn) {
         this.fqn = fqn;
     }
 
     /**
-     * @param hostname
-     *            the hostname to set
+     * @param hostname the hostname to set
      */
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
 
     /**
-     * @param ip
-     *            the ip to set
+     * @param ip the ip to set
      */
     public void setIp(String ip) {
         this.ip = ip;
     }
-    
+
     /**
-     * @param ip
-     *            the ip to set
+     * @param floatingip the ip to set
      */
     public void setFloatingIp(String floatingip) {
         this.floatingip = floatingip;
     }
 
     /**
-     * @param osType
-     *            the osType to set
+     * @param osType the osType to set
      */
     public void setOsType(String osType) {
         this.osType = osType;
     }
 
     /**
-     * @param vmid
-     *            the vmid to set
+     * @param vmid the vmid to set
      */
     public void setVmid(String vmid) {
         this.vmid = vmid;
@@ -299,7 +304,7 @@ public class VM {
 
     /**
      * a Dto entity.
-     * 
+     *
      * @return
      */
     public VMDto toDto() {
@@ -312,22 +317,21 @@ public class VM {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[VM]");
-       sb.append("[ip = ").append(this.ip).append("]");
-       sb.append("[floatingip = ").append(this.floatingip).append("]");
-       sb.append("[hostname = ").append(this.hostname).append("]");
-       sb.append("[domain = ").append(this.domain).append("]");
-       sb.append("[fqn = ").append(this.fqn).append("]");
-       sb.append("[osType = ").append(this.osType).append("]");
-       sb.append("[vmid = ").append(this.vmid).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[VM]");
+        sb.append("[ip = ").append(this.ip).append("]");
+        sb.append("[floatingip = ").append(this.floatingip).append("]");
+        sb.append("[hostname = ").append(this.hostname).append("]");
+        sb.append("[domain = ").append(this.domain).append("]");
+        sb.append("[fqn = ").append(this.fqn).append("]");
+        sb.append("[osType = ").append(this.osType).append("]");
+        sb.append("[vmid = ").append(this.vmid).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

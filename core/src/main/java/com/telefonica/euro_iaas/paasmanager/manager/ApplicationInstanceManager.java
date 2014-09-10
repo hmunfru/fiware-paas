@@ -37,30 +37,28 @@ import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.EnvironmentInstance;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationInstanceSearchCriteria;
 
+/**
+ * Manager class of the Application Instance.
+ */
 public interface ApplicationInstanceManager {
 
     /**
-     * Install a list of applications in a given environment
-     * 
-     * @param org
-     *            the org where the instance will be installed
-     * @param vdc
-     *            the vdc where the instance will be installed
+     * Install a list of applications in a given environment.
+     * @param data
      * @param environmentInstance
-     *            the environmentInstance where the instance will be installed
      * @param application
-     *            the application to install
-     * @return the of installed product.
+     * @return
+     * @throws ProductReleaseNotFoundException
      * @throws InvalidEntityException
      * @throws AlreadyExistsEntityException
-     * @throws ApplicationTypeNotFoundException
+     * @throws ProductInstallatorException
      */
     ApplicationInstance install(ClaudiaData data,  EnvironmentInstance environmentInstance,
             ApplicationRelease application) throws ProductReleaseNotFoundException, InvalidEntityException,
             AlreadyExistsEntityException,  ProductInstallatorException;
 
     /**
-     * Find all ApplicationInstances
+     * Find all ApplicationInstances.
      * 
      * @return the applicationInstances
      */

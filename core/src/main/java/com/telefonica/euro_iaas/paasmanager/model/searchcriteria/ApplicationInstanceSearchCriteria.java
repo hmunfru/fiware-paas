@@ -45,7 +45,7 @@ public class ApplicationInstanceSearchCriteria extends AbstractSearchCriteria {
     private String productInstanceName;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public ApplicationInstanceSearchCriteria() {
     }
@@ -167,7 +167,7 @@ public class ApplicationInstanceSearchCriteria extends AbstractSearchCriteria {
     }
 
     /**
-     * @param vdc
+     * @param environmentInstance
      *            the vdc to set
      */
     public void setEnvironmentInstance(String environmentInstance) {
@@ -182,7 +182,7 @@ public class ApplicationInstanceSearchCriteria extends AbstractSearchCriteria {
     }
 
     /**
-     * @param vdc
+     * @param applicationName
      *            the applicationName to set
      */
     public void setApplicationName(String applicationName) {
@@ -197,7 +197,7 @@ public class ApplicationInstanceSearchCriteria extends AbstractSearchCriteria {
     }
 
     /**
-     * @param vdc
+     * @param productInstanceName
      *            the applicationName to set
      */
     public void setProductInstanceName(String productInstanceName) {

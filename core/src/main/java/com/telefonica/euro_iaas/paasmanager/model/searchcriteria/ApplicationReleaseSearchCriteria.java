@@ -35,7 +35,7 @@ public class ApplicationReleaseSearchCriteria extends AbstractSearchCriteria {
     private Artifact artifact;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public ApplicationReleaseSearchCriteria() {
     }
@@ -95,7 +95,7 @@ public class ApplicationReleaseSearchCriteria extends AbstractSearchCriteria {
     }
 
     /**
-     * @param Application
+     * @param artifact
      *            the application to set
      */
     public void setArtifact(Artifact artifact) {

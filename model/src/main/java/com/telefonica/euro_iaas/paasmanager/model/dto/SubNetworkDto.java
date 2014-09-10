@@ -32,7 +32,7 @@ import com.telefonica.euro_iaas.paasmanager.model.SubNetwork;
 
 /**
  * Represents the data about the network to be invoke in the request.
- * 
+ *
  * @author Henar Munoz
  * @version $Id: $
  */
@@ -43,7 +43,6 @@ public class SubNetworkDto {
     /* The subred name */
     private String subnetName;
     private String cidr;
-
 
 
     /**
@@ -70,6 +69,7 @@ public class SubNetworkDto {
 
     /**
      * It returns the network object associated to the dto.
+     *
      * @return the network
      */
     public SubNetwork fromDto(String vdc, String region) {
@@ -112,17 +112,16 @@ public class SubNetworkDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[SubNetworkDto]");
-       sb.append("[subnetName = ").append(this.subnetName).append("]");
-       sb.append("[cidr = ").append(this.cidr).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[SubNetworkDto]");
+        sb.append("[subnetName = ").append(this.subnetName).append("]");
+        sb.append("[cidr = ").append(this.cidr).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-
 
 
 }

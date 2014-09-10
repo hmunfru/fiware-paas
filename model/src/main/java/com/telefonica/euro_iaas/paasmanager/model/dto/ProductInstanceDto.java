@@ -34,7 +34,7 @@ import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 
 /**
  * DTO to receive the complete information when a product release is going to be installed.
- * 
+ *
  * @author Jesus M. Movilla
  */
 @XmlRootElement
@@ -49,10 +49,15 @@ public class ProductInstanceDto {
     private String taskId;
 
     /**
+     * Constructor.
      */
     public ProductInstanceDto() {
     }
 
+    /**
+     * Constructor with a product release dto information.
+     * @param productReleaseDto
+     */
     public ProductInstanceDto(ProductReleaseDto productReleaseDto) {
         this.productReleaseDto = productReleaseDto;
 
@@ -77,8 +82,7 @@ public class ProductInstanceDto {
     }
 
     /**
-     * @param attributes
-     *            the attributes to set
+     * @param attributes the attributes to set
      */
     public void setAttributes(Set<Attribute> attributes) {
         this.attributes = attributes;
@@ -92,8 +96,7 @@ public class ProductInstanceDto {
     }
 
     /**
-     * @param vdc
-     *            the vdc to set
+     * @param vdc the vdc to set
      */
     public void setVdc(String vdc) {
         this.vdc = vdc;
@@ -115,19 +118,19 @@ public class ProductInstanceDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[ProductInstanceDto]");
-       sb.append("[productReleaseDto = ").append(this.productReleaseDto).append("]");
-       sb.append("[attributes = ").append(this.attributes).append("]");
-       sb.append("[vdc = ").append(this.vdc).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[taskId = ").append(this.taskId).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[ProductInstanceDto]");
+        sb.append("[productReleaseDto = ").append(this.productReleaseDto).append("]");
+        sb.append("[attributes = ").append(this.attributes).append("]");
+        sb.append("[vdc = ").append(this.vdc).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[taskId = ").append(this.taskId).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

@@ -39,22 +39,36 @@ import com.telefonica.euro_iaas.paasmanager.model.ApplicationRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Artifact;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationReleaseSearchCriteria;
 
+/**
+ * Class Application Release Dao.
+ */
 @Transactional(propagation = Propagation.REQUIRED)
 public class ApplicationReleaseDaoJpaImpl extends AbstractBaseDao<ApplicationRelease, String> implements
         ApplicationReleaseDao {
 
+    /**
+     * Get the list of all application releases.
+     * @return
+     */
     public List<ApplicationRelease> findAll() {
         return super.findAll(ApplicationRelease.class);
     }
 
+    /**
+     * Get an application release given its name.
+     * @param arg0
+     * @return
+     * @throws EntityNotFoundException
+     */
     public ApplicationRelease load(String arg0) throws EntityNotFoundException {
         return super.loadByField(ApplicationRelease.class, "name", arg0);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.telefonica.euro_iaas.paasmanager.dao.ApplicationReleaseDao#findByCriteria
-     * (com.telefonica.euro_iaas.paasmanager.model.searchcriteria. ApplicationReleaseSearchCriteria)
+    /**
+     * Get the list of application releases given a search criteria.
+     * @param criteria
+     *            the search criteria
+     * @return
      */
     public List<ApplicationRelease> findByCriteria(ApplicationReleaseSearchCriteria criteria) {
         Session session = (Session) getEntityManager().getDelegate();
@@ -70,9 +84,9 @@ public class ApplicationReleaseDaoJpaImpl extends AbstractBaseDao<ApplicationRel
     }
 
     /**
-     * Filter the result by application release
+     * Filter the result by application release.
      * 
-     * @param applicationReleasess
+     * @param applicationReleases
      * @param artifact
      * @return
      */

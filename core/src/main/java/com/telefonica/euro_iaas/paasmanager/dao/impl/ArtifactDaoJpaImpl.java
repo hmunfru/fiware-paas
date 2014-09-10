@@ -26,9 +26,6 @@ package com.telefonica.euro_iaas.paasmanager.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +33,6 @@ import com.telefonica.euro_iaas.commons.dao.AbstractBaseDao;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.ArtifactDao;
 import com.telefonica.euro_iaas.paasmanager.model.Artifact;
-import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 
 /**
  * Defines the methods needed to persist/to manage Artifact objects.
@@ -47,17 +43,17 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 @Transactional(propagation = Propagation.REQUIRED)
 public class ArtifactDaoJpaImpl extends AbstractBaseDao<Artifact, String> implements ArtifactDao {
 
-    /*
-     * Find all the Artifacts in paas-manager database
+    /**
+     * Find all the Artifacts in paas-manager database.
      * @return artifacts, the list of artifacts
      */
     public List<Artifact> findAll() {
         return super.findAll(Artifact.class);
     }
 
-    /*
-     * Find an artifact by name-searching
-     * @param name, the name of the artifact
+    /**
+     * Find an artifact by name-searching.
+     * @param name the name of the artifact
      * @return artifact, the artifact
      */
     public Artifact load(String name) throws EntityNotFoundException {

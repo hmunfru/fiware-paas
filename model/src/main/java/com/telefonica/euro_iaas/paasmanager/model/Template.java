@@ -47,6 +47,9 @@ public class Template {
     @OneToOne
     private TierInstance tierInstance;
 
+    /**
+     * Constructor.
+     */
     public Template() {
     }
 
@@ -67,8 +70,7 @@ public class Template {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(Long id) {
         this.id = id;
@@ -82,8 +84,7 @@ public class Template {
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
@@ -97,8 +98,7 @@ public class Template {
     }
 
     /**
-     * @param tierInstance
-     *            the tierInstance to set
+     * @param tierInstance the tierInstance to set
      */
     public void setTierInstance(TierInstance tierInstance) {
         this.tierInstance = tierInstance;
@@ -108,18 +108,17 @@ public class Template {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[Template]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[tierInstance = ").append(this.tierInstance).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[Template]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[tierInstance = ").append(this.tierInstance).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

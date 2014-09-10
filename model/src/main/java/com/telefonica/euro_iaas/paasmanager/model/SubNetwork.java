@@ -39,7 +39,7 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.SubNetworkDto;
 
 /**
  * A sub network.
- * 
+ *
  * @author Henar Munoz
  */
 
@@ -57,9 +57,9 @@ public class SubNetwork {
 
     // the network name //
     private String name;
-    
+
     private String region;
-    
+
     private String vdc;
 
     private String cidr;
@@ -86,15 +86,15 @@ public class SubNetwork {
     public String getName() {
         return name;
     }
-    
+
     public String getRegion() {
         return region;
     }
-    
+
     public String getVdc() {
         return vdc;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -121,6 +121,10 @@ public class SubNetwork {
         return true;
     }
 
+    /**
+     * Get the hash code associated to the id, if the id is null return the number 31.
+     * @return
+     */
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -138,6 +142,7 @@ public class SubNetwork {
 
     /**
      * To the subnetwork Dto.
+     *
      * @return
      */
     public SubNetworkDto toDto() {
@@ -145,13 +150,14 @@ public class SubNetwork {
         return subNetworkDto;
 
     }
-    
+
     /**
      * To the subnetwork Dto.
+     *
      * @return
      */
     public SubNetworkInstance toInstance(String vdc, String region) {
-    	SubNetworkInstance subNetworkInstance = new SubNetworkInstance(this.getName(), vdc, region);
+        SubNetworkInstance subNetworkInstance = new SubNetworkInstance(this.getName(), vdc, region);
         return subNetworkInstance;
 
     }
@@ -160,21 +166,19 @@ public class SubNetwork {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[SubNetwork]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[region = ").append(this.region).append("]");
-       sb.append("[vdc = ").append(this.vdc).append("]");
-       sb.append("[cidr = ").append(this.cidr).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[SubNetwork]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[region = ").append(this.region).append("]");
+        sb.append("[vdc = ").append(this.vdc).append("]");
+        sb.append("[cidr = ").append(this.cidr).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
 
 
 }

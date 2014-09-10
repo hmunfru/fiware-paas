@@ -31,7 +31,7 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.ProductInstanceDto;
 
 /**
  * The Product Instance entity.
- * 
+ *
  * @author henar
  */
 @Entity
@@ -50,7 +50,7 @@ public class ProductInstance extends InstallableInstance implements Comparable<P
 
     /**
      * Constructor.
-     * 
+     *
      * @param productRelease
      * @param status
      * @param vdc
@@ -77,8 +77,7 @@ public class ProductInstance extends InstallableInstance implements Comparable<P
     }
 
     /**
-     * @param productRelease
-     *            the productRelease to set
+     * @param productRelease the productRelease to set
      */
     public void setProductRelease(ProductRelease productRelease) {
         this.productRelease = productRelease;
@@ -90,7 +89,7 @@ public class ProductInstance extends InstallableInstance implements Comparable<P
 
     /**
      * It returns the dto.
-     * 
+     *
      * @return ProductInstanceDto.class
      */
     public ProductInstanceDto toDto() {
@@ -109,17 +108,16 @@ public class ProductInstance extends InstallableInstance implements Comparable<P
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[ProductInstance]");
-       sb.append("[productRelease = ").append(this.productRelease).append("]");
-       sb.append("[taskId = ").append(this.taskId).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[ProductInstance]");
+        sb.append("[productRelease = ").append(this.productRelease).append("]");
+        sb.append("[taskId = ").append(this.taskId).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

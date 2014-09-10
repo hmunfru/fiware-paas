@@ -55,7 +55,11 @@ import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationReleaseDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ArtifactDto;
+<<<<<<< HEAD
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
+=======
+
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
 import com.telefonica.euro_iaas.paasmanager.rest.validation.ApplicationInstanceResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -83,6 +87,7 @@ public class ApplicationInstanceResourceImplTest {
 
     /**
      * Initialize the Unit Test.
+     *
      * @throws Exception
      */
 
@@ -97,6 +102,10 @@ public class ApplicationInstanceResourceImplTest {
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         taskManager = mock(TaskManager.class);
         validator = mock(ApplicationInstanceResourceValidator.class);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
 
         applicationInstanceResource.setApplicationInstanceAsyncManager(applicationInstanceAsyncManager);
         applicationInstanceResource.setApplicationInstanceManager(applicationInstanceManager);
@@ -107,12 +116,17 @@ public class ApplicationInstanceResourceImplTest {
         applicationInstanceResource.setValidator(validator);
 
         when(systemPropertiesProvider.getProperty(any(String.class))).thenReturn("");
+<<<<<<< HEAD
+=======
+
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
 
     }
 
 
     /**
      * Test the operation of installing an application.
+     *
      * @throws Exception
      */
 
@@ -124,17 +138,35 @@ public class ApplicationInstanceResourceImplTest {
         artifacts.add(artifact);
         ApplicationReleaseDto application = new ApplicationReleaseDto("APP", "version", artifacts);
 
+<<<<<<< HEAD
         Mockito.doNothing().when(validator)
                 .validateInstall(any(String.class), any(String.class), any(ApplicationReleaseDto.class));
         Mockito.doNothing()
                 .when(applicationInstanceAsyncManager)
                 .install(any(ClaudiaData.class), any(String.class), any(ApplicationRelease.class), any(Task.class),
                         any(String.class));
+=======
+        Mockito
+                .doNothing()
+                .when(validator)
+                .validateInstall(any(String.class), any(String.class), any(ApplicationReleaseDto.class));
+
+        Mockito
+                .doNothing()
+                .when(applicationInstanceAsyncManager)
+                .install(any(ClaudiaData.class), any(String.class),
+                any(ApplicationRelease.class), any(Task.class), any(String.class));
+
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         Task tasks = new Task();
         tasks.setStatus(TaskStates.RUNNING);
         when(taskManager.createTask(any(Task.class))).thenReturn(tasks);
         task = applicationInstanceResource.install(org, vdc, "environment", application, callback);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         assertNotNull(task);
         assertEquals(task.getStatus(), TaskStates.RUNNING);
 
@@ -146,13 +178,19 @@ public class ApplicationInstanceResourceImplTest {
      */
     @Test
     public void testFindAll() {
+<<<<<<< HEAD
         // applicationInstanceResource.findAll(page, pageSize, orderBy, orderType, status, vdc, environmentInstance,
         // productInstanceName, applicationName);
+=======
+        //applicationInstanceResource.findAll(page, pageSize, orderBy, orderType, status, vdc,
+        //                            environmentInstance, productInstanceName, applicationName);
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
 
     }
 
     /**
      * Test the operation of find a specific application instance.
+     *
      * @throws EntityNotFoundException
      */
 
@@ -168,19 +206,29 @@ public class ApplicationInstanceResourceImplTest {
 
     /**
      * Test the operation of uninstall an applicaiton.
+     *
      * @throws EntityNotFoundException
      */
 
     @Test
+<<<<<<< HEAD
     public void testUninstall() throws EntityNotFoundException, APIException {
+=======
+    public void testUninstall() throws EntityNotFoundException {
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         EnvironmentInstance env = new EnvironmentInstance();
         ApplicationInstance app = new ApplicationInstance();
         when(environmentInstanceManager.load(any(String.class), any(String.class))).thenReturn(env);
         when(applicationInstanceManager.load(any(String.class), any(String.class))).thenReturn(app);
+<<<<<<< HEAD
         Mockito.doNothing()
                 .when(applicationInstanceAsyncManager)
                 .uninstall(any(ClaudiaData.class), any(String.class), any(String.class), any(Task.class),
                         any(String.class));
+=======
+        Mockito.doNothing().when(applicationInstanceAsyncManager).uninstall(any(ClaudiaData.class), any(String.class),
+                any(String.class), any(Task.class), any(String.class));
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         Task tasks = new Task();
         tasks.setStatus(TaskStates.RUNNING);
         when(taskManager.createTask(any(Task.class))).thenReturn(tasks);

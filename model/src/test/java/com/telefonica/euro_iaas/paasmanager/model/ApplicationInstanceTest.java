@@ -45,12 +45,12 @@ import org.junit.Test;
  */
 public class ApplicationInstanceTest extends TestCase {
 
-    public static String ARTIFACT_NAME = "ARTIFACT_NAME";
-    public static String ARTIFACT_PATH = "ARTIFACT_PATH";
-    public static String APP_NAME = "APP_NAME";
-    public static String APP_VERSION = "APP_VERSION";
-    public static String PRODUCT_NAME = "PRODUCT_NAME";
-    public static String PRODUCT_VERSION = "PRODUCT_VERSION";
+    private static final String ARTIFACT_NAME = "ARTIFACT_NAME";
+    private static final String ARTIFACT_PATH = "ARTIFACT_PATH";
+    private static final String APP_NAME = "APP_NAME";
+    private static final String APP_VERSION = "APP_VERSION";
+    private static final String PRODUCT_NAME = "PRODUCT_NAME";
+    private static final String PRODUCT_VERSION = "PRODUCT_VERSION";
 
     private EnvironmentInstance envIns = null;
     private Environment envResult;

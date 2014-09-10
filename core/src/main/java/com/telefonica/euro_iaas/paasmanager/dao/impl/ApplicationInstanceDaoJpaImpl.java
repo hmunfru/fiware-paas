@@ -48,26 +48,46 @@ import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationInstanceSearchCriteria;
 
+/**
+ * Application Instance transaction class to DB.
+ */
 @Transactional(propagation = Propagation.REQUIRED)
 public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationInstance, String> implements
         ApplicationInstanceDao {
 
+    /**
+     * Get the list of all application instances.
+     * @return
+     */
     public List<ApplicationInstance> findAll() {
         return super.findAll(ApplicationInstance.class);
     }
 
+    /**
+     * Get an application instance (not implemented).
+     * @param arg0
+     * @return
+     * @throws EntityNotFoundException
+     */
     public ApplicationInstance load(String arg0) throws EntityNotFoundException {
         //return super.loadByField(ApplicationInstance.class, "name", arg0);
-    	return null;
+        return null;
     }
-    
-    public ApplicationInstance load(String name, String vdc ) throws EntityNotFoundException {
-    	Query query = getEntityManager().createQuery(
+
+    /**
+     * Get an application instance given its name and vdc.
+     * @param name
+     * @param vdc
+     * @return
+     * @throws EntityNotFoundException
+     */
+    public ApplicationInstance load(String name, String vdc) throws EntityNotFoundException {
+        Query query = getEntityManager().createQuery(
                 "select p from ApplicationInstance p where p.name = :name and p.vdc = :vdc");
         query.setParameter("name", name);
 
         query.setParameter("vdc", vdc);
-        if (vdc == null ){
+        if (vdc == null) {
 
             query.setParameter("vdc", "");
         } else {
@@ -77,12 +97,20 @@ public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationIn
         try {
             app = (ApplicationInstance) query.getSingleResult();
         } catch (NoResultException e) {
-            String message = " No app found in the database with id: " + name + " and vdc " + vdc +  " Exception: " + e.getMessage();
+            String message = " No app found in the database with id: "
+                    + name + " and vdc " + vdc + " Exception: " + e.getMessage();
+
             throw new EntityNotFoundException(Network.class, "name", name);
         }
         return app;
     }
 
+    /**
+     * Get a list of application instances given a search criteria.
+     * @param criteria
+     *            the search criteria
+     * @return
+     */
     public List<ApplicationInstance> findByCriteria(ApplicationInstanceSearchCriteria criteria) {
         Session session = (Session) getEntityManager().getDelegate();
         Criteria baseCriteria = session.createCriteria(ApplicationInstance.class);
@@ -98,8 +126,8 @@ public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationIn
         if (!StringUtils.isEmpty(criteria.getVdc())) {
             baseCriteria.add(Restrictions.eq(ApplicationInstance.VDC_FIELD, criteria.getVdc()));
         }
- 
-        
+
+
         if (!StringUtils.isEmpty(criteria.getApplicationName())) {
             baseCriteria.add(Restrictions.eq(ApplicationInstance.APP_FIELD, criteria.getApplicationName()));
         }
@@ -119,14 +147,14 @@ public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationIn
     }
 
     /**
-     * Filter the result by product instance
-     * 
+     * Filter the result by product instance.
+     *
      * @param applications
      * @param product
      * @return
      */
     private List<ApplicationInstance> filterByApplicationRelease(List<ApplicationInstance> applicationInstances,
-            ApplicationRelease applicationRelease) {
+                                                                 ApplicationRelease applicationRelease) {
         List<ApplicationInstance> result = new ArrayList<ApplicationInstance>();
         for (ApplicationInstance applicationInstance : applicationInstances) {
             if (applicationInstance.getApplicationRelease().getId().equals(applicationRelease.getId())) {
@@ -137,14 +165,14 @@ public class ApplicationInstanceDaoJpaImpl extends AbstractBaseDao<ApplicationIn
     }
 
     /**
-     * Filter the result by product instance
-     * 
+     * Filter the result by product instance.
+     *
      * @param applications
      * @param product
      * @return
      */
     private List<ApplicationInstance> filterByVDCandEnvironmentInstance(List<ApplicationInstance> applicationInstances,
-            String vdc, String environmentInstanceName) {
+                                                                        String vdc, String environmentInstanceName) {
         List<ApplicationInstance> result = new ArrayList<ApplicationInstance>();
         for (ApplicationInstance applicationInstance : applicationInstances) {
             if (applicationInstance.getEnvironmentInstance().getName().equals(environmentInstanceName)

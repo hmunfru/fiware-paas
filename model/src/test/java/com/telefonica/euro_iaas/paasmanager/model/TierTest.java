@@ -44,14 +44,14 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 
 /**
  * Test for Tier entity.
- * 
+ *
  * @author henar
  */
 public class TierTest extends TestCase {
 
     /**
      * Test the creation of the enviornment.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -79,6 +79,10 @@ public class TierTest extends TestCase {
 
     }
 
+    /**
+     * Test the creation of a tier with network.
+     * @throws Exception
+     */
     @Test
     public void testTierWithNetwork() throws Exception {
 
@@ -96,7 +100,11 @@ public class TierTest extends TestCase {
         }
 
     }
-    
+
+    /**
+     * Test the creation of a tier from a Dto with no affinity information.
+     * @throws Exception
+     */
     @Test
     public void testTierFromDtoNoAffinity() throws Exception {
 
@@ -106,19 +114,23 @@ public class TierTest extends TestCase {
 
         TierDto tierDto = new TierDto("tier", maximum, minimum, initial, null, "2", "image", "icono", "keypair", "yes");
         Tier tier = tierDto.fromDto("vdc", "envName");
-        
+
         assertEquals(tier.getName(), "tier");
         assertEquals(tier.getMaximumNumberInstances().intValue(), 3);
         assertEquals(tier.getMinimumNumberInstances().intValue(), 1);
         assertEquals(tier.getInitialNumberInstances().intValue(), 2);
-        assertEquals(tier.getFlavour(),"2");
-        assertEquals(tier.getImage(),"image");
-        assertEquals(tier.getIcono(),"icono");
-        assertEquals(tier.getKeypair(),"keypair");
-        assertEquals(tier.getFloatingip(),"yes");
-        assertEquals(tier.getAffinity(),"None");
+        assertEquals(tier.getFlavour(), "2");
+        assertEquals(tier.getImage(), "image");
+        assertEquals(tier.getIcono(), "icono");
+        assertEquals(tier.getKeypair(), "keypair");
+        assertEquals(tier.getFloatingip(), "yes");
+        assertEquals(tier.getAffinity(), "None");
     }
-    
+
+    /**
+     * Test the creation of a tier from a Dto with affinity information.
+     * @throws Exception
+     */
     @Test
     public void testTierFromDtoAffinity() throws Exception {
 
@@ -137,39 +149,44 @@ public class TierTest extends TestCase {
         tierDto.setImage("image");
         tierDto.setKeypair("keypair");
         tierDto.setFloatingip("true");
-        ProductReleaseDto product = new ProductReleaseDto ("product", "version");
-        Set<Attribute> atts = new HashSet<Attribute> ();
+        ProductReleaseDto product = new ProductReleaseDto("product", "version");
+        Set<Attribute> atts = new HashSet<Attribute>();
         atts.add(new Attribute("key", "value"));
         product.setPrivateAttributes(atts);
         tierDto.addProductRelease(product);
         Tier tier = tierDto.fromDto("vdc", "envName");
-        
-   
-        
+
+
         assertEquals(tier.getName(), "tier");
         assertEquals(tier.getMaximumNumberInstances().intValue(), 3);
         assertEquals(tier.getMinimumNumberInstances().intValue(), 1);
         assertEquals(tier.getInitialNumberInstances().intValue(), 2);
-        assertEquals(tier.getFlavour(),"2");
-        assertEquals(tier.getImage(),"image");
-        assertEquals(tier.getIcono(),"icono");
-        assertEquals(tier.getKeypair(),"keypair");
-        assertEquals(tier.getFloatingip(),"true");
-        assertEquals(tier.getAffinity(),"affinity");
+        assertEquals(tier.getFlavour(), "2");
+        assertEquals(tier.getImage(), "image");
+        assertEquals(tier.getIcono(), "icono");
+        assertEquals(tier.getKeypair(), "keypair");
+        assertEquals(tier.getFloatingip(), "true");
+        assertEquals(tier.getAffinity(), "affinity");
         assertEquals(tier.getProductReleases().get(0).getAttributes().size(), 1);
-        
-        
-        TierDto tierDto2 = new TierDto("tier", maximumNumberInstances, minimumNumberInstances, initialNumberInstances, null, "2", "image", "icono", "keypair", "yes", "affinity");
-        tierDto2.addProductRelease(new ProductReleaseDto ());
-        tierDto2.addNetworkDto(new NetworkDto ());
-        
-        assertEquals(tierDto2.getAffinity(),"affinity");
-        assertEquals(tierDto2.getProductReleaseDtos().size(),1);
+
+
+        TierDto tierDto2 = new TierDto("tier", maximumNumberInstances, minimumNumberInstances,
+                initialNumberInstances, null, "2", "image", "icono", "keypair", "yes", "affinity");
+
+        tierDto2.addProductRelease(new ProductReleaseDto());
+        tierDto2.addNetworkDto(new NetworkDto());
+
+        assertEquals(tierDto2.getAffinity(), "affinity");
+        assertEquals(tierDto2.getProductReleaseDtos().size(), 1);
         assertEquals(tierDto2.getNetworksDto().size(), 1);
-       
-        
+
+
     }
 
+    /**
+     * Test the creation of a new Tier Instance.
+     * @throws Exception
+     */
     @Test
     public void testTierInstance() throws Exception {
 
@@ -182,8 +199,8 @@ public class TierTest extends TestCase {
         networkInstance.setIdNetwork("ID");
 
         Tier tier = new Tier("tier", maximum, minimum, initial, null, "2", "image", "icono", "keypair", "yes", null);
-        VM vm = new VM ();
-        vm.setFqn ("services.vees.fqn");
+        VM vm = new VM();
+        vm.setFqn("services.vees.fqn");
         TierInstance tierInst = new TierInstance();
         tierInst.setName("tier");
         tierInst.addNetworkInstance(networkInstance);
@@ -207,24 +224,28 @@ public class TierTest extends TestCase {
                         .get("uuid"));
 
     }
- 
-    
+
+    /**
+     * Test the creation of a Tier instance dto with other information.
+     */
     @Test
-    public void testTierInstanceDtoII () {
-    	List<ProductInstanceDto> productInstanceDtos = new ArrayList ();
-    	TierInstanceDto tierInstanceDto = new TierInstanceDto ("tiername", 1, productInstanceDtos);
-    	tierInstanceDto.addProductInstanceDto(new ProductInstanceDto ());
-    	tierInstanceDto.setAttributes(new HashSet<Attribute> ());
-    	assertEquals (tierInstanceDto.getReplicaNumber(), 1);
-    	assertEquals (tierInstanceDto.getTierInstanceName(), "tiername");
-    	assertEquals (tierInstanceDto.getProductInstanceDtos().size(),1);
+    public void testTierInstanceDtoII() {
+        List<ProductInstanceDto> productInstanceDtos = new ArrayList();
+        TierInstanceDto tierInstanceDto = new TierInstanceDto("tiername", 1, productInstanceDtos);
+        tierInstanceDto.addProductInstanceDto(new ProductInstanceDto());
+        tierInstanceDto.setAttributes(new HashSet<Attribute>());
+        assertEquals(tierInstanceDto.getReplicaNumber(), 1);
+        assertEquals(tierInstanceDto.getTierInstanceName(), "tiername");
+        assertEquals(tierInstanceDto.getProductInstanceDtos().size(), 1);
     }
-    
-    
+
+    /**
+     * Test the creation of a tierPDto.
+     */
     @Test
-    public void testTierPDto () {
-    	TierPDto tierDto = new TierPDto ("tier");
-    	Integer minimumNumberInstances = new Integer(1);
+    public void testTierPDto() {
+        TierPDto tierDto = new TierPDto("tier");
+        Integer minimumNumberInstances = new Integer(1);
         Integer initialNumberInstances = new Integer(2);
         Integer maximumNumberInstances = new Integer(3);
 
@@ -236,19 +257,17 @@ public class TierTest extends TestCase {
         tierDto.setImage("image");
         tierDto.setKeypair("keypair");
         tierDto.setFloatingip("true");
-        
+
         assertEquals(tierDto.getName(), "tier");
         assertEquals(tierDto.getMaximumNumberInstances().intValue(), 3);
         assertEquals(tierDto.getMinimumNumberInstances().intValue(), 1);
         assertEquals(tierDto.getInitialNumberInstances().intValue(), 2);
-        assertEquals(tierDto.getFlavour(),"2");
-        assertEquals(tierDto.getImage(),"image");
-        assertEquals(tierDto.getIcono(),"icono");
-        assertEquals(tierDto.getKeypair(),"keypair");
-        assertEquals(tierDto.getFloatingip(),"true");
+        assertEquals(tierDto.getFlavour(), "2");
+        assertEquals(tierDto.getImage(), "image");
+        assertEquals(tierDto.getIcono(), "icono");
+        assertEquals(tierDto.getKeypair(), "keypair");
+        assertEquals(tierDto.getFloatingip(), "true");
     }
-    
-    
 
 
 }

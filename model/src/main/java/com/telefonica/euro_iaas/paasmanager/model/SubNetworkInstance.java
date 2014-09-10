@@ -39,7 +39,7 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.SubNetworkDto;
 
 /**
  * A sub network.
- * 
+ *
  * @author Henar Munoz
  */
 
@@ -61,9 +61,9 @@ public class SubNetworkInstance {
     private String idSubNet;
 
     private String idNetwork;
-    
+
     private String region;
-    
+
     private String vdc;
 
     private String cidr;
@@ -85,7 +85,7 @@ public class SubNetworkInstance {
         this.name = name;
         this.cidr = "10.100." + 1 + ".0/24";
         this.region = region;
-        this.vdc=vdc;
+        this.vdc = vdc;
     }
 
     /**
@@ -97,8 +97,8 @@ public class SubNetworkInstance {
         this.region = region;
         this.vdc = vdc;
     }
-    
-    public void setId (Long id) {
+
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -124,14 +124,13 @@ public class SubNetworkInstance {
     }
 
 
-
     /**
      * @return the networkName
      */
     public String getName() {
         return name;
     }
-    
+
     public String getRegion() {
         return region;
     }
@@ -193,6 +192,7 @@ public class SubNetworkInstance {
 
     /**
      * To the subnetwork Dto.
+     *
      * @return
      */
     public SubNetworkDto toDto() {
@@ -204,45 +204,50 @@ public class SubNetworkInstance {
 
     /**
      * the json for the OPenstack request.
-     * 
+     *
      * @return
      */
     public String toJson() {
 
-        return "{\"subnet\":{" + "      \"name\":\"" + name + "\"," + "      \"network_id\":\"" + this.idNetwork
-        + "\"," + "      \"ip_version\":4,    \"dns_nameservers\": [\"8.8.8.8\"],       \"cidr\":\"" + this.cidr + "\"   }" + "}";
+        return "{\"subnet\":{"
+                + "      \"name\":\"" + name + "\","
+                + "      \"network_id\":\"" + this.idNetwork
+                + "\","
+                + "      \"ip_version\":4,    \"dns_nameservers\": [\"8.8.8.8\"],       \"cidr\":\""
+                + this.cidr + "\"   }"
+                + "}";
     }
 
     /**
      * It obtains the json for adding this subnet into a router.
+     *
      * @return
      */
     public String toJsonAddInterface() {
-        return  "{\"subnet_id\": \"" + getIdSubNet()+ "\" }";
+        return "{\"subnet_id\": \"" + getIdSubNet() + "\" }";
     }
 
     /**
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[SubNetworkInstance]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[idSubNet = ").append(this.idSubNet).append("]");
-       sb.append("[idNetwork = ").append(this.idNetwork).append("]");
-       sb.append("[region = ").append(this.region).append("]");
-       sb.append("[vdc = ").append(this.vdc).append("]");
-       sb.append("[cidr = ").append(this.cidr).append("]");
-       sb.append("[allocationPoolsStart = ").append(this.allocationPoolsStart).append("]");
-       sb.append("[allocationPoolsEnd = ").append(this.allocationPoolsEnd).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[SubNetworkInstance]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[idSubNet = ").append(this.idSubNet).append("]");
+        sb.append("[idNetwork = ").append(this.idNetwork).append("]");
+        sb.append("[region = ").append(this.region).append("]");
+        sb.append("[vdc = ").append(this.vdc).append("]");
+        sb.append("[cidr = ").append(this.cidr).append("]");
+        sb.append("[allocationPoolsStart = ").append(this.allocationPoolsStart).append("]");
+        sb.append("[allocationPoolsEnd = ").append(this.allocationPoolsEnd).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

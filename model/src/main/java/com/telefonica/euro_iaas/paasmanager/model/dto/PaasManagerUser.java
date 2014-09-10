@@ -35,33 +35,40 @@ import org.springframework.security.core.userdetails.User;
  */
 public class PaasManagerUser extends User {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID.
+     */
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
-    /** The tenantId. */
+    /**
+     * The tenantId.
+     */
     private String tenantId = "";
 
-    /** The tenantName. */
+    /**
+     * The tenantName.
+     */
     private String tenantName = "";
 
-    /** The token. */
+    /**
+     * The token.
+     */
     private String token = "";
 
-    /** The username. */
+    /**
+     * The username.
+     */
     private String username = "";
 
     /**
      * Instantiates a new open stack user.
-     * 
-     * @param username
-     *            the username
-     * @param password
-     *            the password
-     * @param authorities
-     *            the authorities
+     *
+     * @param username    the username
+     * @param password    the password
+     * @param authorities the authorities
      */
     public PaasManagerUser(final String username, final String password,
-            final Collection<? extends GrantedAuthority> authorities) {
+                           final Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.token = password;
         this.username = username;
@@ -90,8 +97,7 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param token
-     *            the token to set
+     * @param token the token to set
      */
     public void setToken(String token) {
         this.token = token;
@@ -105,8 +111,7 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param tenantId
-     *            the tenantId to set
+     * @param tenantId the tenantId to set
      */
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -120,8 +125,7 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param tenantName
-     *            the tenantName to set
+     * @param tenantName the tenantName to set
      */
     public void setTenantName(String tenantName) {
         this.tenantName = tenantName;
@@ -135,8 +139,7 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param username
-     *            the username to set
+     * @param username the username to set
      */
     public void setUsername(String username) {
         this.username = username;
@@ -146,18 +149,18 @@ public class PaasManagerUser extends User {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[PaasManagerUser]");
-       sb.append("[tenantId = ").append(this.tenantId).append("]");
-       sb.append("[tenantName = ").append(this.tenantName).append("]");
-       sb.append("[token = ").append(this.token).append("]");
-       sb.append("[username = ").append(this.username).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[PaasManagerUser]");
+        sb.append("[tenantId = ").append(this.tenantId).append("]");
+        sb.append("[tenantName = ").append(this.tenantName).append("]");
+        sb.append("[token = ").append(this.token).append("]");
+        sb.append("[username = ").append(this.username).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

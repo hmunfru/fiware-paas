@@ -74,7 +74,9 @@ public class EnvironmentInstance extends InstallableInstance {
 
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "environmentInstance_has_tierInstances", joinColumns = {@JoinColumn(name = "environmentinstance_ID", nullable = false, updatable = false)}, inverseJoinColumns = {@JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false)})
+    @JoinTable(name = "environmentInstance_has_tierInstances",
+            joinColumns = {@JoinColumn(name = "environmentinstance_ID", nullable = false, updatable = false) },
+            inverseJoinColumns = {@JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) })
     private List<TierInstance> tierInstances;
 
     @Column(length = 90000)
@@ -367,6 +369,12 @@ public class EnvironmentInstance extends InstallableInstance {
         return envInstanceDto;
     }
 
+    /**
+     * Get the network instances from a network of a tier instance.
+     * @param networkName
+     * @param region
+     * @return
+     */
     public NetworkInstance getNetworkInstanceFromNetwork(String networkName, String region) {
 
         for (TierInstance tierInstance : this.getTierInstances()) {

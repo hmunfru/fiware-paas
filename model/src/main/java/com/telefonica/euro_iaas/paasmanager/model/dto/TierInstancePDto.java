@@ -33,7 +33,7 @@ import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 
 /**
  * The dto for the Tier Instance.
- * 
+ *
  * @author henar
  */
 @XmlRootElement
@@ -55,7 +55,7 @@ public class TierInstancePDto {
 
     /**
      * Constructor.
-     * 
+     *
      * @param tierInstanceName
      * @param productInstanceDtos
      * @param vm
@@ -63,7 +63,7 @@ public class TierInstancePDto {
      * @param taskId
      */
     public TierInstancePDto(String tierInstanceName, List<ProductInstanceDto> productInstanceDtos, VMDto vm,
-            Status status, String taskId) {
+                            Status status, String taskId) {
 
         this.tierInstanceName = tierInstanceName;
         this.productInstanceDtos = productInstanceDtos;
@@ -108,19 +108,19 @@ public class TierInstancePDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TierInstancePDto]");
-       sb.append("[tierInstanceName = ").append(this.tierInstanceName).append("]");
-       sb.append("[status = ").append(this.status).append("]");
-       sb.append("[taskId = ").append(this.taskId).append("]");
-       sb.append("[productInstanceDtos = ").append(this.productInstanceDtos).append("]");
-       sb.append("[vm = ").append(this.vm).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TierInstancePDto]");
+        sb.append("[tierInstanceName = ").append(this.tierInstanceName).append("]");
+        sb.append("[status = ").append(this.status).append("]");
+        sb.append("[taskId = ").append(this.taskId).append("]");
+        sb.append("[productInstanceDtos = ").append(this.productInstanceDtos).append("]");
+        sb.append("[vm = ").append(this.vm).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

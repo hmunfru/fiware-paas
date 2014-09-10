@@ -90,7 +90,6 @@ public interface ApplicationInstanceResource {
      * @param name  The name
      * @param callback  The url of the callback to return.
      * @return  A task to follow the execution of the task.
-     * @throws APIException A exception when it cannot be uninstalled.
      */
     @DELETE
     @Path("/{name}")

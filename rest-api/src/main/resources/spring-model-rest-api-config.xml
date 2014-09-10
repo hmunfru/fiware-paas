@@ -78,7 +78,7 @@
 		<property name="tierInstanceManager" ref="tierInstanceManager" />
 		<!-- <property name="tierTypeDao" ref="tierTypeDao"/> -->
 	</bean>
-	<!-- <bean id="tierResource" lazy-init="true" class="com.telefonica.euro_iaas.paasmanager.rest.resources.TierResourceImpl"> 
+    <!-- <bean id="tierResource" lazy-init="true" class="com.telefonica.euro_iaas.paasmanager.rest.resources.TierResourceImpl">
 		</bean> -->
 
 	<aop:config proxy-target-class="true">

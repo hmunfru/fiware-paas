@@ -47,7 +47,7 @@ import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.EnvironmentInst
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.EnvironmentSearchCriteria;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring-test-db-config.xml", "classpath:/spring-dao-config.xml" })
+@ContextConfiguration(locations = {"classpath:/spring-test-db-config.xml", "classpath:/spring-dao-config.xml" })
 public class EnvironmenDaoTest {
 
     @Autowired
@@ -55,17 +55,17 @@ public class EnvironmenDaoTest {
     @Autowired
     EnvironmentInstanceDao environmentInstanceDao;
 
-    public static String ENVIRONMENT_NAME = "ENVIRONMENT_NAME";
-    public static String ORG = "org";
-    public static String VDC = "vdc";
+    public static final String ENVIRONMENT_NAME = "ENVIRONMENT_NAME";
+    public static final String ORG = "org";
+    public static final String VDC = "vdc";
 
     /**
-     * Test the create method
+     * Test the create method.
      */
     @Test
     public void testEnvironmentNoTiers() throws Exception {
 
-    	int num = environmentDao.findAll().size();
+        int num = environmentDao.findAll().size();
         Environment environment = new Environment();
         environment.setName(ENVIRONMENT_NAME);
         environment.setOrg(ORG);
@@ -73,37 +73,37 @@ public class EnvironmenDaoTest {
         environment = environmentDao.create(environment);
         assertNotNull(environment);
         assertNotNull(environment.getId());
-        assertEquals(environmentDao.findAll().size(), num +1 );
+        assertEquals(environmentDao.findAll().size(), num + 1);
 
     }
-    
+
     @Test
     public void testEnvironmentInstNoTiers() throws Exception {
 
-        int num =environmentInstanceDao.findAll().size();
-    	EnvironmentInstance envInst = new EnvironmentInstance ();
+        int num = environmentInstanceDao.findAll().size();
+        EnvironmentInstance envInst = new EnvironmentInstance();
         envInst.setBlueprintName("bluename");
         envInst.setVdc(VDC);
         envInst.setName("env");
         envInst = environmentInstanceDao.create(envInst);
-        
+
         envInst = environmentInstanceDao.load("bluename", VDC);
-        
+
         assertNotNull(envInst);
         assertNotNull(envInst.getId());
-        assertEquals(environmentInstanceDao.findAll().size(), num +1 );
+        assertEquals(environmentInstanceDao.findAll().size(), num + 1);
 
     }
-    
-    @Test(expected=com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
-    public void testProductLoadEnvInstError() throws EntityNotFoundException  {
 
-    	environmentInstanceDao.load("otro","3");
+    @Test(expected = com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
+    public void testProductLoadEnvInstError() throws EntityNotFoundException {
+
+        environmentInstanceDao.load("otro", "3");
     }
 
 
     /**
-     * Test the load method
+     * Test the load method.
      */
     @Test
     public void testLoadNoTiers() throws Exception {
@@ -119,82 +119,83 @@ public class EnvironmenDaoTest {
         assertNotNull(environment.getId());
 
     }
-    
+
     @Test
     public void testFindByCriteria() throws Exception {
 
         Environment environment = new Environment();
-        environment.setName(ENVIRONMENT_NAME+"cri");
+        environment.setName(ENVIRONMENT_NAME + "cri");
         environment.setOrg(ORG);
         environment.setVdc("vdc");
         environment.setDescription("description");
         environment = environmentDao.create(environment);
-        EnvironmentSearchCriteria criteria = new EnvironmentSearchCriteria ();
+        EnvironmentSearchCriteria criteria = new EnvironmentSearchCriteria();
         criteria.setOrg(ORG);
         criteria.setVdc("vdc");
         List<Environment> lEnvironment = environmentDao.findByCriteria(criteria);
         assertNotNull(lEnvironment);
-        assertEquals (lEnvironment.size (), 1);
+        assertEquals(lEnvironment.size(), 1);
 
     }
-    
+
     @Test
     public void testFindEnvInstByCriteria() throws Exception {
 
         Environment environment = new Environment();
-        environment.setName(ENVIRONMENT_NAME+"cri");
+        environment.setName(ENVIRONMENT_NAME + "cri");
         environment.setOrg(ORG);
         environment.setVdc("vdc");
         environment.setDescription("description");
         environment = environmentDao.create(environment);
-        EnvironmentInstance envInst = new EnvironmentInstance ();
+        EnvironmentInstance envInst = new EnvironmentInstance();
         envInst.setBlueprintName("bluename2");
         envInst.setVdc(VDC);
         envInst.setName("env");
         envInst.setEnvironment(environment);
         envInst = environmentInstanceDao.create(envInst);
-        
-        EnvironmentInstanceSearchCriteria criteria = new EnvironmentInstanceSearchCriteria ();
+
+        EnvironmentInstanceSearchCriteria criteria = new EnvironmentInstanceSearchCriteria();
         criteria.setEnvironment(environment);
         criteria.setVdc(VDC);
         criteria.setEnviromentName("bluename2");
         List<EnvironmentInstance> lEnvironment = environmentInstanceDao.findByCriteria(criteria);
         assertNotNull(lEnvironment);
-        assertEquals (lEnvironment.size (), 1);
+        assertEquals(lEnvironment.size(), 1);
 
     }
-    
+
     @Test
     public void testFindByCriteriaWithEnv() throws Exception {
 
         Environment environment = new Environment();
-        environment.setName(ENVIRONMENT_NAME+"critev");
+        environment.setName(ENVIRONMENT_NAME + "critev");
         environment.setOrg(ORG);
         environment.setVdc("vdc");
         environment.setDescription("description");
         environment = environmentDao.create(environment);
-        EnvironmentSearchCriteria criteria = new EnvironmentSearchCriteria ();
+        EnvironmentSearchCriteria criteria = new EnvironmentSearchCriteria();
         criteria.setOrg(ORG);
         criteria.setVdc("vdc");
-        criteria.setEnvironmentName(ENVIRONMENT_NAME+"critev");
+        criteria.setEnvironmentName(ENVIRONMENT_NAME + "critev");
         List<Environment> lEnvironment = environmentDao.findByCriteria(criteria);
         assertNotNull(lEnvironment);
-        assertEquals (lEnvironment.size (), 1);
+        assertEquals(lEnvironment.size(), 1);
 
     }
 
     /**
-     * Test the load method
-     * @throws AlreadyExistsEntityException 
-     * @throws InvalidEntityException 
-     * 
+     * Test the load method.
+     *
      * @throws AlreadyExistsEntityException
      * @throws InvalidEntityException
-     * @throws EntityNotFoundException 
+     * @throws AlreadyExistsEntityException
+     * @throws InvalidEntityException
+     * @throws EntityNotFoundException
      * @throws EntityNotFoundException
      */
     @Test(expected = EntityNotFoundException.class)
-    public void testDeleteNoTiers() throws InvalidEntityException, AlreadyExistsEntityException, EntityNotFoundException {
+    public void testDeleteNoTiers() throws InvalidEntityException, AlreadyExistsEntityException,
+            EntityNotFoundException {
 
         Environment environment = new Environment();
         environment.setName(ENVIRONMENT_NAME);

@@ -54,7 +54,7 @@ public interface ApplicationReleaseManager {
     List<ApplicationRelease> findAll();
 
     /**
-     * Retrieve the applicationReselease followiong the established criteria
+     * Retrieve the applicationReselease followiong the established criteria.
      * 
      * @param criteria
      * @return

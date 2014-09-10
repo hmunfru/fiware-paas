@@ -32,8 +32,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represents an artifact to be installed on a ProductRelease
- * 
+ * Represents an artifact to be installed on a ProductRelease.
+ *
  * @author Henar Mu�oz
  * @version $Id: $
  */
@@ -52,7 +52,7 @@ public class TierPDto {
     private List<ProductReleaseDto> productReleaseDtos;
 
     private String icono;
-    private String security_group;
+    private String securityGroup;
     private String keypair;
     private String floatingip;
     private String region;
@@ -60,18 +60,38 @@ public class TierPDto {
     private List<TierInstancePDto> tierInstancePDto;
 
     /**
-     * Default Constructor
+     * Default Constructor.
      */
     public TierPDto() {
     }
 
+    /**
+     * Constructor.
+     * @param name
+     */
     public TierPDto(String name) {
         this.name = name;
     }
 
+    /**
+     * Constructor with complete information about the product.
+     * @param name
+     * @param maximumNumberInstances
+     * @param minimumNumberInstances
+     * @param initialNumberInstances
+     * @param productReleaseDtos
+     * @param flavour
+     * @param image
+     * @param icono
+     * @param securityGroup
+     * @param keypair
+     * @param floatingip
+     * @param region
+     */
     public TierPDto(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos, String flavour, String image,
-            String icono, String security_group, String keypair, String floatingip, String region) {
+                    Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos,
+                    String flavour, String image, String icono, String securityGroup, String keypair,
+                    String floatingip, String region) {
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
         this.minimumNumberInstances = minimumNumberInstances;
@@ -80,7 +100,7 @@ public class TierPDto {
         this.flavour = flavour;
         this.image = image;
         this.icono = icono;
-        this.security_group = security_group;
+        this.securityGroup = securityGroup;
         this.keypair = keypair;
         this.floatingip = floatingip;
         this.region = region;
@@ -122,40 +142,35 @@ public class TierPDto {
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @param maximumNumberInstances
-     *            the maximumNumberInstances to set
+     * @param maximumNumberInstances the maximumNumberInstances to set
      */
     public void setMaximumNumberInstances(Integer maximumNumberInstances) {
         this.maximumNumberInstances = maximumNumberInstances;
     }
 
     /**
-     * @param minimumNumberInstances
-     *            the minimumNumberInstances to set
+     * @param minimumNumberInstances the minimumNumberInstances to set
      */
     public void setMinimumNumberInstances(Integer minimumNumberInstances) {
         this.minimumNumberInstances = minimumNumberInstances;
     }
 
     /**
-     * @param initialNumberInstances
-     *            the initialNumberInstances to set
+     * @param initialNumberInstances the initialNumberInstances to set
      */
     public void setInitialNumberInstances(Integer initialNumberInstances) {
         this.initialNumberInstances = initialNumberInstances;
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param flavour the name to set
      */
     public void setFlavour(String flavour) {
         this.flavour = flavour;
@@ -174,25 +189,37 @@ public class TierPDto {
     }
 
     /**
-     * @param productReleases
-     *            the productReleases to set
+     * @param productReleaseDtos the productReleases to set
      */
     public void setProductReleaseDtos(List<ProductReleaseDto> productReleaseDtos) {
         this.productReleaseDtos = productReleaseDtos;
     }
 
+    /**
+     * Add a new product release.
+     * @param productReleaseDto
+     */
     public void addProductRelease(ProductReleaseDto productReleaseDto) {
-        if (this.productReleaseDtos == null)
+        if (this.productReleaseDtos == null) {
             productReleaseDtos = new ArrayList();
+        }
 
         productReleaseDtos.add(productReleaseDto);
     }
 
+    /**
+     * Delete a Product Release.
+     * @param productReleaseDto
+     */
     public void removeProductRelease(ProductReleaseDto productReleaseDto) {
 
         productReleaseDtos.remove(productReleaseDto);
     }
 
+    /**
+     * Set a new set of Tier instances.
+     * @param tierInstancePDto
+     */
     public void setTierInstances(List<TierInstancePDto> tierInstancePDto) {
         this.tierInstancePDto = tierInstancePDto;
     }
@@ -201,13 +228,22 @@ public class TierPDto {
         return this.tierInstancePDto;
     }
 
+    /**
+     * Add a new Tier instance.
+     * @param tierInstacesDto
+     */
     public void addTierInstance(TierInstancePDto tierInstacesDto) {
-        if (this.tierInstancePDto == null)
+        if (this.tierInstancePDto == null) {
             tierInstancePDto = new ArrayList();
+        }
 
         tierInstancePDto.add(tierInstacesDto);
     }
 
+    /**
+     * Remove a Tier instance.
+     * @param tierInstacesDto
+     */
     public void removeTierInstances(TierInstancePDto tierInstacesDto) {
 
         tierInstancePDto.remove(tierInstacesDto);
@@ -221,12 +257,12 @@ public class TierPDto {
         return this.icono;
     }
 
-    public void setSecurity_group(String security_group) {
-        this.security_group = security_group;
+    public void setSecurityGroup(String securityGroup) {
+        this.securityGroup = securityGroup;
     }
 
-    public String getSecurity_group() {
-        return this.security_group;
+    public String getSecurityGroup() {
+        return this.securityGroup;
     }
 
     public void setKeypair(String keypair) {
@@ -249,28 +285,27 @@ public class TierPDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TierPDto]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[flavour = ").append(this.flavour).append("]");
-       sb.append("[image = ").append(this.image).append("]");
-       sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
-       sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
-       sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
-       sb.append("[productReleaseDtos = ").append(this.productReleaseDtos).append("]");
-       sb.append("[icono = ").append(this.icono).append("]");
-       sb.append("[security_group = ").append(this.security_group).append("]");
-       sb.append("[keypair = ").append(this.keypair).append("]");
-       sb.append("[floatingip = ").append(this.floatingip).append("]");
-       sb.append("[region = ").append(this.region).append("]");
-       sb.append("[tierInstancePDto = ").append(this.tierInstancePDto).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TierPDto]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[flavour = ").append(this.flavour).append("]");
+        sb.append("[image = ").append(this.image).append("]");
+        sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
+        sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
+        sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
+        sb.append("[productReleaseDtos = ").append(this.productReleaseDtos).append("]");
+        sb.append("[icono = ").append(this.icono).append("]");
+        sb.append("[security_group = ").append(this.securityGroup).append("]");
+        sb.append("[keypair = ").append(this.keypair).append("]");
+        sb.append("[floatingip = ").append(this.floatingip).append("]");
+        sb.append("[region = ").append(this.region).append("]");
+        sb.append("[tierInstancePDto = ").append(this.tierInstancePDto).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

@@ -58,6 +58,7 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Initialize the Unit Test.
+     *
      * @throws EntityNotFoundException
      * @throws InvalidEntityException
      */
@@ -73,6 +74,7 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Test the installation of an application instance.
+     *
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
@@ -95,6 +97,7 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Test the exception in the installation of an application instance.
+     *
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
@@ -116,6 +119,7 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Test the uninstall an application.
+     *
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
@@ -123,8 +127,8 @@ public class AppInstanceResourceValidatorImplTest {
      */
     @Test
     public void testCheckValidateUnInstall()
-        throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException, EntityNotFoundException,
-               com.telefonica.euro_iaas.commons.dao.InvalidEntityException {
+            throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException, EntityNotFoundException,
+            com.telefonica.euro_iaas.commons.dao.InvalidEntityException {
 
         // given
 

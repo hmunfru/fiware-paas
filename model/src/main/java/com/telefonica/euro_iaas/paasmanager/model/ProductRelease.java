@@ -38,7 +38,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -53,7 +52,7 @@ import net.sf.json.JSONObject;
 
 /**
  * A product release is a concrete version of a given product.
- * 
+ *
  * @author Jesus M. Movilla
  */
 
@@ -82,13 +81,13 @@ public class ProductRelease {
     private String product;
     @Column(nullable = false, length = 256)
     private String version;
-    
+
     @Column(length = 2048)
     private String description;
     @Column(length = 256)
     private String tierName = "";
-    
-    @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Attribute> attributes = null;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -120,7 +119,7 @@ public class ProductRelease {
 
     /**
      * Constructor.
-     * 
+     *
      * @param product
      * @param version
      * @param object2
@@ -153,7 +152,7 @@ public class ProductRelease {
 
     /**
      * Add an attribute to the product release.
-     * 
+     *
      * @param attribute
      */
     public void addAttribute(Attribute attribute) {
@@ -165,7 +164,7 @@ public class ProductRelease {
 
     /**
      * Add a metadata.
-     * 
+     *
      * @param metadata
      */
     public void addMetadata(Metadata metadata) {
@@ -177,9 +176,8 @@ public class ProductRelease {
 
     /**
      * Add a transitable release.
-     * 
-     * @param transitableRelease
-     *            the new release.
+     *
+     * @param transitableRelease the new release.
      */
     public void addTransitableRelease(ProductRelease transitableRelease) {
         if (transitableReleases == null) {
@@ -212,7 +210,7 @@ public class ProductRelease {
         return true;
     }
 
-    
+
     private JSONObject formatJsonArray(JSONObject productJson, String tag) {
         String stringProductJson = productJson.toString();
         if (stringProductJson.contains("\"" + tag + "\":{")) {
@@ -228,7 +226,7 @@ public class ProductRelease {
 
     /**
      * the json.
-     * 
+     *
      * @param jsonNode
      */
     public void fromSdcJson(JSONObject jsonNode) {
@@ -254,7 +252,7 @@ public class ProductRelease {
             setAttributes(attributes);
         }
 
-     // Attributes
+        // Attributes
         if (productJson.containsKey("metadatas")) {
             Set<Metadata> metadatas = new HashSet<Metadata>();
             productJson = formatJsonArray(productJson, "metadatas");
@@ -284,7 +282,7 @@ public class ProductRelease {
 
     /**
      * Get the attribute with the key.
-     * 
+     *
      * @param key
      * @return
      */
@@ -323,7 +321,7 @@ public class ProductRelease {
 
     /**
      * Get the metadata from the key.
-     * 
+     *
      * @param key
      * @return
      */
@@ -343,9 +341,9 @@ public class ProductRelease {
      * @return the metadatas
      */
     public Set<Metadata> getMetadatas() {
-    	if (metadatas == null) {
-    		metadatas = new HashSet<Metadata> ();
-    	}
+        if (metadatas == null) {
+            metadatas = new HashSet<Metadata>();
+        }
         return metadatas;
     }
 
@@ -390,16 +388,16 @@ public class ProductRelease {
     public Boolean getWithArtifact() {
         return withArtifact;
     }
-    
+
     /**
      * @return the tierName
      */
-    
+
     public String getTierName() {
         return this.tierName;
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -409,48 +407,42 @@ public class ProductRelease {
     }
 
     /**
-     * @param attributes
-     *            the attributes to set
+     * @param attributes the attributes to set
      */
     public void setAttributes(Set<Attribute> attributes) {
         this.attributes = attributes;
     }
 
     /**
-     * @param description
-     *            the description to set
+     * @param description the description to set
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * @param metadatas
-     *            the metadatas to set
+     * @param metadatas the metadatas to set
      */
     public void setMetadatas(Set<Metadata> metadatas) {
         this.metadatas = metadatas;
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @param product
-     *            the product to set
+     * @param product the product to set
      */
     public void setProduct(String product) {
         this.product = product;
@@ -458,48 +450,43 @@ public class ProductRelease {
 
 
     /**
-     * @param supportedOOSS
-     *            the supportedOOSS to set
+     * @param supportedOOSS the supportedOOSS to set
      */
     public void setSupportedOOSS(List<OS> supportedOOSS) {
         this.supportedOOSS = supportedOOSS;
     }
 
     /**
-     * @param transitableReleases
-     *            the transitableReleases to set
+     * @param transitableReleases the transitableReleases to set
      */
     public void setTransitableReleases(List<ProductRelease> transitableReleases) {
         this.transitableReleases = transitableReleases;
     }
 
     /**
-     * @param version
-     *            the version to set
+     * @param version the version to set
      */
     public void setVersion(String version) {
         this.version = version;
     }
 
     /**
-     * @param withArtifact
-     *            the withArtifact to set
+     * @param withArtifact the withArtifact to set
      */
     public void setWithArtifact(Boolean withArtifact) {
         this.withArtifact = withArtifact;
     }
-    
+
     /**
-     * @param tierName
-     *            the tierName to set
+     * @param tierName the tierName to set
      */
     public void setTierName(String tierName) {
         this.tierName = tierName;
     }
-    
+
     /**
      * the dto representation.
-     * 
+     *
      * @return
      */
     public ProductReleaseDto toDto() {
@@ -523,26 +510,25 @@ public class ProductRelease {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[ProductRelease]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[product = ").append(this.product).append("]");
-       sb.append("[version = ").append(this.version).append("]");
-       sb.append("[description = ").append(this.description).append("]");
-       sb.append("[tierName = ").append(this.tierName).append("]");
-       sb.append("[attributes = ").append(this.attributes).append("]");
-       sb.append("[metadatas = ").append(this.metadatas).append("]");
-       sb.append("[transitableReleases = ").append(this.transitableReleases).append("]");
-       sb.append("[supportedOOSS = ").append(this.supportedOOSS).append("]");
-       sb.append("[withArtifact = ").append(this.withArtifact).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[ProductRelease]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[product = ").append(this.product).append("]");
+        sb.append("[version = ").append(this.version).append("]");
+        sb.append("[description = ").append(this.description).append("]");
+        sb.append("[tierName = ").append(this.tierName).append("]");
+        sb.append("[attributes = ").append(this.attributes).append("]");
+        sb.append("[metadatas = ").append(this.metadatas).append("]");
+        sb.append("[transitableReleases = ").append(this.transitableReleases).append("]");
+        sb.append("[supportedOOSS = ").append(this.supportedOOSS).append("]");
+        sb.append("[withArtifact = ").append(this.withArtifact).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

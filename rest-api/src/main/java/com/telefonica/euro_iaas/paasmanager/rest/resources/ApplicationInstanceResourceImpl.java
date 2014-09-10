@@ -56,7 +56,7 @@ import com.telefonica.euro_iaas.paasmanager.rest.validation.ApplicationInstanceR
 
 /**
  * Default ApplicationInstanceResource implementation.
- * 
+ *
  * @author Jesus M. Movilla
  */
 @Path("/envInst/org/{org}/vdc/{vdc}/environmentInstance/{environmentInstance}/applicationInstance")
@@ -81,11 +81,11 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
     private ApplicationInstanceResourceValidator validator;
 
     /**
-     * 
+     *
      */
     public Task install(String org, String vdc, String environmentInstance,
 
-    ApplicationReleaseDto applicationReleaseDto, String callback) throws APIException {
+                        ApplicationReleaseDto applicationReleaseDto, String callback) throws APIException {
         log.info("Install aplication " + applicationReleaseDto.getApplicationName() + " "
                 + applicationReleaseDto.getVersion() + " on " + " enviornment " + environmentInstance
                 + " with artificats " + applicationReleaseDto.getArtifactsDto().size());
@@ -113,20 +113,21 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
 
     /**
      * Find all application instances installed in a environment instance.
-     * @param page  The page to show the data.
-     * @param pageSize  The size of the information to return.
-     * @param orderBy   The order to be formatted.
-     * @param orderType The type of order to apply.
-     * @param status    The status of the operation.
-     * @param vdc   The id of the vdc.
-     * @param environmentInstance   The id of the environment instance.
-     * @param productInstanceName   the name of the product instance.
-     * @param applicationName   The name of the application.
-     * @return  The list of all application instances.
+     *
+     * @param page                The page to show the data.
+     * @param pageSize            The size of the information to return.
+     * @param orderBy             The order to be formatted.
+     * @param orderType           The type of order to apply.
+     * @param status              The status of the operation.
+     * @param vdc                 The id of the vdc.
+     * @param environmentInstance The id of the environment instance.
+     * @param productInstanceName the name of the product instance.
+     * @param applicationName     The name of the application.
+     * @return The list of all application instances.
      */
     public List<ApplicationInstance> findAll(Integer page, Integer pageSize, String orderBy, String orderType,
-            List<Status> status, String vdc, String environmentInstance, String productInstanceName,
-            String applicationName) {
+                                             List<Status> status, String vdc, String environmentInstance,
+                                             String productInstanceName, String applicationName) {
 
         ApplicationInstanceSearchCriteria criteria = new ApplicationInstanceSearchCriteria();
 
@@ -156,12 +157,13 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
 
     /**
      * Uninstall an specific application in a environment instance.
-     * @param org   The organization.
-     * @param vdc   The VDC.
-     * @param environmentName   The name of the environment.
-     * @param applicationName   The name of the application.
-     * @param callback  The url of the callback to return.
-     * @return  The task to follow the execution of the task.
+     *
+     * @param org             The organization.
+     * @param vdc             The VDC.
+     * @param environmentName The name of the environment.
+     * @param applicationName The name of the application.
+     * @param callback        The url of the callback to return.
+     * @return The task to follow the execution of the task.
      * @throws APIException The exception if the information cannot be found.
      */
 
@@ -172,10 +174,15 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
 
         try {
+<<<<<<< HEAD
 
              validator.validateUnInstall(vdc, environmentName, applicationName);
              log.info("Application validated");
 
+=======
+            validator.validateUnInstall(vdc, environmentName, applicationName);
+            log.info("Application validated");
+>>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         } catch (Exception ex) {
             throw new APIException(ex);
         }
@@ -188,11 +195,9 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
 
     /**
      * Find an applicationinstance by name and vdc.
-     * 
-     * @param vdc
-     *            , the vdc the app belongs to
-     * @param name
-     *            , the applicationInstanceName
+     *
+     * @param vdc  , the vdc the app belongs to
+     * @param name , the applicationInstanceName
      * @return the applicationInstance
      */
     public ApplicationInstance load(String vdc, String enviroment, String name) {
@@ -213,8 +218,7 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
     }
 
     /**
-     * @param validator
-     *            the validator to set
+     * @param validator the validator to set
      */
     public void setValidator(ApplicationInstanceResourceValidator validator) {
         this.validator = validator;

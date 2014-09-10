@@ -33,6 +33,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 
+/**
+ * Class environment instance pdto.
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentInstancePDto {
@@ -132,6 +135,10 @@ public class EnvironmentInstancePDto {
         this.tierDto = tierPDtos;
     }
 
+    /**
+     * Add a new tier to the tierpdto.
+     * @param tierPDto
+     */
     public void addTiers(TierPDto tierPDto) {
         if (tierDto == null) {
             tierDto = new ArrayList();

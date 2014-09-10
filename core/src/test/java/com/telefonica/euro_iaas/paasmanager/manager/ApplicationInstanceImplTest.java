@@ -35,14 +35,9 @@ import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.ApplicationInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ApplicationReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ArtifactDao;
-import com.telefonica.euro_iaas.paasmanager.dao.ProductInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
-import com.telefonica.euro_iaas.paasmanager.dao.TierDao;
-import com.telefonica.euro_iaas.paasmanager.exception.ProductReleaseNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.installator.ProductInstallator;
 import com.telefonica.euro_iaas.paasmanager.manager.impl.ApplicationInstanceManagerImpl;
-import com.telefonica.euro_iaas.paasmanager.manager.impl.ProductInstanceManagerImpl;
-import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.ApplicationInstance;
@@ -56,13 +51,11 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
-import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 
 
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 
@@ -93,8 +86,8 @@ public class ApplicationInstanceImplTest extends TestCase {
     public void setUp() throws Exception {
 
         applicationInstanceDao = mock(ApplicationInstanceDao.class);
-        applicationReleaseDao = mock (ApplicationReleaseDao.class);
-        artifactDao = mock (ArtifactDao.class);
+        applicationReleaseDao = mock(ApplicationReleaseDao.class);
+        artifactDao = mock(ArtifactDao.class);
         productInstallator = mock(ProductInstallator.class);
         productReleaseDao = mock(ProductReleaseDao.class);
 
@@ -107,12 +100,12 @@ public class ApplicationInstanceImplTest extends TestCase {
         manager.setProductReleaseDao(productReleaseDao);
 
         ProductRelease product = new ProductRelease("product", "version");
-        Artifact artifact = new Artifact ("arti", "version",product  );
-        List<Artifact> arts = new ArrayList ();
+        Artifact artifact = new Artifact("arti", "version", product);
+        List<Artifact> arts = new ArrayList();
         arts.add(artifact);
-        appRelease =  new ApplicationRelease("product", "2.0");
+        appRelease = new ApplicationRelease("product", "2.0");
         appRelease.setArtifacts(arts);
-        
+
         Tier tier = new Tier();
         tier.setInitialNumberInstances(new Integer(1));
         tier.setMaximumNumberInstances(new Integer(5));
@@ -120,8 +113,8 @@ public class ApplicationInstanceImplTest extends TestCase {
         tier.setName("tierName");
         tier.addProductRelease(product);
         tier.setRegion("region1");
-        tier.addNetwork(new Network ("uno", "VDC", "region1"));
-        
+        tier.addNetwork(new Network("uno", "VDC", "region1"));
+
         Set<Tier> tiers = new HashSet<Tier>();
         tiers.add(tier);
 
@@ -136,7 +129,7 @@ public class ApplicationInstanceImplTest extends TestCase {
         productInstance.setStatus(Status.INSTALLED);
         productInstance.setName("name");
         productInstance.setVdc("vdc");
-        
+
         List<ProductInstance> productInstances = new ArrayList<ProductInstance>();
         productInstances.add(productInstance);
 
@@ -157,81 +150,115 @@ public class ApplicationInstanceImplTest extends TestCase {
         environmentInstance.setBlueprintName("blue");
         environmentInstance.setStatus(Status.INSTALLED);
         environmentInstance.setEnvironment(environment);
-         
-        when (productReleaseDao.load( any(String.class))).thenReturn(product);
-        when (applicationReleaseDao.create( any(ApplicationRelease.class))).thenReturn(appRelease);
-        when (artifactDao.load(any(String.class))).thenReturn(artifact);
-      
+
+        when(productReleaseDao.load(any(String.class))).thenReturn(product);
+        when(applicationReleaseDao.create(any(ApplicationRelease.class))).thenReturn(appRelease);
+        when(artifactDao.load(any(String.class))).thenReturn(artifact);
+
         data = mock(ClaudiaData.class);
         PaasManagerUser user = mock(PaasManagerUser.class);
-        
-    
-
-        when (data.getUser()).thenReturn(user);
-        when (data.getOrg()).thenReturn("FIWARE");
-        when (data.getService()).thenReturn("deploytm");
-        when (data.getVdc()).thenReturn("vdc");
-        when (user.getToken()).thenReturn("any");
 
 
+        when(data.getUser()).thenReturn(user);
+        when(data.getOrg()).thenReturn("FIWARE");
+        when(data.getService()).thenReturn("deploytm");
+        when(data.getVdc()).thenReturn("vdc");
+        when(user.getToken()).thenReturn("any");
     }
 
+    /**
+     * Test the creation of an applicaiton instance.
+     * @throws Exception
+     */
     @Test
     public void testCreateApplicationInstance() throws Exception {
-        ApplicationInstance appInst = new ApplicationInstance (appRelease, environmentInstance);
-    	when (applicationInstanceDao.create(any(ApplicationInstance.class))).thenReturn(appInst);
-    	when (applicationInstanceDao.load(any(String.class),any(String.class))).thenThrow( EntityNotFoundException.class);
-    	Mockito.doNothing().when ( productInstallator).installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
-    	
+        ApplicationInstance appInst = new ApplicationInstance(appRelease, environmentInstance);
+
+        when(applicationInstanceDao.create(any(ApplicationInstance.class)))
+                .thenReturn(appInst);
+
+        when(applicationInstanceDao.load(any(String.class), any(String.class)))
+                .thenThrow(EntityNotFoundException.class);
+
+        Mockito
+                .doNothing()
+                .when(productInstallator)
+                .installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
+
         ApplicationInstance appInstanceCreated = manager.install(data, environmentInstance, appRelease);
-        assertNotNull (appInstanceCreated);
-        assertEquals(appInstanceCreated.getName(), appRelease.getName()+"-"+ environmentInstance.getBlueprintName());    
+        assertNotNull(appInstanceCreated);
+        assertEquals(
+                appInstanceCreated.getName(),
+                appRelease.getName() + "-" + environmentInstance.getBlueprintName());
 
     }
-    
+
+    /**
+     * Test the deletion of an application instance.
+     * @throws Exception
+     */
     @Test
     public void testDeleteApplicationInstance() throws Exception {
-        ApplicationInstance appInst = new ApplicationInstance (appRelease, environmentInstance);
-        
-    	when (applicationInstanceDao.create(any(ApplicationInstance.class))).thenReturn(appInst);
-    	when (applicationInstanceDao.load(any(String.class),any(String.class))).thenThrow( EntityNotFoundException.class);
-    	Mockito.doNothing().when ( productInstallator).installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
-    	
+        ApplicationInstance appInst = new ApplicationInstance(appRelease, environmentInstance);
+
+        when(applicationInstanceDao.create(any(ApplicationInstance.class)))
+                .thenReturn(appInst);
+
+        when(applicationInstanceDao.load(any(String.class), any(String.class)))
+                .thenThrow(EntityNotFoundException.class);
+
+        Mockito
+                .doNothing()
+                .when(productInstallator)
+                .installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
+
         manager.uninstall(data, environmentInstance, appInst);
-        
+
 
     }
-    
+
+    /**
+     * Test the loading of an application instance.
+     * @throws Exception
+     */
     @Test
     public void testLoadApplicationInstance() throws Exception {
-        ApplicationInstance appInst = new ApplicationInstance (appRelease, environmentInstance);
-    	when (applicationInstanceDao.create(any(ApplicationInstance.class))).thenReturn(appInst);
-    	when (applicationInstanceDao.load(any(String.class),any(String.class))).thenReturn(appInst);
-    	Mockito.doNothing().when ( productInstallator).installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
-    	
-    	appInst = manager.load( data.getVdc(), appInst.getName());
-    	assertNotNull (appInst);
-        assertEquals(appInst.getName(), appRelease.getName()+"-"+ environmentInstance.getBlueprintName());  
-        
+        ApplicationInstance appInst = new ApplicationInstance(appRelease, environmentInstance);
+        when(applicationInstanceDao.create(any(ApplicationInstance.class))).thenReturn(appInst);
+        when(applicationInstanceDao.load(any(String.class), any(String.class))).thenReturn(appInst);
+
+        Mockito
+                .doNothing()
+                .when(productInstallator)
+                .installArtifact(any(ClaudiaData.class), any(ProductInstance.class), any(Artifact.class));
+
+        appInst = manager.load(data.getVdc(), appInst.getName());
+        assertNotNull(appInst);
+        assertEquals(appInst.getName(), appRelease.getName() + "-" + environmentInstance.getBlueprintName());
 
     }
-    
+
+    /**
+     * Test the creation of an application instance with different product release.
+     * @throws Exception
+     */
     @Test
     public void testCreateApplicationInstancedifferentProductRelease() throws Exception {
-    	ProductRelease product = new ProductRelease("product2", "version");
-        Artifact artifact = new Artifact ("arti", "version",product  );
-        List<Artifact> arts = new ArrayList ();
+        ProductRelease product = new ProductRelease("product2", "version");
+        Artifact artifact = new Artifact("arti", "version", product);
+        List<Artifact> arts = new ArrayList();
         arts.add(artifact);
-        appRelease =  new ApplicationRelease("product2", "2.0");
+        appRelease = new ApplicationRelease("product2", "2.0");
         appRelease.setArtifacts(arts);
-    	
+
         try {
-        	 manager.install(data, environmentInstance, appRelease);
-        	 fail();
+            manager.install(data, environmentInstance, appRelease);
+            fail();
         } catch (InvalidEntityException e) {
+            // do nothing...
+            assertEquals(true, true);
         }
     }
-
 
 
 }

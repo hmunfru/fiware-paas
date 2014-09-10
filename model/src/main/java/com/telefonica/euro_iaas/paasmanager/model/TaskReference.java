@@ -29,6 +29,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Task reference class.
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TaskReference {
@@ -59,8 +62,7 @@ public class TaskReference {
     }
 
     /**
-     * @param href
-     *            the href to set
+     * @param href the href to set
      */
     public void setHref(String href) {
         this.href = href;
@@ -74,8 +76,7 @@ public class TaskReference {
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
@@ -89,8 +90,7 @@ public class TaskReference {
     }
 
     /**
-     * @param type
-     *            the type to set
+     * @param type the type to set
      */
     public void setType(String type) {
         this.type = type;
@@ -100,17 +100,17 @@ public class TaskReference {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TaskReference]");
-       sb.append("[href = ").append(this.href).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[type = ").append(this.type).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TaskReference]");
+        sb.append("[href = ").append(this.href).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[type = ").append(this.type).append("]");
+        sb.append("]");
+        return sb.toString();
     }
 
-    
+
 }

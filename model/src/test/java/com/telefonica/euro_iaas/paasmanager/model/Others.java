@@ -66,6 +66,10 @@ public class Others {
         assertEquals(claudiaData.getUser().getTenantName(), "FIWARE");
     }
 
+    /**
+     * Test the creation of a task.
+     * @throws Exception
+     */
     @Test
     public void testTasks() throws Exception {
 
@@ -91,6 +95,10 @@ public class Others {
 
     }
 
+    /**
+     * Test the creation of a Task with tier information.
+     * @throws Exception
+     */
     @Test
     public void testTasksII() throws Exception {
 
@@ -107,6 +115,10 @@ public class Others {
 
     }
 
+    /**
+     * Test the creation of a Task with an error message.
+     * @throws Exception
+     */
     @Test
     public void testTaskError() throws Exception {
 
@@ -124,6 +136,10 @@ public class Others {
 
     }
 
+    /**
+     * Test the creation of a error task with a reference.
+     * @throws Exception
+     */
     @Test
     public void testTaskReference() throws Exception {
 
@@ -139,6 +155,10 @@ public class Others {
 
     }
 
+    /**
+     * Test the creation of a error task with no reference.
+     * @throws Exception
+     */
     @Test
     public void testTaskReferenceII() throws Exception {
 

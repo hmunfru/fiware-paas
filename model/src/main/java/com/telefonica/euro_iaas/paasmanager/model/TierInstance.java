@@ -47,7 +47,7 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 
 /**
  * Represents an instance of a tier.
- * 
+ *
  * @author Jesus M. Movilla
  * @version $Id: $
  */
@@ -59,11 +59,15 @@ public class TierInstance extends InstallableInstance {
     @ManyToOne
     private Tier tier;
 
-    /** the vmOVF. ***/
+    /**
+     * the vmOVF. **
+     */
     @Column(length = 100000)
     private String ovf = "";
 
-    /** the VAPP. ***/
+    /**
+     * the VAPP. **
+     */
     @Column(length = 10000)
     private String vapp = "";
     private String taskId = "";
@@ -74,11 +78,17 @@ public class TierInstance extends InstallableInstance {
     private VM vm;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tierinstance_has_productinstances", joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "productinstance_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tierinstance_has_productinstances",
+            joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "productinstance_ID", nullable = false, updatable = false) })
+
     private List<ProductInstance> productInstances;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tierinstance_has_networkinstance", joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "networkinstance_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tierinstance_has_networkinstance",
+            joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "networkinstance_ID", nullable = false, updatable = false) })
+
     private Set<NetworkInstance> networkInstances;
 
     /**
@@ -159,6 +169,10 @@ public class TierInstance extends InstallableInstance {
         }
     }
 
+    /**
+     * Clone the network instances.
+     * @return
+     */
     public Set<NetworkInstance> cloneNetworkInt() {
         Set<NetworkInstance> netInts = new HashSet<NetworkInstance>();
         for (NetworkInstance netInst : this.getNetworkInstances()) {
@@ -213,27 +227,35 @@ public class TierInstance extends InstallableInstance {
         return taskId;
 
     }
-    
-    public boolean isTherePublicNet () {
-    	for (NetworkInstance net: networkInstances) {
-    		if (net.getNetworkName().equals("Internet")) {
-    			return true;
-    		}
-    	}
-    	return false;
+
+    /**
+     * Check if there is a public network (Internet) in the list of network instances.
+     * @return
+     */
+    public boolean isTherePublicNet() {
+        for (NetworkInstance net : networkInstances) {
+            if (net.getNetworkName().equals("Internet")) {
+                return true;
+            }
+        }
+        return false;
     }
-    
-    public int getNetworkNumberNoPublic () {
-    	int i = 0;
-    	if (networkInstances == null ) {
-    		return 0;
-    	}
-    	for (NetworkInstance net: networkInstances) {
-    		if (!net.getNetworkName().equals("Internet")) {
-    			i ++;
-    		}
-    	}
-    	return i;
+
+    /**
+     * Return the number of no public networks (with name different to Internet).
+     * @return
+     */
+    public int getNetworkNumberNoPublic() {
+        int i = 0;
+        if (networkInstances == null) {
+            return 0;
+        }
+        for (NetworkInstance net : networkInstances) {
+            if (!net.getNetworkName().equals("Internet")) {
+                i++;
+            }
+        }
+        return i;
     }
 
     /**
@@ -273,16 +295,14 @@ public class TierInstance extends InstallableInstance {
     }
 
     /**
-     * @param productInstances
-     *            the productInstances to set
+     * @param productInstances the productInstances to set
      */
     public void setProductInstances(List<ProductInstance> productInstances) {
         this.productInstances = productInstances;
     }
 
     /**
-     * @param networkInstances
-     *            the networkInstances to set
+     * @param networkInstances the networkInstances to set
      */
     public void setNetworkInstance(Set<NetworkInstance> networkInstances) {
         this.networkInstances = networkInstances;
@@ -294,8 +314,7 @@ public class TierInstance extends InstallableInstance {
     }
 
     /**
-     * @param tier
-     *            the tier to set
+     * @param tier the tier to set
      */
     public void setTier(Tier tier) {
         this.tier = tier;
@@ -314,7 +333,7 @@ public class TierInstance extends InstallableInstance {
 
     /**
      * The Dto specification.
-     * 
+     *
      * @return
      */
     public TierInstanceDto toDto() {
@@ -345,7 +364,7 @@ public class TierInstance extends InstallableInstance {
 
     /**
      * to json.
-     * 
+     *
      * @return
      */
     public String toJson(String userData) {
@@ -370,18 +389,18 @@ public class TierInstance extends InstallableInstance {
             payload = payload + "], ";
 
         }
-        
-        if (this.getTier().getAffinity()!="None") {
-        	String id = this.getVM().getFqn().substring(0, this.getVM().getFqn().indexOf(".vee"));
-        	String group = null;
-        	if (this.getTier().getAffinity().equals("anti-affinity")) {
-        		   
-        		group = "\"group\": \""+ id + "\""; 
-        		
-        	} else {
-        		group = "\"group\": \"affinity:"+ id+ "\""; 
-        	}
-        	payload = payload + "\"os:scheduler_hints\": { "+ group + "},";
+
+        if (this.getTier().getAffinity() != "None") {
+            String id = this.getVM().getFqn().substring(0, this.getVM().getFqn().indexOf(".vee"));
+            String group = null;
+            if (this.getTier().getAffinity().equals("anti-affinity")) {
+
+                group = "\"group\": \"" + id + "\"";
+
+            } else {
+                group = "\"group\": \"affinity:" + id + "\"";
+            }
+            payload = payload + "\"os:scheduler_hints\": { " + group + "},";
         }
 
         if (this.getTier().getRegion() != null) {
@@ -389,7 +408,7 @@ public class TierInstance extends InstallableInstance {
             payload += "\"metadata\": {\"region\": \"" + this.getTier().getRegion() + "\"},";
         }
         if (userData != null) {
-            payload += "\"user_data\": \"" + userData +"\",";
+            payload += "\"user_data\": \"" + userData + "\",";
         }
         payload += "\"flavorRef\": \"" + getTier().getFlavour() + "\", " + "\"imageRef\": \"" + getTier().getImage()
                 + "\", " + "\"name\": \"" + name + "\"}}";
@@ -398,7 +417,10 @@ public class TierInstance extends InstallableInstance {
 
     }
 
-
+    /**
+     * Update the Application instance with a new tier.
+     * @param tier2
+     */
     public void update(Tier tier2) {
         tier = tier2;
 
@@ -408,23 +430,22 @@ public class TierInstance extends InstallableInstance {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TierInstance]");
-       sb.append("[tier = ").append(this.tier).append("]");
-       sb.append("[ovf = ").append(this.ovf).append("]");
-       sb.append("[vapp = ").append(this.vapp).append("]");
-       sb.append("[taskId = ").append(this.taskId).append("]");
-       sb.append("[numberReplica = ").append(this.numberReplica).append("]");
-       sb.append("[vm = ").append(this.vm).append("]");
-       sb.append("[productInstances = ").append(this.productInstances).append("]");
-       sb.append("[networkInstances = ").append(this.networkInstances).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TierInstance]");
+        sb.append("[tier = ").append(this.tier).append("]");
+        sb.append("[ovf = ").append(this.ovf).append("]");
+        sb.append("[vapp = ").append(this.vapp).append("]");
+        sb.append("[taskId = ").append(this.taskId).append("]");
+        sb.append("[numberReplica = ").append(this.numberReplica).append("]");
+        sb.append("[vm = ").append(this.vm).append("]");
+        sb.append("[productInstances = ").append(this.productInstances).append("]");
+        sb.append("[networkInstances = ").append(this.networkInstances).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

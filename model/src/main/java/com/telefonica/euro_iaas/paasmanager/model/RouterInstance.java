@@ -35,13 +35,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * A router.
- * 
+ *
  * @author Henar Munoz
  */
 
@@ -60,21 +59,25 @@ public class RouterInstance {
     private String name;
 
     private String idRouter;
-    
+
     private String tenantId;
 
     private String idPublicNetwork;
-    
+
     private boolean adminStateUp;
-    
+
     private String networkId;
 
+    /**
+     * Default constructor.
+     */
     public RouterInstance() {
 
     }
 
     /**
      * Constructor.
+     *
      * @param idPublicNetwork
      */
     public RouterInstance(String idPublicNetwork) {
@@ -84,6 +87,7 @@ public class RouterInstance {
 
     /**
      * Constructor.
+     *
      * @param idPublicNetwork
      * @param name
      */
@@ -105,16 +109,16 @@ public class RouterInstance {
     public String getName() {
         return name;
     }
-    
+
     /**
      * @return the tenantId
      */
     public String getTenantId() {
         return tenantId;
     }
-    
+
     /**
-     * @return the tenantId
+     * Set the tenant id.
      */
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -126,21 +130,21 @@ public class RouterInstance {
     public void setIdRouter(String id) {
         this.idRouter = id;
     }
-    
+
     private void setAdminStateUp(boolean adminStateUp) {
         this.adminStateUp = adminStateUp;
-        
+
     }
-    
+
     private boolean getAdminStateUp() {
         return adminStateUp;
     }
-    
+
     private void setNetworkId(String networkId) {
         this.networkId = networkId;
-        
+
     }
-    
+
     public String getNetworkId() {
         return networkId;
     }
@@ -149,20 +153,26 @@ public class RouterInstance {
      * @return string with the json representation for the request
      */
 
-    public String toJson(){
-        return  "{" +
-        "    \"router\":" +
-        "    {" +
-        "        \"name\": \"" + name + "\"," +
-        "        \"admin_state_up\": true ,"+
-        "        \"external_gateway_info\" : {" +
-        "             \"network_id\": \"" + idPublicNetwork + "\"" +
-        "        }" +
-        "    }" +
-        "}";
+    public String toJson() {
+        return "{"
+                + "    \"router\":"
+                + "    {"
+                + "        \"name\": \"" + name + "\","
+                + "        \"admin_state_up\": true ,"
+                + "        \"external_gateway_info\" : {"
+                + "             \"network_id\": \"" + idPublicNetwork + "\""
+                + "        }"
+                + "    }"
+                + "}";
     }
-    
-    public static RouterInstance fromJson (JSONObject jsonRouter) throws JSONException {
+
+    /**
+     * Constructor from a json message.
+     * @param jsonRouter    The json message.
+     * @return
+     * @throws JSONException
+     */
+    public static RouterInstance fromJson(JSONObject jsonRouter) throws JSONException {
 
         String name = (String) jsonRouter.get("name");
         String id = (String) jsonRouter.get("id");
@@ -170,13 +180,13 @@ public class RouterInstance {
         String tenantId = (String) jsonRouter.get("tenant_id");
         String networkId = "";
         try {
-        JSONObject array = jsonRouter.getJSONObject("external_gateway_info");
-        networkId = (String) array.get("network_id"); }
-        catch (Exception e) {
-        	 if (!(jsonRouter.get("external_gateway_info") == JSONObject.NULL) ) {
-        		 networkId = (String) jsonRouter.get("external_gateway_info"); 
-        	 }
-        	
+            JSONObject array = jsonRouter.getJSONObject("external_gateway_info");
+            networkId = (String) array.get("network_id");
+        } catch (Exception e) {
+            if (!(jsonRouter.get("external_gateway_info") == JSONObject.NULL)) {
+                networkId = (String) jsonRouter.get("external_gateway_info");
+            }
+
         }
 
         RouterInstance router = new RouterInstance();
@@ -184,36 +194,34 @@ public class RouterInstance {
         router.setTenantId(tenantId);
         router.setAdminStateUp(adminStateUp);
         router.setNetworkId(networkId);
-        router.setName (name);
+        router.setName(name);
         return router;
     }
 
-	public void setName(String name2) {
-		this.name=name2;
-		
-	}
+    public void setName(String name2) {
+        this.name = name2;
+
+    }
 
     /**
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[RouterInstance]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[idRouter = ").append(this.idRouter).append("]");
-       sb.append("[tenantId = ").append(this.tenantId).append("]");
-       sb.append("[idPublicNetwork = ").append(this.idPublicNetwork).append("]");
-       sb.append("[adminStateUp = ").append(this.adminStateUp).append("]");
-       sb.append("[networkId = ").append(this.networkId).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[RouterInstance]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[idRouter = ").append(this.idRouter).append("]");
+        sb.append("[tenantId = ").append(this.tenantId).append("]");
+        sb.append("[idPublicNetwork = ").append(this.idPublicNetwork).append("]");
+        sb.append("[adminStateUp = ").append(this.adminStateUp).append("]");
+        sb.append("[networkId = ").append(this.networkId).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-
-   
 
 
 }

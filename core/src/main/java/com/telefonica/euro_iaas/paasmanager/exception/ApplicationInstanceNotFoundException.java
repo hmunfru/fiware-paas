@@ -30,6 +30,10 @@ package com.telefonica.euro_iaas.paasmanager.exception;
 @SuppressWarnings("serial")
 public class ApplicationInstanceNotFoundException extends Exception {
 
+    /**
+     * Constructor.
+     * @param e
+     */
     public ApplicationInstanceNotFoundException(Throwable e) {
         super(e);
     }

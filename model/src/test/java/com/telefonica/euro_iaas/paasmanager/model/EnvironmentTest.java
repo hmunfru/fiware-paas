@@ -38,8 +38,8 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentDto;
 
 public class EnvironmentTest extends TestCase {
 
-    private static String VDC = "vdc";
-    private static String REGION = "region";
+    private static final String VDC = "vdc";
+    private static final String REGION = "region";
 
     @Override
     @Before

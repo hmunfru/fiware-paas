@@ -54,7 +54,6 @@ import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
-import com.telefonica.euro_iaas.paasmanager.util.FileUtils;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
@@ -81,7 +80,8 @@ public class ClaudiaClientOpenStackImplTest {
                 + " xmlns:quantum=\"http://openstack.org/quantum/api/v2.0\" "
                 + "xmlns:router=\"http://docs.openstack.org/ext/quantum/router/api/v1.0\" "
                 + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-                + "<network><status>ACTIVE</status><subnets><subnet>e7118ac1-4aea-49f3-8ebf-383170453fd9</subnet></subnets>"
+                + "<network><status>ACTIVE</status>"
+                + "<subnets><subnet>e7118ac1-4aea-49f3-8ebf-383170453fd9</subnet></subnets>"
                 + "<name>test</name><provider:physical_network xsi:nil=\"true\" />"
                 + "<admin_state_up quantum:type=\"bool\">True</admin_state_up>"
                 + "<tenant_id>08bed031f6c54c9d9b35b42aa06b51c0</tenant_id>"
@@ -101,7 +101,8 @@ public class ClaudiaClientOpenStackImplTest {
                 + " \"admin_state_up\": true, \"tenant_id\": \"67c979f51c5b4e89b85c1f876bdffe31\","
                 + " \"id\": \"08b0bd71-4fc4-4192-af2c-539ad4e02d2f\"}}";
         String expectedNetwork = "{\"network\": {\"status\": \"ACTIVE\", \"subnets\": [], \"name\": \"network-demo\","
-                + " \"router:external\": false, \"tenant_id\": \"67c979f51c5b4e89b85c1f876bdffe31\", \"admin_state_up\": false,"
+                + " \"router:external\": false, \"tenant_id\": \"67c979f51c5b4e89b85c1f876bdffe31\","
+                + " \"admin_state_up\": false,"
                 + " \"shared\": false, \"id\": \"d8023576-7743-4f98-8089-a1ccc60b5ec2\"}}";
         PaasManagerUser user = new PaasManagerUser("username", "myToken", new HashSet<GrantedAuthority>());
         user.setTenantName("FIWARE");
@@ -114,12 +115,12 @@ public class ClaudiaClientOpenStackImplTest {
 
         tier.setName("prueba");
         tier.setKeypair("jesusmovilla");
-        
-        claudiaClientOpenStack  = new ClaudiaClientOpenStackImpl ();
+
+        claudiaClientOpenStack = new ClaudiaClientOpenStackImpl();
 
         openStackUtil = mock(OpenStackUtil.class);
-        networkInstanceManager = mock (NetworkInstanceManager.class);
-        openStackRegion = mock (OpenStackRegion.class);
+        networkInstanceManager = mock(NetworkInstanceManager.class);
+        openStackRegion = mock(OpenStackRegion.class);
         fileUtils = new FileUtilsImpl();
         claudiaClientOpenStack.setNetworkInstanceManager(networkInstanceManager);
         claudiaClientOpenStack.setOpenStackUtil(openStackUtil);
@@ -145,13 +146,13 @@ public class ClaudiaClientOpenStackImplTest {
     @Test
     public void testDeployVMEssex() throws Exception {
 
-        
+
         TierInstance tierInstance = new TierInstance();
         tierInstance.setTier(tier);
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
-        
+
         when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
         when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
 
@@ -160,11 +161,11 @@ public class ClaudiaClientOpenStackImplTest {
         verify(openStackUtil).createServer(any(String.class), anyString(), anyString(), anyString());
 
     }
-    
+
     @Test
     public void testUserData() throws Exception {
 
-        
+
         TierInstance tierInstance = new TierInstance();
         tierInstance.setTier(tier);
         VM vm = new VM();
@@ -174,17 +175,17 @@ public class ClaudiaClientOpenStackImplTest {
         tierInstance.addNetworkInstance(network);
         NetworkInstance network2 = new NetworkInstance("2", "VDC", "REGION");
         tierInstance.addNetworkInstance(network2);
-        
+
         when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
         when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
 
 
         String result = claudiaClientOpenStack.getUserData(claudiaData, tierInstance);
-        assertNotNull (result);
-        System.out.println (result);
+        assertNotNull(result);
+        System.out.println(result);
 
     }
-    
+
     @Test
     public void testDeployVMEGrizzlyNetwork() throws Exception {
 
@@ -193,7 +194,7 @@ public class ClaudiaClientOpenStackImplTest {
         tier.addNetwork(network);
         tierInstance.setTier(tier);
         tierInstance.addNetworkInstance(network.toNetworkInstance());
-        
+
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
@@ -203,19 +204,19 @@ public class ClaudiaClientOpenStackImplTest {
         verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
 
     }
-    
+
     @Test
     public void testDeployVMEGrizzlyNotNetwork() throws Exception {
 
         TierInstance tierInstance = new TierInstance();
         tierInstance.setTier(tier);
-        
+
         Network network = new Network("NETWORK", "VDC", "REGION");
         NetworkInstance netInst = network.toNetworkInstance();
         netInst.setShared(false);
         netInst.setTenantId(claudiaData.getVdc());
         netInst.setIdNetwork("ID");
-        List<NetworkInstance> networkInstances = new ArrayList<NetworkInstance> ();
+        List<NetworkInstance> networkInstances = new ArrayList<NetworkInstance>();
         networkInstances.add(netInst);
 
         VM vm = new VM();
@@ -223,25 +224,29 @@ public class ClaudiaClientOpenStackImplTest {
         tierInstance.setVM(vm);
         when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
         when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
-        when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(networkInstances);
-        when(networkInstanceManager.load(any(String.class),any(String.class),any(String.class))).thenReturn(netInst);
+
+        when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class)))
+                .thenReturn(networkInstances);
+
+        when(networkInstanceManager.load(any(String.class), any(String.class), any(String.class))).thenReturn(netInst);
+
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
-        
+
         verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
 
     }
-    
-    
+
+
     @Test
     public void testDeployVMEGrizzlyNotNetwork2() throws Exception {
 
         TierInstance tierInstance = new TierInstance();
         tierInstance.setTier(tier);
-        
+
         Network network = new Network("NETWORK", "VDC", "REGION");
         NetworkInstance netInst = network.toNetworkInstance();
         netInst.setShared(true);
-        List<NetworkInstance> networkInstances = new ArrayList<NetworkInstance> ();
+        List<NetworkInstance> networkInstances = new ArrayList<NetworkInstance>();
         networkInstances.add(netInst);
 
         VM vm = new VM();
@@ -252,44 +257,49 @@ public class ClaudiaClientOpenStackImplTest {
         netInst2.setDefaultNet(true);
         when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
         when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
-        when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(networkInstances);
-        when(networkInstanceManager.create(any(ClaudiaData.class), any(NetworkInstance.class),any(String.class))).thenReturn(netInst2);
-        
+
+        when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class)))
+                .thenReturn(networkInstances);
+
+        when(networkInstanceManager.create(any(ClaudiaData.class), any(NetworkInstance.class), any(String.class)))
+                .thenReturn(netInst2);
+
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         assertEquals(tierInstance.getNetworkInstances().size(), 1);
-        verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
+        verify(openStackUtil)
+                .createServer(any(String.class), any(String.class), any(String.class), any(String.class));
 
     }
-    
+
     @Test
     public void testGenerateInterfacesFileOneNet() throws Exception {
 
         TierInstance tierInstance = new TierInstance();
-        
+
         Network network = new Network("NETWORK", "VDC", "REGION");
         NetworkInstance netInst = network.toNetworkInstance();
         tierInstance.addNetworkInstance(netInst);
-        
+
         String file = claudiaClientOpenStack.writeInterfaces(tierInstance);
         assertNotNull(file);
-        assertEquals (file, "");
+        assertEquals(file, "");
 
     }
-    
+
     @Test
     public void testGenerateInterfacesFileTwoNet() throws Exception {
 
         TierInstance tierInstance = new TierInstance();
-        
+
         Network network = new Network("NETWORK", "VDC", "REGION");
         NetworkInstance netInst = network.toNetworkInstance();
         tierInstance.addNetworkInstance(netInst);
         tierInstance.addNetworkInstance(new Network("NETWORK2", "VDC", "REGION").toNetworkInstance());
-        
+
         String file = claudiaClientOpenStack.writeInterfaces(tierInstance);
-        System.out.println (file);
+        System.out.println(file);
         assertNotNull(file);
-        
+
 
     }
 

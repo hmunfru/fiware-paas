@@ -24,7 +24,6 @@
 
 package com.telefonica.euro_iaas.paasmanager.model.dto;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,12 +31,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.telefonica.euro_iaas.paasmanager.model.Attribute;
-import com.telefonica.euro_iaas.paasmanager.model.OS;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 
 /**
  * DTO to receive rest request with the product releases objects.
- * 
+ *
  * @author Jesus M. Movilla *
  */
 
@@ -70,6 +68,11 @@ public class ProductReleaseDto {
         this.version = version;
     }
 
+    /**
+     * Constructor.
+     * @param productName   Name of the product.
+     * @param version       Version of the product.
+     */
     public ProductReleaseDto(String productName, String version) {
         this.productName = productName;
         this.version = version;
@@ -118,6 +121,10 @@ public class ProductReleaseDto {
      * this.transitableReleases = transitableReleases; }
      */
 
+    /**
+     * Get a Product Release from the Dto.
+     * @return
+     */
     public ProductRelease fromDto() {
         ProductRelease productRelease = new ProductRelease(this.getProductName(), this.getVersion());
         return productRelease;
@@ -127,19 +134,18 @@ public class ProductReleaseDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[ProductReleaseDto]");
-       sb.append("[productName = ").append(this.productName).append("]");
-       sb.append("[productDescription = ").append(this.productDescription).append("]");
-       sb.append("[version = ").append(this.version).append("]");
-       sb.append("[attributes = ").append(this.attributes).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[ProductReleaseDto]");
+        sb.append("[productName = ").append(this.productName).append("]");
+        sb.append("[productDescription = ").append(this.productDescription).append("]");
+        sb.append("[version = ").append(this.version).append("]");
+        sb.append("[attributes = ").append(this.attributes).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

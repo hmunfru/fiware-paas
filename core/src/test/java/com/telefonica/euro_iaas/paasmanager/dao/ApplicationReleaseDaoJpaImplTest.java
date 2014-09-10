@@ -31,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,162 +46,194 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.ApplicationReleaseSearchCriteria;
 
 /**
- * Unit test for TierDaoJpaImplTest
- * 
+ * Unit test for TierDaoJpaImplTest.
+ *
  * @author Jesus M. Movilla
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/spring-test-db-config.xml", "classpath:/spring-dao-config.xml" })
+@ContextConfiguration(locations = {"classpath:/spring-test-db-config.xml", "classpath:/spring-dao-config.xml" })
 public class ApplicationReleaseDaoJpaImplTest {
 
-    
+
     @Autowired
     private ApplicationReleaseDao applicationReleaseDao;
-    
+
     @Autowired
     private ArtifactDao artifactDao;
-    
+
     @Autowired
     private ProductReleaseDao productReleaseDao;
 
-  
-    public final static String APP_NAME = "app";
-    public final static String VDC = "vdc";
-    public final static String ENV = "env";
+
+    public static final String APP_NAME = "app";
+    public static final String VDC = "vdc";
+    public static final String ENV = "env";
     private ProductRelease product;
 
+    /**
+     * Initialization of the Test case.
+     * @throws AlreadyExistsEntityException
+     */
     @Before
-    public void setUp () throws AlreadyExistsEntityException {
-    	product = new ProductRelease ("product", "version");
-    	product = productReleaseDao.create (product);
+    public void setUp() throws AlreadyExistsEntityException {
+        product = new ProductRelease("product", "version");
+        product = productReleaseDao.create(product);
     }
+
+    /**
+     * Test the creation of an artifact.
+     * @throws Exception
+     */
     @Test
     public void testCreateArtifact() throws Exception {
-    	Artifact artifact = new Artifact ("artifact", "path", product);
-        artifact = artifactDao.create (artifact);
+        Artifact artifact = new Artifact("artifact", "path", product);
+        artifact = artifactDao.create(artifact);
 
         assertNotNull(artifact);
         assertNotNull(artifact.getId());
-        assertEquals (artifact.getName(), "artifact");
-        assertEquals (artifact.getPath(), "path");
+        assertEquals(artifact.getName(), "artifact");
+        assertEquals(artifact.getPath(), "path");
     }
-    
+
+    /**
+     * Test the loading of a specific artifact.
+     * @throws Exception
+     */
     @Test
     public void testLoadArtifact() throws Exception {
-    	Artifact artifact = new Artifact ("artifact2", "path", product);
-    	int num = artifactDao.findAll().size();
-        artifactDao.create (artifact);
-        artifact = artifactDao.load (artifact.getName());
+        Artifact artifact = new Artifact("artifact2", "path", product);
+        int num = artifactDao.findAll().size();
+        artifactDao.create(artifact);
+        artifact = artifactDao.load(artifact.getName());
         assertNotNull(artifact);
         assertNotNull(artifact.getId());
-        assertEquals (artifact.getName(), "artifact2");
-        assertEquals (artifact.getPath(), "path");
-        assertEquals ( artifactDao.findAll().size(), num + 1);
+        assertEquals(artifact.getName(), "artifact2");
+        assertEquals(artifact.getPath(), "path");
+        assertEquals(artifactDao.findAll().size(), num + 1);
     }
-    
-    @Test(expected=EntityNotFoundException.class)
+
+    /**
+     * Test the deletion of an specific artifact.
+     * @throws Exception
+     */
+    @Test(expected = EntityNotFoundException.class)
     public void testDeleteArtifact() throws Exception {
-    	Artifact artifact = new Artifact ("artifact3", "path", product);
-        artifactDao.create (artifact);
+        Artifact artifact = new Artifact("artifact3", "path", product);
+        artifactDao.create(artifact);
         artifactDao.remove(artifact);
-        artifactDao.load (artifact.getName());
+        artifactDao.load(artifact.getName());
 
     }
-    
+
+    /**
+     * Test the creation of an application release.
+     * @throws Exception
+     */
     @Test
     public void testCreateAppRelease() throws Exception {
-    	ApplicationRelease applicationRelease = new ApplicationRelease ("productV", "version");
-    	applicationRelease = applicationReleaseDao.create(applicationRelease);
-        
-       
+        ApplicationRelease applicationRelease = new ApplicationRelease("productV", "version");
+        applicationRelease = applicationReleaseDao.create(applicationRelease);
+
+
         assertNotNull(applicationRelease);
         assertNotNull(applicationRelease.getId());
-        assertEquals (applicationRelease.getName(), "productV");
-        assertEquals (applicationRelease.getVersion(), "version");
+        assertEquals(applicationRelease.getName(), "productV");
+        assertEquals(applicationRelease.getVersion(), "version");
     }
-    
+
+    /**
+     * Test the creation of an application release with an artifact.
+     * @throws Exception
+     */
     @Test
     public void testCreateAppReleaseII() throws Exception {
-    	Artifact artifact = new Artifact ("artifact5", "path", product);
-    	artifact = artifactDao.create (artifact);
-    	ApplicationRelease applicationRelease = new ApplicationRelease ("productII", "version");
-    	List<Artifact> artifacts = new ArrayList<Artifact> ();
-    	artifacts.add(artifact);
-    	applicationRelease.setArtifacts(artifacts);
-    	int num = applicationReleaseDao.findAll().size();
-    	applicationRelease = applicationReleaseDao.create(applicationRelease);
-        
-       
+        Artifact artifact = new Artifact("artifact5", "path", product);
+        artifact = artifactDao.create(artifact);
+        ApplicationRelease applicationRelease = new ApplicationRelease("productII", "version");
+        List<Artifact> artifacts = new ArrayList<Artifact>();
+        artifacts.add(artifact);
+        applicationRelease.setArtifacts(artifacts);
+        int num = applicationReleaseDao.findAll().size();
+        applicationRelease = applicationReleaseDao.create(applicationRelease);
+
+
         assertNotNull(applicationRelease);
         assertNotNull(applicationRelease.getId());
-        assertEquals (applicationRelease.getName(), "productII");
-        assertEquals (applicationRelease.getVersion(), "version");
-        assertEquals (applicationRelease.getArtifacts().size(), 1);
-        assertEquals (applicationReleaseDao.findAll().size(), num + 1);
+        assertEquals(applicationRelease.getName(), "productII");
+        assertEquals(applicationRelease.getVersion(), "version");
+        assertEquals(applicationRelease.getArtifacts().size(), 1);
+        assertEquals(applicationReleaseDao.findAll().size(), num + 1);
     }
-    
+
+    /**
+     * Test the searching of an application release given a search criteria.
+     * @throws Exception
+     */
     @Test
     public void testFindByCriteria() throws Exception {
-    	Artifact artifact = new Artifact ("artifact6", "path", product);
-    	artifact = artifactDao.create (artifact);
-    	ApplicationRelease applicationRelease = new ApplicationRelease ("productIII", "version");
-    	List<Artifact> artifacts = new ArrayList<Artifact> ();
-    	artifacts.add(artifact);
-    	applicationRelease.setArtifacts(artifacts);
-    	
-        
-    	ApplicationReleaseSearchCriteria criteria = new ApplicationReleaseSearchCriteria ();
-    	criteria.setArtifact(artifact);
-    	
-    	List<ApplicationRelease> lApp = applicationReleaseDao.findByCriteria(criteria);
+        Artifact artifact = new Artifact("artifact6", "path", product);
+        artifact = artifactDao.create(artifact);
+        ApplicationRelease applicationRelease = new ApplicationRelease("productIII", "version");
+        List<Artifact> artifacts = new ArrayList<Artifact>();
+        artifacts.add(artifact);
+        applicationRelease.setArtifacts(artifacts);
+
+
+        ApplicationReleaseSearchCriteria criteria = new ApplicationReleaseSearchCriteria();
+        criteria.setArtifact(artifact);
+
+        List<ApplicationRelease> lApp = applicationReleaseDao.findByCriteria(criteria);
         int num = lApp.size();
         assertNotNull(lApp);
-        
+
         applicationRelease = applicationReleaseDao.create(applicationRelease);
-        assertEquals (applicationReleaseDao.findByCriteria(criteria).size(), num+1);
+        assertEquals(applicationReleaseDao.findByCriteria(criteria).size(), num + 1);
 
     }
 
-    
+    /**
+     * Test the loading of an application release.
+     * @throws Exception
+     */
     @Test
     public void testLoadAppRelease() throws Exception {
-    	ApplicationRelease applicationRelease = new ApplicationRelease ("product1", "version");
-    	applicationRelease = applicationReleaseDao.create(applicationRelease);
-    	applicationRelease = applicationReleaseDao.load("product1");
-       
+        ApplicationRelease applicationRelease = new ApplicationRelease("product1", "version");
+        applicationRelease = applicationReleaseDao.create(applicationRelease);
+        applicationRelease = applicationReleaseDao.load("product1");
 
-        assertEquals (applicationRelease.getName(), "product1");
-        assertEquals (applicationRelease.getVersion(), "version");
-        assertEquals (applicationRelease.getArtifacts().size(), 0);
+
+        assertEquals(applicationRelease.getName(), "product1");
+        assertEquals(applicationRelease.getVersion(), "version");
+        assertEquals(applicationRelease.getArtifacts().size(), 0);
 
     }
-    
-    @Test (expected=EntityNotFoundException.class)
+
+    /**
+     * Test the deletion of an application release.
+     * @throws Exception
+     */
+    @Test(expected = EntityNotFoundException.class)
     public void testDeleteAppRelease() throws Exception {
-    	ApplicationRelease applicationRelease = new ApplicationRelease ("productIV", "version");
-    	applicationRelease = applicationReleaseDao.create(applicationRelease);
-    	applicationRelease = applicationReleaseDao.load("productIV");
-    	applicationReleaseDao.remove(applicationRelease);
-    	applicationReleaseDao.load("productIV-version");
+        ApplicationRelease applicationRelease = new ApplicationRelease("productIV", "version");
+        applicationRelease = applicationReleaseDao.create(applicationRelease);
+        applicationRelease = applicationReleaseDao.load("productIV");
+        applicationReleaseDao.remove(applicationRelease);
+        applicationReleaseDao.load("productIV-version");
     }
-    
-   
+
 
     public void setApplicationReleaseDao(ApplicationReleaseDao applicationReleaseDao) {
         this.applicationReleaseDao = applicationReleaseDao;
     }
-    
+
     public void setArtifactDao(ArtifactDao artifactDao) {
         this.artifactDao = artifactDao;
     }
-    
+
     public void setProductReleaseDao(ProductReleaseDao productReleaseDao) {
         this.productReleaseDao = productReleaseDao;
     }
-    
-    
-    
-    
+
 
 }

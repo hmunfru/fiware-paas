@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * Defines the object return in an asynchronous request to the system. Provides some information to know the result of
  * the task and how to find the created resource.
- * 
+ *
  * @author Jesus M. Movilla
  */
 @SuppressWarnings("serial")
@@ -52,6 +52,9 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Task implements Serializable {
+    /**
+     * List of task states.
+     */
     public enum TaskStates {
         QUEUED, PENDING, RUNNING, SUCCESS, ERROR, CANCELLED
     };
@@ -71,14 +74,16 @@ public class Task implements Serializable {
     @XmlElement(required = false)
     @Embedded
     @AttributeOverrides({ @AttributeOverride(name = "href", column = @Column(name = "owner_href")),
-        @AttributeOverride(name = "name", column = @Column(name = "owner_name")),
-        @AttributeOverride(name = "type", column = @Column(name = "owner_type")) })
+            @AttributeOverride(name = "name", column = @Column(name = "owner_name")),
+            @AttributeOverride(name = "type", column = @Column(name = "owner_type")) })
+
     private TaskReference owner;
     @XmlElement(required = false)
     @Embedded
     @AttributeOverrides({ @AttributeOverride(name = "href", column = @Column(name = "result_href")),
-        @AttributeOverride(name = "name", column = @Column(name = "result_name")),
-        @AttributeOverride(name = "type", column = @Column(name = "result_type")) })
+            @AttributeOverride(name = "name", column = @Column(name = "result_name")),
+            @AttributeOverride(name = "type", column = @Column(name = "result_type")) })
+
     private TaskReference result;
 
     @XmlAttribute(required = true)
@@ -214,104 +219,91 @@ public class Task implements Serializable {
     }
 
     /**
-     * @param description
-     *            the description to set
+     * @param description the description to set
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * @param endTime
-     *            the endTime to set
+     * @param endTime the endTime to set
      */
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
     /**
-     * @param environment
-     *            the environment to set
+     * @param environment the environment to set
      */
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
 
     /**
-     * @param error
-     *            the error to set
+     * @param error the error to set
      */
     public void setError(TaskError error) {
         this.error = error;
     }
 
     /**
-     * @param expireTime
-     *            the expireTime to set
+     * @param expireTime the expireTime to set
      */
     public void setExpireTime(Long expireTime) {
         this.expireTime = expireTime;
     }
 
     /**
-     * @param href
-     *            the href to set
+     * @param href the href to set
      */
     public void setHref(String href) {
         this.href = href;
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(long id) {
         this.id = id;
     }
 
     /**
-     * @param owner
-     *            the owner to set
+     * @param owner the owner to set
      */
     public void setOwner(TaskReference owner) {
         this.owner = owner;
     }
 
     /**
-     * @param result
-     *            the result to set
+     * @param result the result to set
      */
     public void setResult(TaskReference result) {
         this.result = result;
     }
 
     /**
-     * @param startTime
-     *            the startTime to set
+     * @param startTime the startTime to set
      */
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
     /**
-     * @param status
-     *            the status to set
+     * @param status the status to set
      */
     public void setStatus(TaskStates status) {
         this.status = status;
     }
 
     /**
-     * @param tier
-     *            the tier to set
+     * @param tier the tier to set
      */
     public void setTier(String tier) {
         this.tier = tier;
     }
 
     /**
-     * @param vdc
-     *            the vdc to set
+     * @param vdc the vdc to set
      */
     public void setVdc(String vdc) {
         this.vdc = vdc;
@@ -321,28 +313,27 @@ public class Task implements Serializable {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[Task]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[href = ").append(this.href).append("]");
-       sb.append("[error = ").append(this.error).append("]");
-       sb.append("[owner = ").append(this.owner).append("]");
-       sb.append("[result = ").append(this.result).append("]");
-       sb.append("[startTime = ").append(this.startTime).append("]");
-       sb.append("[endTime = ").append(this.endTime).append("]");
-       sb.append("[expireTime = ").append(this.expireTime).append("]");
-       sb.append("[status = ").append(this.status).append("]");
-       sb.append("[description = ").append(this.description).append("]");
-       sb.append("[vdc = ").append(this.vdc).append("]");
-       sb.append("[environment = ").append(this.environment).append("]");
-       sb.append("[tier = ").append(this.tier).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[Task]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[href = ").append(this.href).append("]");
+        sb.append("[error = ").append(this.error).append("]");
+        sb.append("[owner = ").append(this.owner).append("]");
+        sb.append("[result = ").append(this.result).append("]");
+        sb.append("[startTime = ").append(this.startTime).append("]");
+        sb.append("[endTime = ").append(this.endTime).append("]");
+        sb.append("[expireTime = ").append(this.expireTime).append("]");
+        sb.append("[status = ").append(this.status).append("]");
+        sb.append("[description = ").append(this.description).append("]");
+        sb.append("[vdc = ").append(this.vdc).append("]");
+        sb.append("[environment = ").append(this.environment).append("]");
+        sb.append("[tier = ").append(this.tier).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }

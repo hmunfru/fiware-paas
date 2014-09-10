@@ -73,40 +73,50 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private static Logger log = LoggerFactory.getLogger(ClaudiaClientOpenStackImpl.class);
 
     private OpenStackUtil openStackUtil = null;
-    private OpenStackRegion openStackRegion =null;
+    private OpenStackRegion openStackRegion = null;
     private FileUtils fileUtils;
     private NetworkInstanceManager networkInstanceManager = null;
-    private final int POLLING_INTERVAL = 10000;
+    private static final int POLLING_INTERVAL = 10000;
 
+    /**
+     * Get the response of the server from openstack.
+     * @param claudiaData
+     * @param tier
+     * @param replica
+     * @param vm
+     * @param region
+     * @return
+     * @throws ClaudiaResourceNotFoundException
+     */
     public String browseVMReplica(ClaudiaData claudiaData, String tier, int replica, VM vm, String region)
-            throws ClaudiaResourceNotFoundException {
+        throws ClaudiaResourceNotFoundException {
 
         String response = "No Content";
+
         try {
             String token = claudiaData.getUser().getToken();
             String vdc = claudiaData.getVdc();
             response = openStackUtil.getServer(vm.getVmid(), region, token, vdc);
         } catch (OpenStackException e) {
-
             String errorMessage = "Error obtaining info from Server " + vm.getVmid();
             log.error(errorMessage);
             throw new ClaudiaResourceNotFoundException(errorMessage, e);
-
         }
+
         return response;
     }
 
     /**
      * Build the payload to deploy a VM (createServer).
-     * 
+     *
      * @see com.telefonica.euro_iaas.paasmanager.claudia.ClaudiaClient#undeployVMReplica (java.lang.String,
-     *      java.lang.String)
+     * java.lang.String)
      */
     private String buildCreateServerPayload(ClaudiaData claudiaData, TierInstance tierInstance, int replica)
-            throws InfrastructureException {
+        throws InfrastructureException {
 
-        
-    	if ((tierInstance.getTier().getImage() == null) || (tierInstance.getTier().getFlavour() == null)
+
+        if ((tierInstance.getTier().getImage() == null) || (tierInstance.getTier().getFlavour() == null)
                 || (tierInstance.getTier().getKeypair() == null)) {
             String errorMsg = " The tier does not include a not-null information: " + "Image: "
                     + tierInstance.getTier().getImage() + "Flavour: " + tierInstance.getTier().getFlavour()
@@ -114,63 +124,63 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             log.error(errorMsg);
             throw new InfrastructureException(errorMsg);
         }
-    	String userData = getUserData (claudiaData,  tierInstance);
+        String userData = getUserData(claudiaData, tierInstance);
 
-        String payload = tierInstance.toJson(encode (userData));
+        String payload = tierInstance.toJson(encode(userData));
         log.debug("Payload with base decoded " + payload);
         log.debug("Floating ip " + tierInstance.getTier().getFloatingip());
 
         return payload;
     }
-    
+
     private String base64Decode(String str) {
-    	if (str == null) {
-    		return null;
-    	}
-    	byte[] bytes;
-		try {
-			byte[] decoded = Base64.decodeBase64(str);
-			return new String(decoded, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Error to encode the user data " + e.getMessage());
-			return null;
-		}
-    	
-    }
-    private static String radixBase64=
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      + "abcdefghijklmnopqrstuvwxyz"
-      + "0123456789"
-      + "+/";
-    
-    public static String encode(String string){
-    	if (string == null ) {
-    		return "";
-    	}
-        String whole_binary = "";
-        for(char c:string.toCharArray()){
-            String char_to_binary = Integer.toBinaryString(c);
-            while(char_to_binary.length()<8)
-                char_to_binary="0"+char_to_binary;
-            whole_binary+=char_to_binary;
+        if (str == null) {
+            return null;
         }
-        string="";
-        String suffix="";
-        for(int i=0;i<whole_binary.length();i+=6){
+        byte[] bytes;
+        try {
+            byte[] decoded = Base64.decodeBase64(str);
+            return new String(decoded, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.warn("Error to encode the user data " + e.getMessage());
+            return null;
+        }
+
+    }
+
+    private static String radixBase64 =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    + "abcdefghijklmnopqrstuvwxyz"
+                    + "0123456789"
+                    + "+/";
+
+    public static String encode(String string) {
+        if (string == null) {
+            return "";
+        }
+        String whole_binary = "";
+        for (char c : string.toCharArray()) {
+            String char_to_binary = Integer.toBinaryString(c);
+            while (char_to_binary.length() < 8)
+                char_to_binary = "0" + char_to_binary;
+            whole_binary += char_to_binary;
+        }
+        string = "";
+        String suffix = "";
+        for (int i = 0; i < whole_binary.length(); i += 6) {
             String six_binary_digits = null;
-            try{
-                six_binary_digits = whole_binary.substring(i, i+6);
-            }
-            catch(StringIndexOutOfBoundsException sioobe){
+            try {
+                six_binary_digits = whole_binary.substring(i, i + 6);
+            } catch (StringIndexOutOfBoundsException sioobe) {
                 six_binary_digits = whole_binary.substring(i);
-                while(six_binary_digits.length()<6){
-                    six_binary_digits+="00";
-                    suffix+="=";
+                while (six_binary_digits.length() < 6) {
+                    six_binary_digits += "00";
+                    suffix += "=";
                 }
             }
-            string+=radixBase64.charAt(Integer.parseInt(six_binary_digits,2));
+            string += radixBase64.charAt(Integer.parseInt(six_binary_digits, 2));
         }
-        return string+suffix;
+        return string + suffix;
     }
 
     /**
@@ -178,135 +188,141 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
      * Gives anomalous result for string with any other encoding.
      * Output is similar to output of this command on Linux:
      * printf "<string>" | base64 -d
+     *
      * @param string
      * @return Base64 Decoding of parameter string
      */
-    public static String decode(String string){
-        String binary_string="";
-        for(char c:string.toCharArray()){
-            if(c=='=')
+    public static String decode(String string) {
+        String binary_string = "";
+        for (char c : string.toCharArray()) {
+            if (c == '=')
                 break;
             String char_to_binary = Integer.toBinaryString(radixBase64.indexOf(c));
-            while(char_to_binary.length()<6)
-                char_to_binary="0"+char_to_binary;
-            binary_string+=char_to_binary;
+            while (char_to_binary.length() < 6)
+                char_to_binary = "0" + char_to_binary;
+            binary_string += char_to_binary;
         }
-        if(string.endsWith("=="))
-            binary_string=binary_string.substring(0, binary_string.length()-4);
-        else if(string.endsWith("="))
-            binary_string=binary_string.substring(0, binary_string.length()-2);
-        string="";
-        for(int i=0;i<binary_string.length();i+=8){
-            String eight_binary_digits = binary_string.substring(i, i+8);
-            string+=(char)Integer.parseInt(eight_binary_digits,2);
+        if (string.endsWith("=="))
+            binary_string = binary_string.substring(0, binary_string.length() - 4);
+        else if (string.endsWith("="))
+            binary_string = binary_string.substring(0, binary_string.length() - 2);
+        string = "";
+        for (int i = 0; i < binary_string.length(); i += 8) {
+            String eight_binary_digits = binary_string.substring(i, i + 8);
+            string += (char) Integer.parseInt(eight_binary_digits, 2);
         }
         return string;
     }
-    
-    public String getUserData (ClaudiaData claudiaData, TierInstance tierInstance) {
-    	log.debug ("Creating user data");
-    	String file = null;
-    	String hostname = tierInstance.getVM().getHostname();
-    	String chefServerUrl;
-    	String puppetUrl;
-    	try {
-			file = fileUtils.readFile("userdata");
-			log.debug ("File userdata read");
-		} catch (Exception e) {
-			log.warn ("Error to find the file" + e.getMessage());
-			return file;
-		}
-		
-		try {
-			chefServerUrl = openStackRegion.getChefServerEndPoint(tierInstance.getTier().getRegion(), claudiaData.getUser().getToken());
-		} catch (Exception e1) {
-			log.warn ("Error to obtain the chef-server url" + e1.getMessage());
-			return file;
-		}
-		
-		try {
-            puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion(), claudiaData.getUser().getToken());
-        } catch (Exception e1) {
-            log.warn ("Error to obtain the puppetmaster url" + e1.getMessage());
+
+    public String getUserData(ClaudiaData claudiaData, TierInstance tierInstance) {
+        log.debug("Creating user data");
+        String file = null;
+        String hostname = tierInstance.getVM().getHostname();
+        String chefServerUrl;
+        String puppetUrl;
+        try {
+            file = fileUtils.readFile("userdata");
+            log.debug("File userdata read");
+        } catch (Exception e) {
+            log.warn("Error to find the file" + e.getMessage());
             return file;
         }
-        
-    	String chefValidationKey = "";
-		try {
-			chefValidationKey = fileUtils.readFile("validation.pem", "/etc/chef/");
-		} catch (Exception e1) {
-			log.warn ("Error to find the validation key file" + e1.getMessage());
-			//return file;
-		}
-    	
-		
-    	file = file.replace("{node_name}", hostname).replace( "{server_url}" ,chefServerUrl).
-    	       replace("{validation_key}", chefValidationKey).
-    	       replace("{networks}", writeInterfaces (tierInstance)).
-    	       replace("{if_up}", generateIfUp (tierInstance)).
-    	       replace("{puppet_master}", puppetUrl);
-    	log.debug ("payload " + file);
-    	return file;	
-    	
-    	 
-    }
-    
-    public String writeInterfaces ( TierInstance tierInstance) {
-    	int networkNoPublic = tierInstance.getNetworkNumberNoPublic ();
-    	if (!(networkNoPublic > 1)) {
-    		return "";
-    	}  else {
-    		
-    		return generateFileUbuntu (networkNoPublic) + "\n" + generateFileCentos (networkNoPublic);
-    	}
-    }
-    private String generateFileUbuntu (int networkNoPublic) {
-    	String interfaces = "auto lo \n" +
-            "iface lo inet loopback\n"	;
-    	for (int i =0; i< networkNoPublic; i++ ) {
-    			interfaces = interfaces +  " auto eth" +i +" \n" +
-	       " iface eth"+ i+"  inet dhcp\n";
-	
-    	}
-    	interfaces = encode (interfaces);
 
-    	String file = "write_files: \n" +
-			  "-   encoding: b64 \n" + 
-			  "    content: | \n" +
-			  "        "+ interfaces + "\n" + 
-			  "    path: /etc/network/interfaces \n" ;
-    	return file;
-    		
+        try {
+            chefServerUrl = openStackRegion.getChefServerEndPoint(
+                    tierInstance.getTier().getRegion(),
+                    claudiaData.getUser().getToken());
+
+        } catch (Exception e1) {
+            log.warn("Error to obtain the chef-server url" + e1.getMessage());
+            return file;
+        }
+
+        try {
+            puppetUrl = openStackRegion.getPuppetMasterEndPoint(
+                    tierInstance.getTier().getRegion(),
+                    claudiaData.getUser().getToken());
+
+        } catch (Exception e1) {
+            log.warn("Error to obtain the puppetmaster url" + e1.getMessage());
+            return file;
+        }
+
+        String chefValidationKey = "";
+        try {
+            chefValidationKey = fileUtils.readFile("validation.pem", "/etc/chef/");
+        } catch (Exception e1) {
+            log.warn("Error to find the validation key file" + e1.getMessage());
+            //return file;
+        }
+
+
+        file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl).
+                replace("{validation_key}", chefValidationKey).
+                replace("{networks}", writeInterfaces(tierInstance)).
+                replace("{if_up}", generateIfUp(tierInstance)).
+                replace("{puppet_master}", puppetUrl);
+        log.debug("payload " + file);
+        return file;
+
+
     }
-    	
+
+    public String writeInterfaces(TierInstance tierInstance) {
+        int networkNoPublic = tierInstance.getNetworkNumberNoPublic();
+        if (!(networkNoPublic > 1)) {
+            return "";
+        } else {
+
+            return generateFileUbuntu(networkNoPublic) + "\n" + generateFileCentos(networkNoPublic);
+        }
+    }
+
+    private String generateFileUbuntu(int networkNoPublic) {
+        String interfaces = "auto lo \n" +
+                "iface lo inet loopback\n";
+        for (int i = 0; i < networkNoPublic; i++) {
+            interfaces = interfaces + " auto eth" + i + " \n" +
+                    " iface eth" + i + "  inet dhcp\n";
+
+        }
+        interfaces = encode(interfaces);
+
+        String file = "write_files: \n" +
+                "-   encoding: b64 \n" +
+                "    content: | \n" +
+                "        " + interfaces + "\n" +
+                "    path: /etc/network/interfaces \n";
+        return file;
+
+    }
+
     private String generateFileCentos(int networkNoPublic) {
-    	String interfaces = "";
-    	for (int i =0; i< networkNoPublic; i++ )
-    	{
-    			interfaces = interfaces + "-   content: |\n" + 
-		        "        DEVICE=\"eth" + i + "\"\n" +
-		        "        NM_CONTROLLED=\"yes\"\n" + 
-		        "        ONBOOT=\"yes\" \n" +
-		        "        BOOTPROTO=\"dhcp\" \n" + 
-		        "        TYPE=\"Ethernet\"\n" + 
-    		    "    path: /etc/sysconfig/network-scripts/ifcfg-eth" + i +"\n"+
-    		    "    permissions: '460'\n";
-    	}
-    	
-    	return interfaces;
-    		
+        String interfaces = "";
+        for (int i = 0; i < networkNoPublic; i++) {
+            interfaces = interfaces + "-   content: |\n" +
+                    "        DEVICE=\"eth" + i + "\"\n" +
+                    "        NM_CONTROLLED=\"yes\"\n" +
+                    "        ONBOOT=\"yes\" \n" +
+                    "        BOOTPROTO=\"dhcp\" \n" +
+                    "        TYPE=\"Ethernet\"\n" +
+                    "    path: /etc/sysconfig/network-scripts/ifcfg-eth" + i + "\n" +
+                    "    permissions: '460'\n";
+        }
+
+        return interfaces;
+
     }
-    
+
     private String generateIfUp(TierInstance tierInstance) {
-    	int networkNoPublic = tierInstance.getNetworkNumberNoPublic ();
-    	String interfaces = "\nbootcmd:\n";
-    	for (int i =0; i< networkNoPublic; i++ )
-    	{
-    			interfaces = interfaces + "     - ifup eth"+ i + " \n";
-    	}
-    	return interfaces;
+        int networkNoPublic = tierInstance.getNetworkNumberNoPublic();
+        String interfaces = "\nbootcmd:\n";
+        for (int i = 0; i < networkNoPublic; i++) {
+            interfaces = interfaces + "     - ifup eth" + i + " \n";
+        }
+        return interfaces;
     }
-    
+
 
     private void addNetworkToTierInstance(ClaudiaData claudiaData, TierInstance tierInstance)
             throws InfrastructureException, InvalidEntityException, AlreadyExistsEntityException,
@@ -352,7 +368,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     private List<NetworkInstance> loadNotSharedNetworksUser(List<NetworkInstance> networks, String tenantId,
-            String region) throws InfrastructureException {
+                                                            String region) throws InfrastructureException {
         List<NetworkInstance> networksNotShared = new ArrayList<NetworkInstance>();
         for (NetworkInstance net : networks) {
             if (!net.getShared() && net.getTenantId().equals(tenantId)) {
@@ -381,7 +397,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     /**
      * Checks if a certain Server has been finally deleted from OpenStack.
-     * 
+     *
      * @param tierInstance
      * @param claudiaData
      */
@@ -434,7 +450,8 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         // openStackUtilImpl = new OpenStackUtilImpl(claudiaData.getUser());
 
         log.debug("Deploy server " + claudiaData.getService() + " tier instance " + tierInstance.getName()
-                + " replica " + replica + " with networks " + tierInstance.getNetworkInstances() + " and region " + tierInstance.getTier().getRegion());
+                + " replica " + replica + " with networks " + tierInstance.getNetworkInstances()
+                + " and region " + tierInstance.getTier().getRegion());
 
         if (tierInstance.getNetworkInstances().isEmpty()) {
             try {
@@ -582,16 +599,14 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     /**
-     * @param openStackUtil
-     *            the openStackUtil to set
+     * @param openStackUtil the openStackUtil to set
      */
     public void setOpenStackUtil(OpenStackUtil openStackUtil) {
         this.openStackUtil = openStackUtil;
     }
 
     /**
-     * @param openStackUtil
-     *            the openStackUtil to set
+     * @param openStackUtil the openStackUtil to set
      */
     public void setNetworkInstanceManager(NetworkInstanceManager networkInstanceManager) {
         this.networkInstanceManager = networkInstanceManager;
@@ -626,7 +641,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     public void undeployVMReplica(ClaudiaData claudiaData, TierInstance tierInstance) throws InfrastructureException {
         log.debug("Undeploy VM replica " + tierInstance.getName() + " for region " + tierInstance.getTier().getRegion()
-                + " and user " + tierInstance.getTier().getVdc() );
+                + " and user " + tierInstance.getTier().getVdc());
         try {
 
             String region = tierInstance.getTier().getRegion();
@@ -636,11 +651,12 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             openStackUtil.deleteServer(tierInstance.getVM().getVmid(), region, token, vdc);
 
             checkDeleteServerTaskStatus(tierInstance, claudiaData);
-            log.debug("Undeployed VM replica " + tierInstance.getName() + " for region " + tierInstance.getTier().getRegion() + " and user " + tierInstance.getTier().getVdc() );
-            
+            log.debug("Undeployed VM replica " + tierInstance.getName() + " for region "
+                    + tierInstance.getTier().getRegion() + " and user " + tierInstance.getTier().getVdc());
+
             if (tierInstance.getTier().getFloatingip().equals("true")) {
-            	log.debug("Delete floating ip ");
-            	openStackUtil.disAllocateFloatingIP(region, token, vdc, tierInstance.getVM().getFloatingIp());
+                log.debug("Delete floating ip ");
+                openStackUtil.disAllocateFloatingIP(region, token, vdc, tierInstance.getVM().getFloatingIp());
             }
 
         } catch (OpenStackException oes) {
@@ -655,12 +671,12 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             throws InfrastructureException {
         return null;  // To change body of implemented methods use File | Settings | File Templates.
     }
-    
-    public void setFileUtils (FileUtils fileUtils) {
-    	this.fileUtils = fileUtils;
+
+    public void setFileUtils(FileUtils fileUtils) {
+        this.fileUtils = fileUtils;
     }
-    
-    public void setOpenStackRegion (OpenStackRegion openStackRegion) {
-    	this.openStackRegion = openStackRegion;
+
+    public void setOpenStackRegion(OpenStackRegion openStackRegion) {
+        this.openStackRegion = openStackRegion;
     }
 }

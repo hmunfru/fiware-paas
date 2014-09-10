@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Defines a message in a task.
- * 
+ *
  * @author Sergio Arroyo
  */
 @XmlRootElement
@@ -91,32 +91,28 @@ public class TaskError {
     }
 
     /**
-     * @param majorErrorCode
-     *            the majorErrorCode to set
+     * @param majorErrorCode the majorErrorCode to set
      */
     public void setMajorErrorCode(String majorErrorCode) {
         this.majorErrorCode = majorErrorCode;
     }
 
     /**
-     * @param message
-     *            the message to set
+     * @param message the message to set
      */
     public void setMessage(String message) {
         this.message = message;
     }
 
     /**
-     * @param minorErrorCode
-     *            the minorErrorCode to set
+     * @param minorErrorCode the minorErrorCode to set
      */
     public void setMinorErrorCode(String minorErrorCode) {
         this.minorErrorCode = minorErrorCode;
     }
 
     /**
-     * @param venodrSpecificErrorCode
-     *            the venodrSpecificErrorCode to set
+     * @param venodrSpecificErrorCode the venodrSpecificErrorCode to set
      */
     public void setVenodrSpecificErrorCode(String venodrSpecificErrorCode) {
         this.venodrSpecificErrorCode = venodrSpecificErrorCode;
@@ -126,18 +122,18 @@ public class TaskError {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TaskError]");
-       sb.append("[message = ").append(this.message).append("]");
-       sb.append("[majorErrorCode = ").append(this.majorErrorCode).append("]");
-       sb.append("[minorErrorCode = ").append(this.minorErrorCode).append("]");
-       sb.append("[venodrSpecificErrorCode = ").append(this.venodrSpecificErrorCode).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TaskError]");
+        sb.append("[message = ").append(this.message).append("]");
+        sb.append("[majorErrorCode = ").append(this.majorErrorCode).append("]");
+        sb.append("[minorErrorCode = ").append(this.minorErrorCode).append("]");
+        sb.append("[venodrSpecificErrorCode = ").append(this.venodrSpecificErrorCode).append("]");
+        sb.append("]");
+        return sb.toString();
     }
 
-    
+
 }

@@ -50,7 +50,7 @@ public class Token {
     /** extra Info. */
     private String extra = "";
 
-    /** tenantId **/
+    /** tenantId. **/
     private String tenantId = "";
 
     /**

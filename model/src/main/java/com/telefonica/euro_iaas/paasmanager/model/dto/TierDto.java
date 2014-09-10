@@ -40,7 +40,7 @@ import com.telefonica.euro_iaas.paasmanager.model.Tier;
 
 /**
  * Represents an artifact to be installed on a ProductRelease.
- * 
+ *
  * @author Henar Mu�oz
  * @version $Id: $
  */
@@ -78,7 +78,7 @@ public class TierDto {
 
     /**
      * Constructor.
-     * 
+     *
      * @param name
      * @param maximumNumberInstances
      * @param minimumNumberInstances
@@ -87,7 +87,7 @@ public class TierDto {
      */
 
     public TierDto(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos) {
+                   Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos) {
 
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
@@ -98,11 +98,22 @@ public class TierDto {
         this.networkDto = new ArrayList<NetworkDto>();
     }
 
-  
-    
+    /**
+     * Constructor with complete information.
+     * @param name
+     * @param maximumNumberInstances
+     * @param minimumNumberInstances
+     * @param initialNumberInstances
+     * @param productReleaseDtos
+     * @param flavour
+     * @param image
+     * @param icono
+     * @param keypair
+     * @param floatingip
+     */
     public TierDto(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos, String flavour, String image,
-            String icono, String keypair, String floatingip) {
+                   Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos,
+                   String flavour, String image, String icono, String keypair, String floatingip) {
 
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
@@ -117,10 +128,24 @@ public class TierDto {
         this.affinity = "None";
         this.networkDto = new ArrayList<NetworkDto>();
     }
-    
+
+    /**
+     * Constructor with complete information plus affinity one.
+     * @param name
+     * @param maximumNumberInstances
+     * @param minimumNumberInstances
+     * @param initialNumberInstances
+     * @param productReleaseDtos
+     * @param flavour
+     * @param image
+     * @param icono
+     * @param keypair
+     * @param floatingip
+     * @param affinity
+     */
     public TierDto(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos, String flavour, String image,
-            String icono, String keypair, String floatingip, String affinity) {
+                   Integer initialNumberInstances, List<ProductReleaseDto> productReleaseDtos,
+                   String flavour, String image, String icono, String keypair, String floatingip, String affinity) {
 
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
@@ -138,9 +163,8 @@ public class TierDto {
 
     /**
      * Add network dto.
-     * 
-     * @param networkDto
-     *            the network do to be add to the array.
+     *
+     * @param networkDto the network do to be add to the array.
      */
     public void addNetworkDto(NetworkDto networkDto) {
         if (networkDto == null) {
@@ -151,9 +175,8 @@ public class TierDto {
 
     /**
      * Add product release.
-     * 
-     * @param productReleaseDto
-     *            the product release to be added.
+     *
+     * @param productReleaseDto the product release to be added.
      */
     public void addProductRelease(ProductReleaseDto productReleaseDto) {
         if (this.productReleaseDtos == null) {
@@ -164,7 +187,7 @@ public class TierDto {
 
     /**
      * It obtains the Tier object associated.
-     * 
+     *
      * @tier
      */
     public Tier fromDto(String vdc, String envName) {
@@ -183,8 +206,7 @@ public class TierDto {
         tier.setVdc(vdc);
         tier.setEnviromentName(envName);
         tier.setAffinity(this.getAffinity());
-        
-  
+
 
         for (ProductReleaseDto pReleaseDto : getProductReleaseDtos()) {
             ProductRelease pRelease = new ProductRelease();
@@ -194,10 +216,10 @@ public class TierDto {
             if (pReleaseDto.getProductDescription() != null) {
                 pRelease.setDescription(pReleaseDto.getProductDescription());
             }
-            
+
             if (pReleaseDto.getPrivateAttributes() != null) {
                 Set<Attribute> attrs = new HashSet<Attribute>();
-                for (Attribute attr: pReleaseDto.getPrivateAttributes()){
+                for (Attribute attr : pReleaseDto.getPrivateAttributes()) {
                     attrs.add(attr);
                 }
                 pRelease.setAttributes(attrs);
@@ -206,7 +228,7 @@ public class TierDto {
         }
 
         for (NetworkDto networkDto : this.getNetworksDto()) {
-            Network network ;
+            Network network;
             if (vdc == null) {
                 network = networkDto.fromDto("", this.getRegion());
             } else {
@@ -284,7 +306,7 @@ public class TierDto {
 
     /**
      * Get the security group.
-     * 
+     *
      * @return
      */
     public String getSecurityGroup() {
@@ -293,7 +315,7 @@ public class TierDto {
 
     /**
      * It removes the product release.
-     * 
+     *
      * @param productReleaseDto
      */
     public void removeProductRelease(ProductReleaseDto productReleaseDto) {
@@ -302,8 +324,7 @@ public class TierDto {
     }
 
     /**
-     * @param flavour
-     *            the flavour to set
+     * @param flavour the flavour to set
      */
     public void setFlavour(String flavour) {
         this.flavour = flavour;
@@ -322,8 +343,7 @@ public class TierDto {
     }
 
     /**
-     * @param initialNumberInstances
-     *            the initialNumberInstances to set
+     * @param initialNumberInstances the initialNumberInstances to set
      */
     public void setInitialNumberInstances(Integer initialNumberInstances) {
         this.initialNumberInstances = initialNumberInstances;
@@ -334,48 +354,42 @@ public class TierDto {
     }
 
     /**
-     * @param maximumNumberInstances
-     *            the maximumNumberInstances to set
+     * @param maximumNumberInstances the maximumNumberInstances to set
      */
     public void setMaximumNumberInstances(Integer maximumNumberInstances) {
         this.maximumNumberInstances = maximumNumberInstances;
     }
 
     /**
-     * @param minimumNumberInstances
-     *            the minimumNumberInstances to set
+     * @param minimumNumberInstances the minimumNumberInstances to set
      */
     public void setMinimumNumberInstances(Integer minimumNumberInstances) {
         this.minimumNumberInstances = minimumNumberInstances;
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @param networkDto
-     *            the network do to be add to the array
+     * @param networkDto the network do to be add to the array
      */
     public void setNetworksDto(List<NetworkDto> networkDto) {
         this.networkDto = networkDto;
     }
 
     /**
-     * @param productReleaseDtos
-     *            the productReleases to set
+     * @param productReleaseDtos the productReleases to set
      */
     public void setProductReleaseDtos(List<ProductReleaseDto> productReleaseDtos) {
         this.productReleaseDtos = productReleaseDtos;
     }
 
     /**
-     * @param securityGroup
-     *            the securityGroup to set
+     * @param securityGroup the securityGroup to set
      */
     public void setSecurityGroup(String securityGroup) {
         this.securityGroup = securityGroup;
@@ -389,7 +403,7 @@ public class TierDto {
     public void setRegion(String region) {
         this.region = region;
     }
-    
+
     public String getAffinity() {
         return affinity;
     }
@@ -402,28 +416,28 @@ public class TierDto {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[TierDto]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[flavour = ").append(this.flavour).append("]");
-       sb.append("[image = ").append(this.image).append("]");
-       sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
-       sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
-       sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
-       sb.append("[productReleaseDtos = ").append(this.productReleaseDtos).append("]");
-       sb.append("[networkDto = ").append(this.networkDto).append("]");
-       sb.append("[icono = ").append(this.icono).append("]");
-       sb.append("[securityGroup = ").append(this.securityGroup).append("]");
-       sb.append("[keypair = ").append(this.keypair).append("]");
-       sb.append("[floatingip = ").append(this.floatingip).append("]");
-       sb.append("[affinity = ").append(this.affinity).append("]");
-       sb.append("[region = ").append(this.region).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[TierDto]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[flavour = ").append(this.flavour).append("]");
+        sb.append("[image = ").append(this.image).append("]");
+        sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
+        sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
+        sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
+        sb.append("[productReleaseDtos = ").append(this.productReleaseDtos).append("]");
+        sb.append("[networkDto = ").append(this.networkDto).append("]");
+        sb.append("[icono = ").append(this.icono).append("]");
+        sb.append("[securityGroup = ").append(this.securityGroup).append("]");
+        sb.append("[keypair = ").append(this.keypair).append("]");
+        sb.append("[floatingip = ").append(this.floatingip).append("]");
+        sb.append("[affinity = ").append(this.affinity).append("]");
+        sb.append("[region = ").append(this.region).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

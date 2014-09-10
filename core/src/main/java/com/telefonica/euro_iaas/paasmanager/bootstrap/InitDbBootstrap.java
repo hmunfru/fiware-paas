@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Populates data base with synthetic data to emulate the preconditions of paas manager
+ * Populates data base with synthetic data to emulate the preconditions of paas manager.
  * 
  * @author Jesus M. Movilla
  * @version $Id: $

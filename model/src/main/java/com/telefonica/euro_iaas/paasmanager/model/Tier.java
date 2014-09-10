@@ -44,8 +44,8 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.ProductReleaseDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.TierDto;
 
 /**
- * Represents an artifact to be installed on a ProductRelease
- * 
+ * Represents an artifact to be installed on a ProductRelease.
+ *
  * @author Jesus M. Movilla
  * @version $Id: $
  */
@@ -71,7 +71,7 @@ public class Tier {
 
     private String keypair = "";
     private String floatingip = "false";
-    
+
     private String affinity = "None";
 
     private Integer maximumNumberInstances = new Integer(0);
@@ -82,11 +82,16 @@ public class Tier {
     private String payload;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tier_has_productReleases", joinColumns = { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "productRelease_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tier_has_productReleases", joinColumns =
+            { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) },
+              inverseJoinColumns = { @JoinColumn(name = "productRelease_ID", nullable = false, updatable = false) })
     private List<ProductRelease> productReleases;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tier_has_networks", joinColumns = { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "network_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tier_has_networks", joinColumns =
+            { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) },
+              inverseJoinColumns = { @JoinColumn(name = "network_ID", nullable = false, updatable = false) })
+
     private Set<Network> networks;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -109,8 +114,21 @@ public class Tier {
         networks = new HashSet<Network>();
     }
 
+    /**
+     * Constructor.
+     * @param name
+     *          Name of the Tier.
+     * @param maximumNumberInstances
+     *          Maximum number of instances on that tier.
+     * @param minimumNumberInstances
+     *          Minimum number of instances on that tier.
+     * @param initialNumberInstances
+     *          Initial number of instances.
+     * @param productReleases
+     *          List of product to be released on that tier.
+     */
     public Tier(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductRelease> productReleases) {
+                Integer initialNumberInstances, List<ProductRelease> productReleases) {
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
         this.minimumNumberInstances = minimumNumberInstances;
@@ -128,8 +146,8 @@ public class Tier {
      */
 
     public Tier(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductRelease> productReleases, String flavour, String image,
-            String icono) {
+                Integer initialNumberInstances, List<ProductRelease> productReleases, String flavour, String image,
+                String icono) {
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
         this.minimumNumberInstances = minimumNumberInstances;
@@ -143,7 +161,7 @@ public class Tier {
 
     /**
      * Constructor.
-     * 
+     *
      * @param name
      * @param maximumNumberInstances
      * @param minimumNumberInstances
@@ -157,8 +175,8 @@ public class Tier {
      * @param payload
      */
     public Tier(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
-            Integer initialNumberInstances, List<ProductRelease> productReleases, String flavour, String image,
-            String icono, String keypair, String floatingip, String payload) {
+                Integer initialNumberInstances, List<ProductRelease> productReleases, String flavour, String image,
+                String icono, String keypair, String floatingip, String payload) {
         this.name = name;
         this.maximumNumberInstances = maximumNumberInstances;
         this.minimumNumberInstances = minimumNumberInstances;
@@ -176,15 +194,15 @@ public class Tier {
     }
 
     /**
-     * @param network
-     *            the network list
+     * @param network the network list
      */
     public void addNetwork(Network network) {
         if (this.networks == null) {
             this.networks = new HashSet<Network>();
         }
-        int count = 0;
-        if ((count = containsNetwork(network)) != -1) {
+
+        int count = containsNetwork(network);
+        if (count != -1) {
             networks.remove(count);
         }
         networks.add(network);
@@ -192,8 +210,7 @@ public class Tier {
     }
 
     /**
-     * @param network
-     *            the network list
+     * @param network the network list
      */
     public void deleteNetwork(Network network) {
         if (networks.contains(network)) {
@@ -204,7 +221,7 @@ public class Tier {
 
     /**
      * Add the product release for the tier.
-     * 
+     *
      * @param productRelease
      */
     public void addProductRelease(ProductRelease productRelease) {
@@ -216,7 +233,7 @@ public class Tier {
 
     /**
      * It returns the position in the array list of the network.
-     * 
+     *
      * @param net2
      * @return
      */
@@ -255,11 +272,11 @@ public class Tier {
             return false;
         }
         if (!name.equals(other.name)) {
-        	return false;
+            return false;
         }
-        
+
         if (!image.equals(other.image)) {
-        	return false;
+            return false;
         }
         return true;
     }
@@ -373,8 +390,7 @@ public class Tier {
     }
 
     /**
-     * @param network
-     *            the network to remove
+     * @param network the network to remove
      */
     public void removeNetwork(Network network) {
         if (networks.contains(network)) {
@@ -384,7 +400,7 @@ public class Tier {
 
     /**
      * to remove the product release.
-     * 
+     *
      * @param productRelease
      */
     public void removeProductRelease(ProductRelease productRelease) {
@@ -396,14 +412,13 @@ public class Tier {
     public void setEnviromentName(String environmentname) {
         this.environmentname = environmentname;
     }
-    
+
     public String getEnviromentName() {
         return this.environmentname;
     }
 
     /**
-     * @param flavour
-     *            the flavour to set
+     * @param flavour the flavour to set
      */
     public void setFlavour(String flavour) {
         this.flavour = flavour;
@@ -422,8 +437,7 @@ public class Tier {
     }
 
     /**
-     * @param initialNumberInstances
-     *            the initialNumberInstances to set
+     * @param initialNumberInstances the initialNumberInstances to set
      */
     public void setInitialNumberInstances(Integer initialNumberInstances) {
         this.initialNumberInstances = initialNumberInstances;
@@ -434,48 +448,42 @@ public class Tier {
     }
 
     /**
-     * @param maximumNumberInstances
-     *            the maximumNumberInstances to set
+     * @param maximumNumberInstances the maximumNumberInstances to set
      */
     public void setMaximumNumberInstances(Integer maximumNumberInstances) {
         this.maximumNumberInstances = maximumNumberInstances;
     }
 
     /**
-     * @param minimumNumberInstances
-     *            the minimumNumberInstances to set
+     * @param minimumNumberInstances the minimumNumberInstances to set
      */
     public void setMinimumNumberInstances(Integer minimumNumberInstances) {
         this.minimumNumberInstances = minimumNumberInstances;
     }
 
     /**
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @param networks
-     *            the network list
+     * @param networks the network list
      */
     public void setNetworks(Set<Network> networks) {
         this.networks = networks;
     }
 
     /**
-     * @param payload
-     *            the payload to set
+     * @param payload the payload to set
      */
     public void setPayload(String payload) {
         this.payload = payload;
     }
 
     /**
-     * @param productReleases
-     *            the productReleases to set
+     * @param productReleases the productReleases to set
      */
     public void setProductReleases(List<ProductRelease> productReleases) {
         this.productReleases = productReleases;
@@ -485,18 +493,21 @@ public class Tier {
         this.securityGroup = securityGroup;
     }
 
+    /**
+     * Set a vdc.
+     * @param vdc
+     */
     public void setVdc(String vdc) {
-        if (vdc==null) {
-            this.vdc ="";
-        }
-        else {
+        if (vdc == null) {
+            this.vdc = "";
+        } else {
             this.vdc = vdc;
         }
     }
 
     /**
      * To the dto entity.
-     * 
+     *
      * @return
      */
     public TierDto toDto() {
@@ -542,7 +553,7 @@ public class Tier {
 
     /**
      * to json.
-     * 
+     *
      * @return
      */
     public String toJson() {
@@ -563,8 +574,7 @@ public class Tier {
     }
 
     /**
-     * @param network
-     *            the network list
+     * @param network the network list
      */
     public void updateNetwork(Network network) {
         for (Network net : this.networks) {
@@ -582,7 +592,7 @@ public class Tier {
     public void setRegion(String region) {
         this.region = region;
     }
-    
+
     public String getAffinity() {
         return affinity;
     }
@@ -595,32 +605,32 @@ public class Tier {
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[Tier]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[name = ").append(this.name).append("]");
-       sb.append("[vdc = ").append(this.vdc).append("]");
-       sb.append("[environmentname = ").append(this.environmentname).append("]");
-       sb.append("[flavour = ").append(this.flavour).append("]");
-       sb.append("[image = ").append(this.image).append("]");
-       sb.append("[icono = ").append(this.icono).append("]");
-       sb.append("[keypair = ").append(this.keypair).append("]");
-       sb.append("[floatingip = ").append(this.floatingip).append("]");
-       sb.append("[affinity = ").append(this.affinity).append("]");
-       sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
-       sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
-       sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
-       sb.append("[payload = ").append(this.payload).append("]");
-       sb.append("[productReleases = ").append(this.productReleases).append("]");
-       sb.append("[networks = ").append(this.networks).append("]");
-       sb.append("[securityGroup = ").append(this.securityGroup).append("]");
-       sb.append("[region = ").append(this.region).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[Tier]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[name = ").append(this.name).append("]");
+        sb.append("[vdc = ").append(this.vdc).append("]");
+        sb.append("[environmentname = ").append(this.environmentname).append("]");
+        sb.append("[flavour = ").append(this.flavour).append("]");
+        sb.append("[image = ").append(this.image).append("]");
+        sb.append("[icono = ").append(this.icono).append("]");
+        sb.append("[keypair = ").append(this.keypair).append("]");
+        sb.append("[floatingip = ").append(this.floatingip).append("]");
+        sb.append("[affinity = ").append(this.affinity).append("]");
+        sb.append("[maximumNumberInstances = ").append(this.maximumNumberInstances).append("]");
+        sb.append("[minimumNumberInstances = ").append(this.minimumNumberInstances).append("]");
+        sb.append("[initialNumberInstances = ").append(this.initialNumberInstances).append("]");
+        sb.append("[payload = ").append(this.payload).append("]");
+        sb.append("[productReleases = ").append(this.productReleases).append("]");
+        sb.append("[networks = ").append(this.networks).append("]");
+        sb.append("[securityGroup = ").append(this.securityGroup).append("]");
+        sb.append("[region = ").append(this.region).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
+
 }

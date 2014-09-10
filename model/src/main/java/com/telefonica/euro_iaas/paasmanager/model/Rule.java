@@ -33,7 +33,7 @@ import net.sf.json.JSONObject;
 
 /**
  * Rule entity for security groups.
- * 
+ *
  * @author henar
  */
 @Entity
@@ -60,7 +60,7 @@ public class Rule {
 
     /**
      * Constructor.
-     * 
+     *
      * @param ipProtocol
      * @param fromPort
      * @param toPort
@@ -78,7 +78,7 @@ public class Rule {
 
     /**
      * From json to entity.
-     * 
+     *
      * @param jsonNode
      */
     @SuppressWarnings("unchecked")
@@ -149,7 +149,7 @@ public class Rule {
 
     /**
      * to json for request Openstack.
-     * 
+     *
      * @return
      */
     public String toJSON() {
@@ -164,7 +164,7 @@ public class Rule {
         return payload;
 
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -181,7 +181,7 @@ public class Rule {
             if (other.id != null) {
                 return false;
             }
-        } 
+        }
         if (!this.fromPort.equals(other.fromPort)) {
             return false;
         }
@@ -191,41 +191,41 @@ public class Rule {
         if (!this.cidr.equals(other.cidr)) {
             return false;
         }
-        if (this.idparent!= null && !this.idparent.equals(other.idparent)) {
+        if (this.idparent != null && !this.idparent.equals(other.idparent)) {
             return false;
         }
 
         return true;
     }
+
     @Override
-   public int hashCode() {
-       final int prime = 31;
-       int result = 1;
-       result = prime * result + ((id == null) ? 0 : id.hashCode());
-       return result;
-   }
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
 
     /**
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
-     * @return a <code>String</code> representation 
+     * @return a <code>String</code> representation
      * of this object.
      */
     public String toString() {
-       StringBuilder sb = new StringBuilder("[[Rule]");
-       sb.append("[id = ").append(this.id).append("]");
-       sb.append("[ipProtocol = ").append(this.ipProtocol).append("]");
-       sb.append("[fromPort = ").append(this.fromPort).append("]");
-       sb.append("[toPort = ").append(this.toPort).append("]");
-       sb.append("[sourceGroup = ").append(this.sourceGroup).append("]");
-       sb.append("[cidr = ").append(this.cidr).append("]");
-       sb.append("[idparent = ").append(this.idparent).append("]");
-       sb.append("[idrule = ").append(this.idrule).append("]");
-       sb.append("]");
-       return sb.toString();
+        StringBuilder sb = new StringBuilder("[[Rule]");
+        sb.append("[id = ").append(this.id).append("]");
+        sb.append("[ipProtocol = ").append(this.ipProtocol).append("]");
+        sb.append("[fromPort = ").append(this.fromPort).append("]");
+        sb.append("[toPort = ").append(this.toPort).append("]");
+        sb.append("[sourceGroup = ").append(this.sourceGroup).append("]");
+        sb.append("[cidr = ").append(this.cidr).append("]");
+        sb.append("[idparent = ").append(this.idparent).append("]");
+        sb.append("[idrule = ").append(this.idrule).append("]");
+        sb.append("]");
+        return sb.toString();
     }
-    
-    
+
 
 }
