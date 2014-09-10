@@ -174,15 +174,8 @@ public class ApplicationInstanceResourceImpl implements ApplicationInstanceResou
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
 
         try {
-<<<<<<< HEAD
-
-             validator.validateUnInstall(vdc, environmentName, applicationName);
-             log.info("Application validated");
-
-=======
             validator.validateUnInstall(vdc, environmentName, applicationName);
             log.info("Application validated");
->>>>>>> 28648b94795def961a05a78ab4c4d7d07e708813
         } catch (Exception ex) {
             throw new APIException(ex);
         }
