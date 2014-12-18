@@ -58,29 +58,53 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     private static Logger log = LoggerFactory.getLogger(NetworkInstanceManagerImpl.class);
 
-  
-    public boolean exists (ClaudiaData claudiaData, NetworkInstance networkInstance, String region) throws InvalidEntityException, EntityNotFoundException {
+
+    /**
+     * It tests if the network already exist checking in the paas manager
+     * database and in Openstack.
+     * @param claudiaData
+     * @param networkInstance
+     * @param region
+     * @return
+     * @throws InvalidEntityException
+     * @throws EntityNotFoundException
+     */
+    public boolean exists (ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
+        throws InvalidEntityException, EntityNotFoundException {
     	if (existsInDB(networkInstance.getNetworkName(), claudiaData.getVdc(), region)) {
     		networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(), claudiaData.getVdc(), region);
             if (!existsInOpenstack (claudiaData, networkInstance, region)) {
-            	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id " + networkInstance.getIdNetwork() + " does no exists in Openstack") ;
+            	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id " +
+                    networkInstance.getIdNetwork() + " does no exists in Openstack") ;
             	this.deleteInDb(networkInstance);
             	return false;
-            	
             } else {
-            	 log.debug("The network "+  networkInstance.getNetworkName()+ " with id " + networkInstance.getIdNetwork() + " already exists");
+            	log.debug("The network "+  networkInstance.getNetworkName()+ " with id " +
+                    networkInstance.getIdNetwork() + " already exists");
             	return true;
             }
-            
-           
+
         } else {
-        	log.debug("The network "+  networkInstance.getNetworkName()+ " with id " + networkInstance.getIdNetwork() + " does not exist in DB");
+        	log.debug("The network "+  networkInstance.getNetworkName()+ " with id " +
+                networkInstance.getIdNetwork() + " does not exist in DB");
         	return false;
 
         }
     }
-    
-    public NetworkInstance create (ClaudiaData claudiaData, NetworkInstance networkInstance, String region) throws InfrastructureException, EntityNotFoundException, InvalidEntityException, AlreadyExistsEntityException {
+
+    /**
+     * It creates a new network deploying in Openstack
+     * @param claudiaData
+     * @param networkInstance
+     * @param region
+     * @return
+     * @throws InfrastructureException
+     * @throws EntityNotFoundException
+     * @throws InvalidEntityException
+     * @throws AlreadyExistsEntityException
+     */
+    public NetworkInstance create (ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
+        throws InfrastructureException, EntityNotFoundException, InvalidEntityException, AlreadyExistsEntityException {
     	networkClient.deployNetwork(claudiaData, networkInstance, region);
         log.debug("Network isntance " + networkInstance.getNetworkName() + " with vdc " + claudiaData.getVdc()
                 + ": " + networkInstance.getIdNetwork() + " deployed");

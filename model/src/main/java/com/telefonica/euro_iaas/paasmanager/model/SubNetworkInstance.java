@@ -79,7 +79,10 @@ public class SubNetworkInstance {
     }
 
     /**
-     * @param networkName
+     * Constructor.
+     * @param name
+     * @param vdc
+     * @param region
      */
     public SubNetworkInstance(String name, String vdc, String region) {
         this.name = name;
@@ -89,7 +92,11 @@ public class SubNetworkInstance {
     }
 
     /**
-     * @param networkName
+     * Constructor.
+     * @param name
+     * @param vdc
+     * @param region
+     * @param id
      */
     public SubNetworkInstance(String name, String vdc, String region, String id) {
         this.name = name;
@@ -157,7 +164,11 @@ public class SubNetworkInstance {
         this.idSubNet = id;
     }
 
-    @Override
+    /**
+     * Equals.
+     * @param obj
+     * @return
+     */
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -210,7 +221,8 @@ public class SubNetworkInstance {
     public String toJson() {
 
         return "{\"subnet\":{" + "      \"name\":\"" + name + "\"," + "      \"network_id\":\"" + this.idNetwork
-        + "\"," + "      \"ip_version\":4,    \"dns_nameservers\": [\"8.8.8.8\"],       \"cidr\":\"" + this.cidr + "\"   }" + "}";
+            + "\"," + "      \"ip_version\":4,    \"dns_nameservers\": [\"8.8.8.8\"], " +
+            "      \"cidr\":\"" + this.cidr + "\"   }" + "}";
     }
 
     /**

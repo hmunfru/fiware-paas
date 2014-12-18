@@ -61,7 +61,7 @@ public interface NetworkClient {
      */
 
     void deleteNetworkFromRouter(ClaudiaData claudiaData, RouterInstance router, NetworkInstance idNet, String region)
-            throws InfrastructureException;
+        throws InfrastructureException;
 
     /**
      * Deploy the network in the infrastructure.
@@ -69,7 +69,8 @@ public interface NetworkClient {
      * @param claudiaData
      * @param network
      */
-    void deployNetwork(ClaudiaData claudiaData, NetworkInstance network, String region) throws InfrastructureException;
+    void deployNetwork(ClaudiaData claudiaData, NetworkInstance network, String region)
+        throws InfrastructureException;
 
     /**
      * Deploy the router.
@@ -79,7 +80,8 @@ public interface NetworkClient {
      * @return
      * @throws InfrastructureException
      */
-    void deployRouter(ClaudiaData claudiaData, RouterInstance router, String region) throws InfrastructureException;
+    void deployRouter(ClaudiaData claudiaData, RouterInstance router, String region)
+        throws InfrastructureException;
 
     /**
      * Deploy the subnetwork in the infrastructure.
@@ -97,7 +99,7 @@ public interface NetworkClient {
      * @param networkInstance
      */
     void destroyNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
-            throws InfrastructureException;
+        throws InfrastructureException;
 
     /**
      * It delete a router in Openstack.
@@ -106,7 +108,8 @@ public interface NetworkClient {
      * @param router
      * @throws InfrastructureException
      */
-    void destroyRouter(ClaudiaData claudiaData, RouterInstance router, String region) throws InfrastructureException;
+    void destroyRouter(ClaudiaData claudiaData, RouterInstance router, String region)
+        throws InfrastructureException;
 
     /**
      * Destroy a subnet in OpenStack.
@@ -117,7 +120,7 @@ public interface NetworkClient {
      * @throws EntityNotFoundException
      */
     void destroySubNetwork(ClaudiaData claudiaData, SubNetworkInstance subnet, String region)
-            throws InfrastructureException;
+        throws InfrastructureException;
 
     /**
      * Loads all network associated to a certain vdc.
@@ -126,12 +129,14 @@ public interface NetworkClient {
      * @return List<Network>
      * @throws InfrastructureException
      */
-    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException;
+    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData, String region)
+        throws InfrastructureException;
 
     /**
      * Load a Network from OpenStack.
      */
-    String loadNetwork(ClaudiaData claudiaData, NetworkInstance network, String region) throws EntityNotFoundException;
+    String loadNetwork(ClaudiaData claudiaData, NetworkInstance network, String region)
+        throws EntityNotFoundException;
 
     /**
      * Load a subNet from Openstack.
@@ -163,7 +168,7 @@ public interface NetworkClient {
      * @throws InfrastructureException
      */
     void deleteNetworkToPublicRouter(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
-            throws InfrastructureException;
+        throws InfrastructureException;
 
 	/**
 	 * It obtains the no shared networks.
@@ -171,7 +176,8 @@ public interface NetworkClient {
 	 * @return
 	 * @throws InfrastructureException 
 	 */
-    List<NetworkInstance> loadNotSharedNetworks(ClaudiaData claudiaData, String region) throws InfrastructureException;
+    List<NetworkInstance> loadNotSharedNetworks(ClaudiaData claudiaData, String region)
+        throws InfrastructureException;
 
     /**
      * 
@@ -180,7 +186,8 @@ public interface NetworkClient {
      * @return
      * @throws InfrastructureException
      */
-    NetworkInstance deployDefaultNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException;
+    NetworkInstance deployDefaultNetwork(ClaudiaData claudiaData, String region)
+        throws InfrastructureException;
 
     /**
      * 

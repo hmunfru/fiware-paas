@@ -419,8 +419,9 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
             String vdc = claudiaData.getVdc();
             response = openStackUtil.getNetworkDetails(network.getIdNetwork(), region, token, vdc);
         } catch (OpenStackException e) {
-            String msm = "Error to obtain the network infromation " + network.getNetworkName() + ":" + e.getMessage();
-            log.error(msm);
+            String msm = "Error to obtain the network information " + network.getNetworkName()
+                + ":" + e.getMessage();
+            log.warn(msm);
             throw new EntityNotFoundException(Network.class, msm, e);
         }
         return response;
@@ -436,7 +437,12 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
     }
 
     /**
-     * It load the subNet.
+     * It loads the subnet from Openstack data.
+     * @param claudiaData
+     * @param subNet
+     * @param region
+     * @return
+     * @throws EntityNotFoundException
      */
     public String loadSubNetwork(ClaudiaData claudiaData, SubNetworkInstance subNet, String region)
             throws EntityNotFoundException {
@@ -446,8 +452,9 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
             String vdc = claudiaData.getVdc();
             response = openStackUtil.getSubNetworkDetails(subNet.getIdNetwork(), region, token, vdc);
         } catch (OpenStackException e) {
-            String msm = "Error to obtain the network infromation " + subNet.getName() + ":" + e.getMessage();
-            log.error(msm);
+            String msm = "Error to obtain the subnetwork information " +
+                subNet.getName() + ":" + e.getMessage();
+            log.warn(msm);
             throw new EntityNotFoundException(Network.class, msm, e);
         }
         return response;
