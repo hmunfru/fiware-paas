@@ -361,7 +361,5 @@ public class TierResourceTest extends TestCase {
 
         TierDto tierDto2 = new TierDto("tiername4", new Integer(1), new Integer(1), new Integer(1), productReleaseDto);
         tierResource.update(org, vdc, env, tierDto.getName(), tierDto2);
-
     }
-
 }
