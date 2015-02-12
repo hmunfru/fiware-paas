@@ -231,7 +231,7 @@ public class EnvironmentInstanceResourceImpl implements EnvironmentInstanceResou
         log.info("Destroy env isntna " + name + " vdc " + vdc);
         EnvironmentInstance environmentInstance = null;
         try {
-            environmentInstance = environmentInstanceManager.loadWithTiers(vdc, name);
+            environmentInstance = environmentInstanceManager.load(vdc, name);
         } catch (EntityNotFoundException e) {
             log.warn("Not found " + e.getMessage());
             throw new APIException(e);
