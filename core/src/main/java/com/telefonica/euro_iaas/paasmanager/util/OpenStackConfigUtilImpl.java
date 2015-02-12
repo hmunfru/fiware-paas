@@ -26,7 +26,6 @@ package com.telefonica.euro_iaas.paasmanager.util;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +48,7 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
 
     private static Logger log = LoggerFactory.getLogger(OpenStackConfigUtilImpl.class);
 
-    private HttpClientConnectionManager connectionManager;
+    private HttpClientConnectionManager httpConnectionManager;
 
     private OpenStackRegion openStackRegion;
 
@@ -61,16 +60,15 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
      * The constructor.
      */
     public OpenStackConfigUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
         regionCache = new RegionCache();
     }
 
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
 
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
     /**
