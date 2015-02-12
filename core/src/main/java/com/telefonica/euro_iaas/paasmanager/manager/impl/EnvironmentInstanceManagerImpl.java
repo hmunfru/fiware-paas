@@ -348,17 +348,12 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
     }
 
     public EnvironmentInstance load(String vdc, String name) throws EntityNotFoundException {
-        EnvironmentInstance instance = null;
         try {
-            instance = environmentInstanceDao.load(name, vdc);
+            return environmentInstanceDao.load(name, vdc);
         } catch (Exception e) {
             log.info("error to find environment instance " + e.getMessage());
             throw new EntityNotFoundException(EnvironmentInstance.class, "vdc", vdc);
         }
-        if (!instance.getVdc().equals(vdc)) {
-            throw new EntityNotFoundException(EnvironmentInstance.class, "vdc", vdc);
-        }
-        return instance;
     }
 
     public EnvironmentInstance update(EnvironmentInstance envInst) throws InvalidEntityException {
