@@ -31,7 +31,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -220,15 +219,15 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         CloseableHttpClient httpClient = getHttpClient();
         ArrayList<Object> message = new ArrayList();
 
-        Date localDate = null;
         String aux;
         try {
             response = httpClient.execute(postRequest);
 
-            localDate = new Date();
-            if ((response.getStatusLine().getStatusCode() != 201) && (response.getStatusLine().getStatusCode() != 200)) {
-                log.error("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-                throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+            int statusCode = response.getStatusLine().getStatusCode();
+            if ((statusCode != 201) && (statusCode != 200)) {
+                String errorMessage = "Failed : HTTP error code : " + statusCode;
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage);
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String temp = "";
