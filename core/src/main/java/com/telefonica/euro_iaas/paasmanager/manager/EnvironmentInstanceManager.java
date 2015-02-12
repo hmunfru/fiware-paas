@@ -73,6 +73,16 @@ public interface EnvironmentInstanceManager {
     public EnvironmentInstance load(String vdc, String name) throws EntityNotFoundException;
 
     /**
+     * Load an environment instance with its tiers.
+     * 
+     * @param vdc
+     * @param name
+     * @return
+     * @throws EntityNotFoundException
+     */
+    public EnvironmentInstance loadWithTiers(String vdc, String name) throws EntityNotFoundException;
+
+    /**
      * @param envInst
      * @return
      * @throws InvalidEntityException

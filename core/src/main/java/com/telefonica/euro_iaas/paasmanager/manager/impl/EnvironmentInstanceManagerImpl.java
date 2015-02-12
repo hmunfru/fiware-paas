@@ -66,7 +66,6 @@ import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.EnvironmentInstanceSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.sdc.model.dto.ChefClient;
 
 public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManager {
 
@@ -91,6 +90,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It filter some environment instances.
+     * 
      * @param criteria
      *            the search criteria
      * @return
@@ -102,6 +102,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It returns all environment instances.
+     * 
      * @return
      */
     public List<EnvironmentInstance> findAll() {
@@ -110,6 +111,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It creastes the environment instance including hardware and software.
+     * 
      * @param claudiaData
      * @param environmentInstance
      * @return
@@ -138,6 +140,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
         environmentInstance = insertEnvironmentInstanceInDatabase(environmentInstance);
 
+        environmentManager.loadNetworks(environment);
         if (environment.isNetworkFederated()) {
             try {
                 updateFederatedNetworks(claudiaData, environment);
@@ -217,6 +220,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It updates the networks federated.
+     * 
      * @param claudiaData
      * @param environment
      * @throws InfrastructureException
@@ -255,6 +259,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It installs the software in the environment.
+     * 
      * @param claudiaData
      * @param environmentInstance
      * @return
@@ -356,6 +361,17 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
         return instance;
     }
 
+    public EnvironmentInstance loadWithTiers(String vdc, String name) throws EntityNotFoundException {
+        EnvironmentInstance instance = null;
+        try {
+            instance = environmentInstanceDao.load(name, vdc);
+        } catch (Exception e) {
+            log.info("error to find environment instance " + e.getMessage());
+            throw new EntityNotFoundException(EnvironmentInstance.class, "vdc", vdc);
+        }
+
+        return instance;
+    }
 
     public EnvironmentInstance update(EnvironmentInstance envInst) throws InvalidEntityException {
         try {
@@ -369,6 +385,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     /**
      * It destroy the environment.
+     * 
      * @param claudiaData
      * @param envInstance
      * @throws Exception
@@ -421,7 +438,8 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     }
 
-    private void deletePaaSDB(ClaudiaData claudiaData, EnvironmentInstance envInstance, TierInstance tierInstance, boolean error) throws InvalidEntityException {
+    private void deletePaaSDB(ClaudiaData claudiaData, EnvironmentInstance envInstance, TierInstance tierInstance,
+            boolean error) throws InvalidEntityException {
         // Borrado del registro en BBDD paasmanager
         log.info("Deleting the environment instance " + envInstance.getBlueprintName() + " in the database ");
 
@@ -483,11 +501,12 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
         if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
             try {
                 environment = environmentManager.load(env.getName(), env.getVdc());
-                log.info("afeter obtainin environment");
+                log.info("after obtain environment");
 
                 Set<Tier> tiers = new HashSet();
                 for (Tier tier : env.getTiers()) {
-                    Tier tierDB = tierManager.loadTierWithNetworks(tier.getName(), env.getVdc(), env.getName());
+                    tier.setVdc(env.getVdc());
+                    Tier tierDB = tierManager.loadComplete(tier);
                     log.info("tier " + tier.getName() + " " + env.getVdc() + " " + tier.getRegion());
                     log.info("tierDB " + tierDB.getName() + " " + env.getVdc() + " " + tierDB.getRegion());
                     tierDB = updateTierDB(tierDB, tier);
@@ -498,8 +517,8 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
                     for (ProductRelease pRelease : productReleases) {
                         if (pRelease != null) {
-                            ProductRelease pReleaseDB = productReleaseManager.load(
-                                    pRelease.getProduct() + "-" + pRelease.getVersion(), claudiaData);
+                            ProductRelease pReleaseDB = productReleaseManager.load(pRelease.getProduct() + "-"
+                                    + pRelease.getVersion(), claudiaData);
                             pReleaseDB = updateProductReleaseDB(pReleaseDB, pRelease);
                             pReleaseDB = productReleaseManager.update(pReleaseDB);
                             pReleases.add(pReleaseDB);
@@ -514,6 +533,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
                 return environment;
             } catch (Exception e1) {
+                e1.printStackTrace();
                 log.warn("Error to load env " + e1.getMessage());
                 throw new EntityNotFoundException(Environment.class,
                         "The environment should have been already created", e1);

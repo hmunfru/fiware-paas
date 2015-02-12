@@ -138,4 +138,10 @@ public interface TierManager {
      */
     void updateTier(ClaudiaData data, Tier tierold, Tier tiernew) throws InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException;
 
+    /**
+     * Load with networks, products, security groups from database
+     * @param tier
+     * @return
+     */
+    Tier loadComplete(Tier tier) throws EntityNotFoundException;
 }

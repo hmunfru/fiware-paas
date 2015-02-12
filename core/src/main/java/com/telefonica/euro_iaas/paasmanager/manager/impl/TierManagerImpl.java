@@ -600,7 +600,7 @@ public class TierManagerImpl implements TierManager {
         tierold.setMaximumNumberInstances(tiernew.getMaximumNumberInstances());
         tierold.setMinimumNumberInstances(tiernew.getMinimumNumberInstances());
         tierold.setRegion(tiernew.getRegion());
-        
+
         update(tierold);
 
         // Get networks to be delete
@@ -649,6 +649,11 @@ public class TierManagerImpl implements TierManager {
             tierold.addProductRelease(productRelease);
             update(tierold);
         }
+    }
+
+    @Override
+    public Tier loadComplete(Tier tier) throws EntityNotFoundException {
+        return tierDao.loadComplete(tier);
     }
 
 }

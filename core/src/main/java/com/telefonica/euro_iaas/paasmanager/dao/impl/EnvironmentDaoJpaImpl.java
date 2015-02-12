@@ -38,6 +38,7 @@ import com.telefonica.euro_iaas.commons.dao.AbstractBaseDao;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.EnvironmentDao;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
+import com.telefonica.euro_iaas.paasmanager.model.Tier;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public class EnvironmentDaoJpaImpl extends AbstractBaseDao<Environment, String> implements EnvironmentDao {
@@ -61,15 +62,16 @@ public class EnvironmentDaoJpaImpl extends AbstractBaseDao<Environment, String> 
     public Environment findByEnvironmentNameVdc(String envName, String vdc) throws EntityNotFoundException {
         log.info("findByEnvironmentNameVdc");
         Query query = getEntityManager().createQuery(
-                "select p from Environment p left join " + "fetch p.tiers where p.name = :name and p.vdc = :vdc");
+                "select p from Environment p left join fetch p.tiers where p.name = :name and p.vdc = :vdc");
+
         query.setParameter("name", envName);
         query.setParameter("vdc", vdc);
         Environment environment = null;
         try {
             environment = (Environment) query.getResultList().get(0);
-            log.info("" + Hibernate.isInitialized(environment));
-            Hibernate.initialize(environment);
-            log.info("" + Hibernate.isInitialized(environment));
+            for (Tier tier : environment.getTiers()) {
+                tier.getProductReleases();
+            }
         } catch (Exception e) {
             log.warn("Error to load the env " + envName + " " + e.getMessage());
             throw new EntityNotFoundException(Environment.class, "name", envName);
@@ -113,6 +115,13 @@ public class EnvironmentDaoJpaImpl extends AbstractBaseDao<Environment, String> 
         list = query.setParameter("orgName", org).getResultList();
 
         return list;
+    }
+
+    @Override
+    public void loadNetworks(Environment environment) {
+        for (Tier tier : environment.getTiers()) {
+            Hibernate.initialize(tier.getNetworks());
+        }
     }
 
 }
