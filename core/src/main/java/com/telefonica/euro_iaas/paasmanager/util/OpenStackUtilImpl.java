@@ -32,10 +32,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,8 +63,6 @@ public class OpenStackUtilImpl implements OpenStackUtil {
      */
     private String tenant;
 
-    private HttpClientConnectionManager connectionManager;
-
     private OpenStackRegion openStackRegion;
 
     private OpenOperationUtil openOperationUtil;
@@ -79,15 +73,6 @@ public class OpenStackUtilImpl implements OpenStackUtil {
      * The constructor.
      */
     public OpenStackUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
-    }
-
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
-    }
-
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
     }
 
     /**
@@ -626,10 +611,6 @@ public class OpenStackUtilImpl implements OpenStackUtil {
             throw new OpenStackException(errorMessage);
         }
 
-    }
-
-    protected CloseableHttpClient getHttpClient() {
-        return HttpClients.custom().setConnectionManager(connectionManager).build();
     }
 
     /**
