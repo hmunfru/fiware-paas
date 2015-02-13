@@ -31,7 +31,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -50,7 +49,6 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +106,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
      */
     private String user;
 
-    private HttpClientConnectionManager connectionManager;
+    private HttpClientConnectionManager httpConnectionManager;
 
     private OpenStackRegion openStackRegion;
 
@@ -116,15 +114,14 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
      * The constructor.
      */
     public OpenOperationUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
     }
 
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
 
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
     /**
@@ -222,14 +219,15 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         CloseableHttpClient httpClient = getHttpClient();
         ArrayList<Object> message = new ArrayList();
 
-        Date localDate = null;
         String aux;
         try {
             response = httpClient.execute(postRequest);
-            localDate = new Date();
-            if ((response.getStatusLine().getStatusCode() != 201) && (response.getStatusLine().getStatusCode() != 200)) {
-                log.error("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-                throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+
+            int statusCode = response.getStatusLine().getStatusCode();
+            if ((statusCode != 201) && (statusCode != 200)) {
+                String errorMessage = "Failed : HTTP error code : " + statusCode;
+                log.error(errorMessage);
+                throw new RuntimeException(errorMessage);
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String temp = "";
@@ -449,7 +447,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
         String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
-        log.debug ("quantumUrl for region " + region + " " + quantumUrl);
+        log.debug("quantumUrl for region " + region + " " + quantumUrl);
         request = new HttpGet(quantumUrl + resource);
 
         request.setHeader(ACCEPT, accept);
@@ -621,7 +619,8 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
     }
 
     protected CloseableHttpClient getHttpClient() {
-        return HttpClients.custom().setConnectionManager(connectionManager).build();
+        return HttpClients.custom().setConnectionManager(httpConnectionManager).build();
+
     }
 
     /**

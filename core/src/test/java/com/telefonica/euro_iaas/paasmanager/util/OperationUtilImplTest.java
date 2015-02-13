@@ -97,7 +97,7 @@ public class OperationUtilImplTest {
         openStackRegion = mock(OpenStackRegion.class);
         openOperationUtil.setOpenStackRegion(openStackRegion);
         HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
-        openOperationUtil.setConnectionManager(httpClientConnectionManager);
+        openOperationUtil.setHttpConnectionManager(httpClientConnectionManager);
         openOperationUtil.setSystemPropertiesProvider(systemPropertiesProvider);
 
         GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);

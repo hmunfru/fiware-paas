@@ -41,7 +41,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,9 +110,6 @@ public class OpenStackUtilImplTest {
         paasManagerUser = new PaasManagerUser("user", "aa", authorities);
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
-
-        HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
-        openStackUtil.setConnectionManager(httpClientConnectionManager);
 
         httpResponse = mock(CloseableHttpResponse.class);
         statusLine = mock(StatusLine.class);
