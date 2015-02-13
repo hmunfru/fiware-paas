@@ -73,4 +73,11 @@ public interface EnvironmentDao extends BaseDAO<Environment, String> {
      * @return
      */
     List<Environment> findByOrg(String org);
+
+    /**
+     * Load networks from database.
+     * 
+     * @param environment
+     */
+    void loadNetworks(Environment environment);
 }

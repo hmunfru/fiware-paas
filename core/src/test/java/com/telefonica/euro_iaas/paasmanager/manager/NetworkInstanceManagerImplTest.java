@@ -371,5 +371,117 @@ public class NetworkInstanceManagerImplTest {
         assertEquals (result, true);
     }
 
+    @Test
+    public void testGetDefaultCIDRMaxNetworkAchieved() throws Exception {
+        networkInstanceManager.MAX_NETWORK=4;
+        networkInstanceManager.NET_ELEMENT = 2;
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("another");
+        net.addSubNet(subNet);
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        nets.add(net);
+        nets.add(net);
+        nets.add(net);
+
+        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "");
+
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),anyString())).thenReturn(nets);
+        // Verify
+        String cidr = networkInstanceManager.getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.3.1.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDROnet() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("another");
+        net.addSubNet(subNet);
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+
+        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "");
+
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),anyString())).thenReturn(nets);
+        // Verify
+        String cidr = networkInstanceManager.getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.2.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDRAlreadyExists() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME,
+            "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("10.2.2.0/24");
+
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        List<SubNetworkInstance> subNets =
+            new ArrayList<SubNetworkInstance>();
+        subNets.add(subNet);
+
+        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "");
+
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),
+            anyString())).thenReturn(nets);
+        when (networkClient.loadAllSubNetworks(any(ClaudiaData.class),
+            anyString())).thenReturn(subNets);
+        // Verify
+        String cidr = networkInstanceManager.
+            getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.3.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDRAlreadyExistsTwoNets() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME,
+            "VDC", "region");
+
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("10.2.3.0/24");
+        SubNetworkInstance subNet2 = new SubNetworkInstance ();
+        subNet2.setCidr("10.2.4.0/24");
+
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        nets.add(net);
+        List<SubNetworkInstance> subNets =
+            new ArrayList<SubNetworkInstance>();
+        subNets.add(subNet);
+        subNets.add(subNet2);
+
+        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "");
+
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),
+            anyString())).thenReturn(nets);
+        when (networkClient.loadAllSubNetworks(any(ClaudiaData.class),
+            anyString())).thenReturn(subNets);
+        // Verify
+        String cidr = networkInstanceManager.
+            getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.5.0/24");
+    }
+
 
 }

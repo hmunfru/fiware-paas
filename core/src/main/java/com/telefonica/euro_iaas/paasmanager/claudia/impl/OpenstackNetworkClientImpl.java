@@ -362,6 +362,55 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
     }
 
     /**
+     * It loads all the subnets.
+     * @param claudiaData
+     * @param region
+     * @return
+     * @throws InfrastructureException
+     */
+    public List<SubNetworkInstance> loadAllSubNetworks(ClaudiaData claudiaData,
+                                                      String region)
+        throws InfrastructureException {
+        String token = claudiaData.getUser().getToken();
+        String vdc = claudiaData.getVdc();
+        log.info("Get subnetworks for user "
+            + claudiaData.getUser().getTenantName()
+            + " with token " + token + " and vdc " + vdc);
+        List<SubNetworkInstance> subNetworks =
+            new ArrayList<SubNetworkInstance>();
+        try {
+
+            String response = openStackUtil.
+                listSubNetworks(claudiaData.getUser(), region);
+            JSONObject lSubNetworkString = new JSONObject(response);
+            JSONArray jsonSubNetworks =
+                lSubNetworkString.getJSONArray("subnets");
+
+            for (int i = 0; i < jsonSubNetworks.length(); i++) {
+
+                JSONObject jsonSubNet = jsonSubNetworks.getJSONObject(i);
+                SubNetworkInstance subNetInst =
+                    SubNetworkInstance.fromJson(jsonSubNet, region);
+                subNetworks.add(subNetInst);
+
+            }
+
+        } catch (OpenStackException e) {
+            String msm = "Error to get the subnetworks in region " + region +
+                ": " + e.getMessage();
+            log.error(msm);
+            throw new InfrastructureException(msm, e);
+        } catch (JSONException e) {
+            String msm = "Error to process JSON in load subnetwork in region " +
+                region + ": " + e.getMessage();
+            log.error(msm);
+            throw new InfrastructureException(msm, e);
+        }
+        return subNetworks;
+    }
+
+
+    /**
      * It loads all networks.
      * 
      * @params claudiaData

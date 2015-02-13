@@ -106,4 +106,11 @@ public interface EnvironmentManager {
      * @return
      */
     List<Environment> findByOrg(String org);
+
+    /**
+     * load network from database
+     * 
+     * @param environment
+     */
+    void loadNetworks(Environment environment);
 }

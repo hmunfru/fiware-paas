@@ -38,18 +38,16 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Port;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
@@ -89,6 +87,15 @@ public class OpenStackNetworkImplTest {
             + " \"gre\", \"router:external\": true, \"shared\": false, \"id\": " +
             "\"080b5f2a-668f-45e0-be23-361c3a7d11d0\", \"provider:segmentation_id\": 1}"
             + "]}";
+
+    private String SUB_NETWORKS_STRING = "{\"subnets\": " +
+        "[{\"name\": \"demo-subnet\", \"enable_dhcp\": true, \"network_id\": " +
+        "\"e9dcf592\", \"tenant_id\": \"0c6e5c00749b45999c88609049ee5c4b\", " +
+        "\"dns_nameservers\": [], \"gateway_ip\": \"192.168.1.1\", " +
+        "\"cidr\": \"192.168.1.0/24\", \"id\": \"6795f2f2-a103-4602-ab07-c5ea0ac737e7\"}," +
+        "{\"name\": \"net2\", \"enable_dhcp\": true, \"network_id\": \"90689\", " +
+        "\"tenant_id\": \"71c462bc3d204135b655cb59f7ea2620\", \"cidr\": \"10.0.9.0/24\", " +
+        "\"id\": \"81a05896-5a2b-4b53-a433-a1ea3c728b21\"}]}";
 
     @Before
     public void setUp() {
@@ -182,6 +189,31 @@ public class OpenStackNetworkImplTest {
         assertEquals(networks.get(0).getIdNetwork(), "044aecbe-3975-4318-aad2-a1232dcde47d");
         assertEquals(networks.get(0).getShared(), false);
         assertEquals(networks.get(0).getTenantId(), "67c979f51c5b4e89b85c1f876bdffe31");
+
+    }
+
+    /**
+     * This tests check the data obtaining to list all
+     * subnets.
+     * @throws OpenStackException
+     * @throws InfrastructureException
+     */
+    @Test
+    public void shouldObtainSubDataNetwork()
+        throws OpenStackException, InfrastructureException {
+
+        // when
+        when(openStackUtil.listSubNetworks(any(PaasManagerUser.class),
+            anyString())).thenReturn(SUB_NETWORKS_STRING);
+
+        List<SubNetworkInstance> subNetworks =
+            openStackNetworkImpl.loadAllSubNetworks(claudiaData, REGION);
+
+        // then
+        assertNotNull(subNetworks);
+        verify(openStackUtil).listSubNetworks(any(PaasManagerUser.class), anyString());
+        assertEquals(2, subNetworks.size());
+        assertEquals(subNetworks.get(0).getCidr(), "192.168.1.0/24");
 
     }
 

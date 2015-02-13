@@ -122,13 +122,27 @@ public interface NetworkClient {
             throws InfrastructureException;
 
     /**
-     * Loads all network associated to a certain vdc.
+     * Loads all networks associated to a certain vdc.
      * 
      * @param claudiaData
      * @return List<Network>
      * @throws InfrastructureException
      */
-    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException;
+    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData,
+                                         String region)
+        throws InfrastructureException;
+
+    /**
+     * Loads all subnetwork associated to a certain vdc.
+     *
+     * @param claudiaData
+     * @return List<SubNetwork>
+     * @throws InfrastructureException
+     */
+    List<SubNetworkInstance> loadAllSubNetworks(ClaudiaData claudiaData,
+                                         String region)
+        throws InfrastructureException;
+
 
     /**
      * Load a Network from OpenStack.
