@@ -347,7 +347,7 @@ public class OpenStackNetworkImplTest {
                 "       }\n" +
                 "    }\n" +
                 "\n";
-        NetworkInstance net = new NetworkInstance("dia146", "vdc", "region");
+        NetworkInstance net = new NetworkInstance("ext-net", "\"08bed031f6c54c9d9b35b42aa06b51c0\"", "region");
         when(openStackUtil.listNetworks(any(PaasManagerUser.class), anyString())).thenReturn(NETWORKS_STRING);
         when(openStackUtil.getNetworkDetails(anyString(),anyString(),anyString(),anyString())).thenReturn(response2);
         when(openStackUtil.getSubNetworkDetails(anyString(),anyString(),anyString(),anyString())).thenReturn(response3);
