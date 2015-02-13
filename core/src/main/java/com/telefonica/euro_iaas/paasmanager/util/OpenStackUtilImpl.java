@@ -993,6 +993,40 @@ public class OpenStackUtilImpl implements OpenStackUtil {
 
     }
 
+    /**
+     * It lists the subnets for the user in a concrete region.
+     * @param user: the user
+     * @param region: the region
+     * @return
+     * @throws OpenStackException
+     */
+    public String listSubNetworks(PaasManagerUser user, String region)
+        throws OpenStackException {
+        log.debug("List subnetworks from user " + user.getUserName());
+
+        PaasManagerUser user2 = openOperationUtil.getAdminUser(user);
+
+        HttpUriRequest request = openOperationUtil.
+            createQuantumGetRequest(RESOURCE_SUBNETS, APPLICATION_JSON, region,
+            user2.getToken(), user2.getUserName());
+
+        String response = null;
+
+        try {
+            response = openOperationUtil.executeNovaRequest(request);
+            log.debug("List network response");
+            log.debug(response);
+
+        } catch (Exception e) {
+            String errorMessage = "Error getting list of subnetworks " +
+                "from OpenStack: " + e;
+            log.error(errorMessage);
+            throw new OpenStackException(errorMessage);
+        }
+        return response;
+
+    }
+
     public String listPorts(PaasManagerUser user, String region) throws OpenStackException {
         log.debug("List ports from user " + user.getUserName());
         PaasManagerUser user2 = openOperationUtil.getAdminUser(user);

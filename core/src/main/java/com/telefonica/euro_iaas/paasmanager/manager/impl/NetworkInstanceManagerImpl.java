@@ -24,7 +24,6 @@
 
 package com.telefonica.euro_iaas.paasmanager.manager.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -58,6 +57,10 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     private RouterManager routerManager = null;
     private SystemPropertiesProvider systemPropertiesProvider;
 
+    private static String NETWORK_CIDR = "10.%s.%s.0/24";
+    public static int MAX_NETWORK = 254;
+    public static int NET_ELEMENT = 2;
+
     private static Logger log = LoggerFactory.getLogger(NetworkInstanceManagerImpl.class);
 
     /**
@@ -75,18 +78,18 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     	if (existsInDB(networkInstance.getNetworkName(), claudiaData.getVdc(), region)) {
     		networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(), claudiaData.getVdc(), region);
             if (!existsInOpenstack (claudiaData, networkInstance, region)) {
-            	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id " +
-                     networkInstance.getIdNetwork() + " does no exists in Openstack") ;
+            	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id "
+                    + networkInstance.getIdNetwork() + " does no exists in Openstack") ;
             	this.deleteInDb(networkInstance);
             	return false;
-            	
+
             } else {
-            	log.info("The network "+  networkInstance.getNetworkName()+ " with id " +
-                    networkInstance.getIdNetwork() + " already exists");
+            	log.info("The network "+  networkInstance.getNetworkName()+ " with id "
+                    + networkInstance.getIdNetwork() + " already exists");
             	return true;
             }
-            
-           
+
+
         } else {
             if (!existsInOpenstack (claudiaData, networkInstance, region)) {
                 log.warn ("The network "+  networkInstance.getNetworkName()+ " with id " +
@@ -157,7 +160,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     /**
      * It restore the situation if there is a failure.
-     * 
+     *
      * @param claudiaData
      * @param networkInstance
      * @throws EntityNotFoundException
@@ -209,13 +212,15 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     /**
      * To remove a network.
-     * 
+     *
      * @params claudiaData
      * @params network
      */
-    public void delete(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
+    public void delete(ClaudiaData claudiaData,
+                       NetworkInstance networkInstance, String region)
             throws InvalidEntityException, InfrastructureException {
-        log.info("Destroying network " + networkInstance.getNetworkName() + " region " + region);
+        log.info("Destroying network " + networkInstance.getNetworkName()
+            + " region " + region);
 
         if (!canBeDeleted(claudiaData, networkInstance, region)) {
             log.info("The network cannot be deleted due to existing ports");
@@ -224,18 +229,21 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
         log.info("Deleting the public interface");
         try {
-            log.info("Loading newtwokr " + networkInstance.getNetworkName() + "  " + claudiaData.getVdc() + " "
-                    + region);
-            networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(), claudiaData.getVdc(), region);
+            log.info("Loading network " + networkInstance.getNetworkName()
+                + "  " + claudiaData.getVdc() + " " + region);
+            networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(),
+                claudiaData.getVdc(), region);
         } catch (Exception e) {
-            log.error("It is not possible to find the network " + e.getMessage());
+            log.error("It is not possible to find the network "
+                + e.getMessage());
             throw new InvalidEntityException(networkInstance);
         }
         try {
-            networkClient.deleteNetworkToPublicRouter(claudiaData, networkInstance, region);
+            networkClient.deleteNetworkToPublicRouter(claudiaData,
+                networkInstance, region);
         } catch (Exception e) {
-            log.warn ("It is not possible to delete the public interface. It is not exist: "+
-                e.getMessage());
+            log.warn ("It is not possible to delete the public interface. "
+                + "It is not exist: " + e.getMessage());
         }
 
         log.info("Deleting the subnets");
@@ -255,11 +263,12 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         }
 
     }
-    
-    private void deleteInDb(NetworkInstance networkInstance) throws InvalidEntityException {
-    log.info("Destroying network in DB" + networkInstance.getNetworkName() + " " + networkInstance.getSubNets().size() );
 
-    
+    private void deleteInDb(NetworkInstance networkInstance)
+        throws InvalidEntityException {
+    log.info("Destroying network in DB" + networkInstance.getNetworkName()
+        + " " + networkInstance.getSubNets().size() );
+
     Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
     log.info("Deleting the subnets " + subNetAux.size());
     networkInstance.getSubNets().clear();
@@ -280,15 +289,18 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     /**
      * To remove a network.
-     * 
+     *
      * @params claudiaData
      * @params network
      */
-    public boolean canBeDeleted(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
+    public boolean canBeDeleted(ClaudiaData claudiaData,
+                                NetworkInstance networkInstance, String region)
             throws InvalidEntityException, InfrastructureException {
-        log.info("Obtaining ports from network" + networkInstance.getNetworkName());
+        log.info("Obtaining ports from network"
+            + networkInstance.getNetworkName());
 
-        List<Port> ports = networkClient.listPortsFromNetwork(claudiaData, region, networkInstance.getIdNetwork());
+        List<Port> ports = networkClient.listPortsFromNetwork(claudiaData, region,
+                networkInstance.getIdNetwork());
         log.info("List ports " + ports.size());
         if (ports.size() == 0) {
             return true;
@@ -297,22 +309,34 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             for (Port port : ports) {
                 strPorts = strPorts + " " + port.getNetworkId();
             }
-            log.info("It is not possible to undeply the network since there are VMs associated to it " + strPorts);
+            log.info("It is not possible to undeply the network since there "
+                + " are VMs associated to it " + strPorts);
             return false;
 
         }
     }
 
-    public void joinNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, NetworkInstance networkInstance2)
-            throws EntityNotFoundException, InvalidEntityException, InfrastructureException {
-        log.info("joining netowrk " + networkInstance.getNetworkName() + " " + networkInstance2.getNetworkName());
-        networkClient.joinNetworks(claudiaData, networkInstance, networkInstance2);
+    /**
+     * It join two networks.
+     * @param claudiaData: credentials
+     * @param net1
+     * @param net2
+     * @throws EntityNotFoundException
+     * @throws InvalidEntityException
+     * @throws InfrastructureException
+     */
+    public void joinNetwork(ClaudiaData claudiaData, NetworkInstance net1,
+                            NetworkInstance net2)
+            throws EntityNotFoundException, InvalidEntityException,
+        InfrastructureException {
+        log.info("joining netowrk " + net1.getNetworkName()
+            + " " + net2.getNetworkName());
+        networkClient.joinNetworks(claudiaData, net1, net2);
 
     }
 
     /**
      * To obtain the list of networks.
-     * 
      * @return the network list
      */
     public List<NetworkInstance> findAll() {
@@ -321,10 +345,10 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     /**
      * To obtain the list of networks.
-     * 
      * @return the network list
      */
-    private boolean existsInDB(String networkInstance, String vdc, String region) {
+    private boolean existsInDB(String networkInstance,
+                               String vdc, String region) {
         try {
             networkInstanceDao.load(networkInstance, vdc, region);
             return true;
@@ -334,7 +358,9 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     }
 
-    private NetworkInstance createInBD (ClaudiaData data, NetworkInstance netInstance, String region)
+    private NetworkInstance createInBD (ClaudiaData data,
+                                        NetworkInstance netInstance,
+                                        String region)
         throws EntityNotFoundException, AlreadyExistsEntityException {
 
         netInstance = networkClient.loadNetwork(data, netInstance, region);
@@ -347,31 +373,34 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         }
         netInstance = networkInstanceDao.create(netInstance);
         return netInstance;
-
     }
-    
-    private boolean existsInOpenstack (ClaudiaData claudiaData, NetworkInstance network, String region) {
+
+    private boolean existsInOpenstack (ClaudiaData claudiaData,
+                                       NetworkInstance network, String region) {
     	try {
 			networkClient.loadNetwork(claudiaData, network, region);
 			return true;
 		} catch (EntityNotFoundException e) {
-			return false;// TODO Auto-generated catch block
+			return false;
 
 		}
     }
 
-    public List<NetworkInstance> listNetworks(ClaudiaData claudiaData, String region) throws InfrastructureException {
-        List<NetworkInstance> networkInstances = networkClient.loadAllNetwork(claudiaData, region);
+    public List<NetworkInstance> listNetworks(ClaudiaData claudiaData,
+                                              String region)
+        throws InfrastructureException {
+        List<NetworkInstance> networkInstances =
+            networkClient.loadAllNetwork(claudiaData, region);
         return networkInstances;
     }
 
     /**
      * To obtain the network.
-     * 
      * @param networkName
      * @return the network
      */
-    public NetworkInstance load(String networkName, String vdc, String region) throws EntityNotFoundException {
+    public NetworkInstance load(String networkName, String vdc, String region)
+        throws EntityNotFoundException {
         return networkInstanceDao.load(networkName, vdc, region);
     }
 
@@ -387,7 +416,8 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         this.routerManager = routerManager;
     }
 
-    public void setSubNetworkInstanceManager(SubNetworkInstanceManager subNetworkInstanceManager) {
+    public void setSubNetworkInstanceManager(SubNetworkInstanceManager
+                                                subNetworkInstanceManager) {
         this.subNetworkInstanceManager = subNetworkInstanceManager;
     }
 
@@ -395,29 +425,89 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      * @param systemPropertiesProvider
      *            the systemPropertiesProvider to set
      */
-    public void setSystemPropertiesProvider(SystemPropertiesProvider systemPropertiesProvider) {
+    public void setSystemPropertiesProvider(SystemPropertiesProvider
+                                                systemPropertiesProvider) {
         this.systemPropertiesProvider = systemPropertiesProvider;
     }
 
-    public NetworkInstance update(NetworkInstance networkInstance) throws InvalidEntityException {
+    public NetworkInstance update(NetworkInstance networkInstance)
+        throws InvalidEntityException {
         return networkInstanceDao.update(networkInstance);
     }
 
-    public int getNumberDeployedNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException {
+    /**
+     * It obtains the number of networks deployed in a concrete region.
+     * This is used for obtaining a valid CIDR.
+     * @param claudiaData: credentials.
+     * @param region: the region
+     * @return the number of regions
+     * @throws InfrastructureException
+     */
+    public int getNumberDeployedNetwork(ClaudiaData claudiaData,
+                                        String region)
+        throws InfrastructureException {
         return networkClient.loadAllNetwork(claudiaData, region).size();
     }
-    
- 
-    private String getDefaultCidr(ClaudiaData claudiaData, String region) throws InvalidEntityException,
-            AlreadyExistsEntityException, InfrastructureException {
-        int cidrOpenstack = 1;
+
+    /**
+     * Checks if the CIDR is valid, so that, if it does not exist.
+     * @param claudiaData: credentials.
+     * @param region: the region
+     * @param cidr: the CIDR to check.
+     * @return
+     * @throws InfrastructureException
+     */
+    public boolean checkCidrValid(ClaudiaData claudiaData,
+                                  String region, String cidr)
+        throws InfrastructureException {
+        List<SubNetworkInstance> subNets =
+            networkClient.loadAllSubNetworks(claudiaData, region);
+
+        for (SubNetworkInstance subNet: subNets) {
+            if (subNet.getCidr().equals(cidr)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getValidCidr (ClaudiaData claudiaData, String region,
+                                int subNetElement)
+        throws InfrastructureException {
+        String cidr = String.format(NETWORK_CIDR, NET_ELEMENT, subNetElement);
+        if (checkCidrValid(claudiaData, region, cidr)) {
+            return cidr;
+        }
+        else {
+            return getValidCidr (claudiaData, region,subNetElement+1);
+        }
+    }
+
+    /**
+     * It gets the defaults Cidr.
+     * @param claudiaData
+     * @param region
+     * @return
+     * @throws InvalidEntityException
+     * @throws AlreadyExistsEntityException
+     * @throws InfrastructureException
+     */
+    public String getDefaultCidr(ClaudiaData claudiaData, String region)
+        throws InvalidEntityException, AlreadyExistsEntityException,
+        InfrastructureException {
+        int subNetElement = 1;
+        int cidrOpenstack = 0;
         if (!(claudiaData.getVdc() == null || claudiaData.getVdc().isEmpty())) {
+            // Two networks cannot overlap the same CIDR. It should be unique
             cidrOpenstack = getNumberDeployedNetwork(claudiaData, region) + 1;
         }
-
-        int cidrdb = this.findAll().size();
-        int cidrCount = cidrdb + cidrOpenstack;
-        return "10.0." + cidrCount + ".0/24";
+        if (cidrOpenstack > MAX_NETWORK) {
+            NET_ELEMENT += 1;
+            subNetElement = cidrOpenstack / NET_ELEMENT;
+        } else {
+            subNetElement = cidrOpenstack;
+        }
+        return getValidCidr (claudiaData, region, subNetElement);
     }
 
 

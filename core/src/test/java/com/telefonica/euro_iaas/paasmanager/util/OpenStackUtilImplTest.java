@@ -307,6 +307,26 @@ public class OpenStackUtilImplTest {
     }
 
     /**
+     * it lists the subnets.
+     *
+     * @throws OpenStackException
+     * @throws IOException
+     */
+    @Test
+    public void shouldListSubNetworks() throws OpenStackException, IOException {
+
+        when(openOperationUtil.
+            getAdminUser(any(PaasManagerUser.class))).
+            thenReturn(paasManagerUser);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class)))
+            .thenReturn("ok");
+        String response = openStackUtil.listSubNetworks(paasManagerUser, "region");
+
+        // then
+        assertNotNull(response);
+    }
+
+    /**
      * It adds a network interface to a public router.
      * 
      * @throws OpenStackException

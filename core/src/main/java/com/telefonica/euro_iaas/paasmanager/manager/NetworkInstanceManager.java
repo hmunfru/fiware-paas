@@ -31,28 +31,29 @@ import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
-import com.telefonica.euro_iaas.paasmanager.model.EnvironmentInstance;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 
 /**
  * @author henar
  */
 public interface NetworkInstanceManager {
-    
-	
+
 	/**
-	 * 
+	 *
 	 * @param claudiaData
 	 * @param networkInstance
 	 * @param region
 	 * @return
 	 * @throws InvalidEntityException
-	 * @throws EntityNotFoundException 
+	 * @throws EntityNotFoundException
 	 */
-	boolean exists (ClaudiaData claudiaData, NetworkInstance networkInstance, String region) throws InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException;
+	boolean exists(ClaudiaData claudiaData,
+                   NetworkInstance networkInstance, String region)
+        throws InvalidEntityException, EntityNotFoundException,
+        AlreadyExistsEntityException;
 	/**
      * Create a network.
-     * 
      * @param claudiaData
      * @param network
      * @return the tierInstance created
@@ -60,64 +61,86 @@ public interface NetworkInstanceManager {
      * @throws AlreadyExistsEntityException
      * @throws EntityNotFoundException
      */
-    NetworkInstance create(ClaudiaData claudiaData, NetworkInstance network, String region)
-            throws InvalidEntityException, InfrastructureException, AlreadyExistsEntityException,
-            EntityNotFoundException;
+    NetworkInstance create(ClaudiaData claudiaData, NetworkInstance network,
+                           String region)
+        throws InvalidEntityException, InfrastructureException,
+        AlreadyExistsEntityException,EntityNotFoundException;
 
     /**
      * Delete a Network.
-     * 
      * @param claudiaData
      * @param network
      * @throws EntityNotFoundException
      * @throws InvalidEntityException
      * @throws InfrastructureException
      */
-    void delete(ClaudiaData claudiaData, NetworkInstance network, String region) throws InvalidEntityException, InfrastructureException;
-    
+    void delete(ClaudiaData claudiaData,
+                NetworkInstance network, String region)
+        throws InvalidEntityException, InfrastructureException;
+
     /**
-     * 
+     * It creates the network in DB.
      * @param networkInstance
      * @return
      * @throws InvalidEntityException
      * @throws AlreadyExistsEntityException
      */
-    NetworkInstance createInDB (NetworkInstance networkInstance) 
-        throws InvalidEntityException, AlreadyExistsEntityException ;
+    NetworkInstance createInDB (NetworkInstance networkInstance)
+        throws InvalidEntityException, AlreadyExistsEntityException;
 
     /**
      * Retrieve all Network created in the system.
-     * 
      * @return the existent networks.
-     */
+     **/
     List<NetworkInstance> findAll();
 
     /**
      * Load the network.
-     * 
      * @return the network.
      */
-    NetworkInstance load(String networkName, String vdc, String region) throws EntityNotFoundException;
+    NetworkInstance load(String networkName, String vdc, String region)
+        throws EntityNotFoundException;
 
     /**
      * Update a network.
-     * 
      * @param network
      * @return the tierInstance created
      */
-    NetworkInstance update(NetworkInstance network) throws InvalidEntityException;
-    
+    NetworkInstance update(NetworkInstance network)
+        throws InvalidEntityException;
+
     /**
-     * 
+     * It lists the networks in a region.
+     * @param claudiaData: the credentials.
+     * @param region: the region
+     * @return
+     * @throws InfrastructureException
+     */
+    List<NetworkInstance> listNetworks (ClaudiaData claudiaData, String region)
+        throws InfrastructureException;
+
+    /**
+     * it gest the number of deployed networks.
      * @param claudiaData
      * @param region
      * @return
      * @throws InfrastructureException
      */
-    List<NetworkInstance> listNetworks (ClaudiaData claudiaData, String region) throws InfrastructureException;
+    int getNumberDeployedNetwork(ClaudiaData claudiaData, String region)
+        throws InfrastructureException;
 
-    int getNumberDeployedNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException;
-    
-    void joinNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, NetworkInstance networkInstance2) throws EntityNotFoundException, InvalidEntityException, InfrastructureException;
+    /**
+     * It joins two networks.
+     * @param claudiaData
+     * @param net1
+     * @param net2
+     * @throws EntityNotFoundException
+     * @throws InvalidEntityException
+     * @throws InfrastructureException
+     */
+    void joinNetwork(ClaudiaData claudiaData, NetworkInstance net1,
+                     NetworkInstance net2)
+        throws EntityNotFoundException, InvalidEntityException,
+        InfrastructureException;
 
 }
