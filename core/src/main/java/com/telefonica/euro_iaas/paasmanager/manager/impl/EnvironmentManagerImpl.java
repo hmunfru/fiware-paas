@@ -119,12 +119,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     public Environment load(String name, String vdc) throws EntityNotFoundException {
         if (vdc == null || vdc.isEmpty()) {
-            return environmentDao.load(name);
+            return environmentDao.findByEnvironmentNameVdc(name, vdc);
         } else {
             try {
 
                 Environment env = environmentDao.findByEnvironmentNameVdc(name, vdc);
-                log.info("in load before rturn");
+                log.info("in load before return");
                 return env;
             } catch (Exception e) {
                 log.info("error in load " + e.getMessage());
@@ -151,6 +151,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public List<Environment> findByOrg(String org) {
         return environmentDao.findByOrg(org);
+    }
+
+    @Override
+    public void loadNetworks(Environment environment) {
+        environmentDao.loadNetworks(environment);
     }
 
     /**
