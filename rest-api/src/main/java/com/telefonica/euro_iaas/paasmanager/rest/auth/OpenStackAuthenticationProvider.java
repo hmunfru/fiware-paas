@@ -74,6 +74,10 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     public static final String SYSTEM_FASTTRACK = "FASTTRACK";
     /**
+     * The Constant CODE_200. HTTP 200 ok
+     */
+    public static final int CODE_200 = 200;
+    /**
      * The Constant CODE_401.
      */
     public static final int CODE_401 = 401;
@@ -189,7 +193,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
                 response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", credential[0]).get();
                 authenticateResponse = response.readEntity(AuthenticateResponse.class);
 
-                if (response.getStatus() == 200) {
+                if (response.getStatus() == CODE_200) {
                     adminTokenCache.put(credential[0], authenticateResponse);
                 } else {
 

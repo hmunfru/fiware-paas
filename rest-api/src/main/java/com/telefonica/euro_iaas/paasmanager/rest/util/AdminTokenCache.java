@@ -33,12 +33,27 @@ import net.sf.ehcache.config.CacheConfiguration;
 
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 
+/**
+ * Create and manage the cache to the response of OpenStack for request the admin token. Based on ehcache open source.
+ */
 public class AdminTokenCache {
 
     public static final String CACHE_NAME = "adminToken";
 
+    /**
+     * The maximum amount of time between accesses before an element expires.
+     */
+    private static final long TIME_TO_IDLE = 1200L;
+    /**
+     * The maximum time between creation time and when an element expires.
+     */
+    private static final long TIME_TO_LIVE = 1200L;
+
     private Cache cache;
 
+    /**
+     * Default constructor. Creates the cache.
+     */
     public AdminTokenCache() {
 
         CacheManager singletonManager;
@@ -51,23 +66,30 @@ public class AdminTokenCache {
             cache.getCacheConfiguration();
             cache = singletonManager.getCache(CACHE_NAME);
             CacheConfiguration cacheConfiguration = cache.getCacheConfiguration();
-            cacheConfiguration.setTimeToIdleSeconds(1200);
-            cacheConfiguration.setTimeToLiveSeconds(1200);
+            cacheConfiguration.setTimeToIdleSeconds(TIME_TO_IDLE);
+            cacheConfiguration.setTimeToLiveSeconds(TIME_TO_LIVE);
 
         }
         cache = singletonManager.getCache(CACHE_NAME);
 
     }
 
-    public CacheConfiguration getConfiguration() {
-        CacheConfiguration cacheConfiguration = cache.getCacheConfiguration();
-        return cacheConfiguration;
-    }
-
+    /**
+     * Put new a new AuthenticateResponse value using token like key, in cache.
+     * 
+     * @param key
+     * @param authenticateResponse
+     */
     public void put(String key, AuthenticateResponse authenticateResponse) {
         cache.put(new Element(key, authenticateResponse));
     }
 
+    /**
+     * Get from cache the response of OpenStack by key. The key is token string.
+     * 
+     * @param key
+     * @return
+     */
     public AuthenticateResponse getAuthenticateResponse(String key) {
 
         if (cache.isKeyInCache(key) && (cache.get(key) != null)) {
