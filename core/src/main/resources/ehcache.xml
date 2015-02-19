@@ -14,7 +14,7 @@
            timeToLiveSeconds="600">
     </cache>
 
-    <cache name="adminToken"
+    <cache name="token"
            maxEntriesLocalHeap="500"
            eternal="false"
            timeToIdleSeconds="1200"
