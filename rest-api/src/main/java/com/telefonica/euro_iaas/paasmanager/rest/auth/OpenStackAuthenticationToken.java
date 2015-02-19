@@ -27,7 +27,6 @@ package com.telefonica.euro_iaas.paasmanager.rest.auth;
 import java.util.ArrayList;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -36,7 +35,6 @@ import javax.ws.rs.core.Response;
 
 import net.sf.json.JSONObject;
 
-import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +79,11 @@ public class OpenStackAuthenticationToken {
      * The pass of the keystone admin.
      */
     private String pass;
-    private HttpClient httpClient;
+
+    /**
+     * Rest client.
+     */
+    private Client client;
     /**
      * The log.
      */
@@ -111,8 +113,7 @@ public class OpenStackAuthenticationToken {
         this.tenant = (String) params.get(1);
         this.user = (String) params.get(2);
         this.pass = (String) params.get(3);
-
-        this.httpClient = (HttpClient) params.get(4);
+        this.client = (Client) params.get(4);
 
     }
 
@@ -127,10 +128,9 @@ public class OpenStackAuthenticationToken {
         log.info("generate new valid token for admin");
 
         try {
-            Client client = ClientBuilder.newClient();
             Response response;
 
-            WebTarget wr = client.target(url);
+            WebTarget wr = this.client.target(url);
 
             String payload = "{\"auth\": {\"tenantName\": \"" + tenant + "\", \""
                     + "passwordCredentials\":{\"username\": \"" + user + "\"," + " \"password\": \"" + pass + "\"}}}";
@@ -159,6 +159,7 @@ public class OpenStackAuthenticationToken {
                 String exceptionMessage = "Failed : HTTP error code : (" + url + ")" + response.getStatus()
                         + " message: " + response;
                 log.error(exceptionMessage);
+                throw new AuthenticationConnectionException(exceptionMessage);
 
             }
         } catch (Exception ex) {

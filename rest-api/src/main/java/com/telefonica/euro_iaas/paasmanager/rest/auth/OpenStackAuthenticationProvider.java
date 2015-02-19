@@ -36,7 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 import org.openstack.docs.identity.api.v2.Role;
 import org.slf4j.Logger;
@@ -51,7 +50,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.rest.util.TokenCache;
-import com.telefonica.euro_iaas.paasmanager.util.OpenOperationUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -82,29 +80,18 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     public static final int CODE_401 = 401;
     /**
-     * The Constant CODE_403.
-     */
-    public static final int CODE_403 = 403;
-    /**
-     * The Constant CODE_404.
-     */
-    public static final int CODE_404 = 404;
-    /**
-     * The max number of reintent.
-     */
-    public static final int MAX_REINTENT = 5;
-    /**
      * The log.
      */
     private static Logger log = LoggerFactory.getLogger(OpenStackAuthenticationProvider.class);
 
     /**
-     * Thread to recover a valid X-Auth-Token each 24 hour.
+     * Thread to recover a valid X-Auth-Token.
      */
     private OpenStackAuthenticationToken oSAuthToken;
 
-    private OpenOperationUtil openOperationUtil;
-
+    /**
+     * Cache for tokens.
+     */
     private TokenCache tokenCache;
 
     /**
@@ -166,9 +153,8 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
 
         String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-
-        configureOpenStackAuthenticationToken(keystoneURL, adminUser, adminPass, adminTenant, httpClient);
+        Client client1 = ClientBuilder.newClient();
+        configureOpenStackAuthenticationToken(keystoneURL, adminUser, adminPass, adminTenant, client1);
 
         String[] adminCredentials = tokenCache.getAdmin();
 
@@ -194,24 +180,22 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
                 if (response.getStatus() == CODE_200) {
                     // Validate user's token
                     authenticateResponse = response.readEntity(AuthenticateResponse.class);
-                    PaasManagerUser userValidated = validateUserToken(token, tenantId, authenticateResponse);
+                    PaasManagerUser userValidated = createPaasManagerUser(token, tenantId, authenticateResponse);
                     log.info("generated new token for tenantId:" + tenantId + ": " + token);
                     tokenCache.put(token + "-" + tenantId, authenticateResponse);
 
                     return userValidated;
                 } else {
-
                     log.warn("response status:" + response.getStatus());
 
                     if (response.getStatus() == CODE_401) {
-
                         throw new BadCredentialsException("Invalid token");
                     }
 
                     throw new AuthenticationServiceException("Invalid token");
                 }
             } else {
-                return validateUserToken(token, tenantId, authenticateResponse);
+                return createPaasManagerUser(token, tenantId, authenticateResponse);
             }
         } catch (Exception e) {
             log.warn("Exception in authentication: " + e);
@@ -220,48 +204,47 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     }
 
     /**
-     * Connect to keystone and validate user token using admin token.
+     * Creates paasManagerUser.
      * 
      * @param token
      * @param tenantId
      * @param authenticateResponse
      * @return
      */
-    private PaasManagerUser validateUserToken(String token, String tenantId, AuthenticateResponse authenticateResponse) {
+    private PaasManagerUser createPaasManagerUser(String token, String tenantId,
+            AuthenticateResponse authenticateResponse) {
 
-        AuthenticateResponse responseAuth = authenticateResponse;
-
-        if (!tenantId.equals(responseAuth.getToken().getTenant().getId())) {
-            throw new AuthenticationServiceException("Token " + responseAuth.getToken().getTenant().getId()
+        if (!tenantId.equals(authenticateResponse.getToken().getTenant().getId())) {
+            throw new AuthenticationServiceException("Token " + authenticateResponse.getToken().getTenant().getId()
                     + " not valid for the tenantId provided:" + tenantId);
         }
 
         Set<GrantedAuthority> authsSet = new HashSet<GrantedAuthority>();
 
-        if (responseAuth.getUser().getRoles() != null) {
-            for (Role role : responseAuth.getUser().getRoles().getRole()) {
+        if (authenticateResponse.getUser().getRoles() != null) {
+            for (Role role : authenticateResponse.getUser().getRoles().getRole()) {
                 authsSet.add(new GrantedAuthorityImpl(role.getName()));
             }
         }
 
-        PaasManagerUser user = new PaasManagerUser(responseAuth.getUser().getOtherAttributes()
+        PaasManagerUser user = new PaasManagerUser(authenticateResponse.getUser().getOtherAttributes()
                 .get(new QName("username")), token, authsSet);
 
         user.setTenantId(tenantId);
-        user.setTenantName(responseAuth.getToken().getTenant().getName());
+        user.setTenantName(authenticateResponse.getToken().getTenant().getName());
         user.setToken(token);
         return user;
     }
 
     private void configureOpenStackAuthenticationToken(String keystoneURL, String adminUser, String adminPass,
-            String adminTenant, DefaultHttpClient httpClient) {
+            String adminTenant, Client client) {
         ArrayList<Object> params = new ArrayList();
 
         params.add(keystoneURL + "tokens");
         params.add(adminTenant);
         params.add(adminUser);
         params.add(adminPass);
-        params.add(httpClient);
+        params.add(client);
 
         if (oSAuthToken == null) {
             oSAuthToken = new OpenStackAuthenticationToken(params);
