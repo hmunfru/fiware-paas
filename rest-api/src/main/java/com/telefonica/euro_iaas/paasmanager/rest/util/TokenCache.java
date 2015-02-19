@@ -36,9 +36,9 @@ import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 /**
  * Create and manage the cache to the response of OpenStack for request the admin token. Based on ehcache open source.
  */
-public class AdminTokenCache {
+public class TokenCache {
 
-    public static final String CACHE_NAME = "adminToken";
+    public static final String CACHE_NAME = "token";
 
     /**
      * The maximum amount of time between accesses before an element expires.
@@ -49,12 +49,15 @@ public class AdminTokenCache {
      */
     private static final long TIME_TO_LIVE = 1200L;
 
+    /**
+     * cache.
+     */
     private Cache cache;
 
     /**
      * Default constructor. Creates the cache.
      */
-    public AdminTokenCache() {
+    public TokenCache() {
 
         CacheManager singletonManager;
         try {
@@ -85,12 +88,37 @@ public class AdminTokenCache {
     }
 
     /**
-     * Get from cache the response of OpenStack by key. The key is token string.
+     * Put new admin token in cache.
      * 
-     * @param key
+     * @param token
+     * @param tenantId
+     */
+    public void putAdmin(String token, String tenantId) {
+        cache.put(new Element("admin", new String[] { token, tenantId }));
+    }
+
+    /**
+     * Return admin credentials.
+     * 
      * @return
      */
-    public AuthenticateResponse getAuthenticateResponse(String key) {
+    public String[] getAdmin() {
+        if (cache.isKeyInCache("admin")) {
+            return (String[]) cache.get("admin").getObjectValue();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get from cache the response of OpenStack by key. The key is token string.
+     * 
+     * @param token
+     * @param tenantId
+     * @return
+     */
+    public AuthenticateResponse getAuthenticateResponse(String token, String tenantId) {
+        String key = token + "-" + tenantId;
 
         if (cache.isKeyInCache(key) && (cache.get(key) != null)) {
 
