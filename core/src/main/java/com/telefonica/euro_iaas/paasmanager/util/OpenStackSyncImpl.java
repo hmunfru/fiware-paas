@@ -131,13 +131,13 @@ public class OpenStackSyncImpl extends Thread implements OpenStackSync {
 
                     try {
                         // Synchronizing secGroups
-
-                        securityGroupsSync(user.getToken(), user.getTenantId());
+                        //securityGroupsSync(user.getToken(), user.getTenantId());
                         // Synchronizing instances
                         tierInstancesSync(claudiaData);
-                    } catch (OpenStackException e) {
-                        String message = "Error accesing OpenSatck. Token outof date for user " + user.getUserName();
+                    } catch (OpenStackSynchronizationException e) {
+                        String message = "Error accesing OpenSatck. Token out of date for user " + user.getUserName();
                         log.info(message);
+                        throw new OpenStackSynchronizationException (message);
                     }
 
                     if (onecycle)
@@ -228,7 +228,7 @@ public class OpenStackSyncImpl extends Thread implements OpenStackSync {
         }
     }
 
-    private void securityGroupsSync(String token, String vdc) throws OpenStackSynchronizationException,
+    /*private void securityGroupsSync(String token, String vdc) throws OpenStackSynchronizationException,
             InfrastructureException, OpenStackException {
         boolean included = false;
         log.debug("Sincronizing security groups ...  ");
@@ -286,9 +286,9 @@ public class OpenStackSyncImpl extends Thread implements OpenStackSync {
                 }
             }
         }
-    }
+    }*/
 
-    private List<SecurityGroup> findAllSecurityGroupsDB(String vdc) {
+    /*private List<SecurityGroup> findAllSecurityGroupsDB(String vdc) {
         List<SecurityGroup> securityGroups = new ArrayList<SecurityGroup>();
         TierSearchCriteria criteria = new TierSearchCriteria();
         criteria.setVdc(vdc);
@@ -303,7 +303,7 @@ public class OpenStackSyncImpl extends Thread implements OpenStackSync {
             log.info(message);
         }
         return securityGroups;
-    }
+    }*/
 
     private List<TierInstance> findAllTierInstancesDB(ClaudiaData claudiaData) {
         List<TierInstance> tierInstances = new ArrayList<TierInstance>();

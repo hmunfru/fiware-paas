@@ -1,3 +1,6 @@
+<%@page import="org.springframework.web.context.WebApplicationContext" %>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" %>
 <%
 
     //Get version of application
@@ -9,9 +12,18 @@
     String applVersion = prop.getProperty("Implementation-Version");
     String buildNumber = prop.getProperty("Implementation-Build");
 
+    WebApplicationContext context = WebApplicationContextUtils
+            .getWebApplicationContext(application);
+
+    org.apache.http.impl.conn.PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+            (PoolingHttpClientConnectionManager) context.getBean("httpConnectionManager");
+
+    String stats = poolingHttpClientConnectionManager.getTotalStats().toString();
+
 %>
 
 <%=applVersion%><br>
-<%=buildNumber%>
+<%=buildNumber%><br>
+<%=stats%>
 
 

@@ -37,6 +37,8 @@ import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.EnvironmentInstanceDao;
+import com.telefonica.euro_iaas.paasmanager.dao.SecurityGroupDao;
+import com.telefonica.euro_iaas.paasmanager.dao.TierDao;
 import com.telefonica.euro_iaas.paasmanager.dao.TierInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentRequestException;
@@ -52,6 +54,7 @@ import com.telefonica.euro_iaas.paasmanager.manager.InfrastructureManager;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkManager;
 import com.telefonica.euro_iaas.paasmanager.manager.ProductInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.ProductReleaseManager;
+import com.telefonica.euro_iaas.paasmanager.manager.SecurityGroupManager;
 import com.telefonica.euro_iaas.paasmanager.manager.TierInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.TierManager;
 import com.telefonica.euro_iaas.paasmanager.model.Attribute;
@@ -62,6 +65,7 @@ import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.ProductInstance;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
+import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.EnvironmentInstanceSearchCriteria;
@@ -81,6 +85,9 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
     private TierManager tierManager;
     private ProductReleaseManager productReleaseManager;
     private ProductInstallator productInstallator;
+    private SecurityGroupManager securityGroupManager;
+    private TierDao tierDao;
+    private SecurityGroupDao securityGroupDao;
 
     /** The log. */
     private static Logger log = LoggerFactory.getLogger(EnvironmentInstanceManagerImpl.class);
@@ -124,8 +131,8 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
      * @throws ProductInstallatorException
      */
     public EnvironmentInstance create(ClaudiaData claudiaData, EnvironmentInstance environmentInstance)
-            throws AlreadyExistsEntityException, InvalidEntityException, EntityNotFoundException, InvalidVappException,
-            InvalidOVFException, InfrastructureException, ProductInstallatorException {
+            throws AlreadyExistsEntityException, InvalidEntityException, EntityNotFoundException,
+            InfrastructureException, ProductInstallatorException {
 
         Environment environment = insertEnvironmentInDatabase(claudiaData, environmentInstance.getEnvironment());
 
@@ -145,7 +152,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
             try {
                 updateFederatedNetworks(claudiaData, environment);
             } catch (Exception e) {
-                log.warn("It is not possible to update the federated     networks");
+                log.warn("It is not possible to update the federated networks");
             }
         }
 
@@ -157,14 +164,6 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
             environmentInstance = infrastructureManager.createInfrasctuctureEnvironmentInstance(environmentInstance,
                     environment.getTiers(), claudiaData);
 
-        } catch (InvalidVappException e) {
-            environmentInstance.setStatus(Status.ERROR);
-            environmentInstanceDao.update(environmentInstance);
-            throw new InvalidVappException(e);
-        } catch (InvalidOVFException e) {
-            environmentInstance.setStatus(Status.ERROR);
-            environmentInstanceDao.update(environmentInstance);
-            throw new InvalidOVFException(e);
         } catch (InfrastructureException e) {
             environmentInstance.setStatus(Status.ERROR);
             environmentInstanceDao.update(environmentInstance);
@@ -183,10 +182,6 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
             environmentInstanceDao.update(environmentInstance);
             throw new ProductInstallatorException(e);
         } catch (InvalidProductInstanceRequestException e) {
-            environmentInstance.setStatus(Status.ERROR);
-            environmentInstanceDao.update(environmentInstance);
-            throw new ProductInstallatorException(e);
-        } catch (NotUniqueResultException e) {
             environmentInstance.setStatus(Status.ERROR);
             environmentInstanceDao.update(environmentInstance);
             throw new ProductInstallatorException(e);
@@ -268,8 +263,8 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
      * @throws EntityNotFoundException
      */
     public boolean installSoftwareInEnvironmentInstance(ClaudiaData claudiaData, EnvironmentInstance environmentInstance)
-            throws ProductInstallatorException, InvalidProductInstanceRequestException, NotUniqueResultException,
-            InfrastructureException, InvalidEntityException, EntityNotFoundException {
+            throws ProductInstallatorException, InvalidProductInstanceRequestException, InfrastructureException,
+            InvalidEntityException, EntityNotFoundException {
         // TierInstance by TierInstance let's check if we have to install
         // software
         boolean bScalableEnvironment = false;
@@ -423,7 +418,7 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
     }
 
     private void deletePaaSDB(ClaudiaData claudiaData, EnvironmentInstance envInstance, TierInstance tierInstance,
-            boolean error) throws InvalidEntityException {
+            boolean error) throws InvalidEntityException, InfrastructureException {
         // Borrado del registro en BBDD paasmanager
         log.info("Deleting the environment instance " + envInstance.getBlueprintName() + " in the database ");
 
@@ -433,8 +428,29 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
         } catch (Exception e) {
             log.error(e.getMessage());
             error = true;
+        } finally {
+            // Deleting SG
+            log.info("Deleting security group from tierInstance " + tierInstance.getName() + " in TierInstance");
+            SecurityGroup secGroup = tierInstance.getSecurityGroup();
+            if (secGroup != null) {
+                SecurityGroup securityGroup = null;
+                try {
+                    securityGroup = securityGroupDao.loadWithRules(secGroup.getName());
+                } catch (EntityNotFoundException e1) {
+                    String msg = "SecurityGroup is not present in database " + securityGroup.getName();
+                    log.error(msg);
+                    e1.printStackTrace();
+                    throw new InvalidEntityException(msg);
+                }
+                log.info("Deleting security group " + securityGroup.getName() + " associated to tierInstance "
+                        + tierInstance.getName());
+                tierInstance.setSecurityGroup(null);
+                tierInstanceDao.update(tierInstance);
+                securityGroupManager.destroy(tierInstance.getTier().getRegion(), claudiaData.getUser().getToken(),
+                        tierInstance.getVdc(), securityGroup);
+            }
+            tierInstanceManager.remove(tierInstance);
         }
-        tierInstanceManager.remove(tierInstance);
     }
 
     // PRVATE METHODS
@@ -517,7 +533,6 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
                 return environment;
             } catch (Exception e1) {
-                e1.printStackTrace();
                 log.warn("Error loading environment " + e1.getMessage());
                 throw new EntityNotFoundException(Environment.class,
                         "The environment should have been already created", e1);
@@ -536,13 +551,13 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
                 environment = environmentManager.create(claudiaData, env);
             } catch (InvalidEnvironmentRequestException e) {
                 // TODO Auto-generated catch block
-                String errorMessage = " Error creating the environment. " + environment.getName() + ". " + "Desc: "
+                String errorMessage = " Error creating the environment. " + environment.getName() + ". Desc: "
                         + e.getMessage();
                 log.error(errorMessage);
                 throw new InvalidEntityException(Environment.class, e);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                String errorMessage = " Error to creating the environment. " + environment.getName() + ". " + "Desc: "
+                String errorMessage = " Error to creating the environment. " + environment.getName() + ". Desc: "
                         + e.getMessage();
                 log.error(errorMessage);
                 throw new InvalidEntityException(Environment.class, e);
@@ -675,5 +690,29 @@ public class EnvironmentInstanceManagerImpl implements EnvironmentInstanceManage
 
     public void setNetworkManager(NetworkManager networkManager) {
         this.networkManager = networkManager;
+    }
+
+    /**
+     * @param securityGroupManager
+     *            the securityGroupManager to set
+     */
+    public void setSecurityGroupManager(SecurityGroupManager securityGroupManager) {
+        this.securityGroupManager = securityGroupManager;
+    }
+
+    /**
+     * @param tierDao
+     *            the tierDao to set
+     */
+    public void setTierDao(TierDao tierDao) {
+        this.tierDao = tierDao;
+    }
+
+    /**
+     * @param securityGroupDao
+     *            the securityGroupDao to set
+     */
+    public void setSecurityGroupDao(SecurityGroupDao securityGroupDao) {
+        this.securityGroupDao = securityGroupDao;
     }
 }

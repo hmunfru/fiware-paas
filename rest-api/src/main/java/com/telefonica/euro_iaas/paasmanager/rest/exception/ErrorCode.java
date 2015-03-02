@@ -25,6 +25,7 @@
 package com.telefonica.euro_iaas.paasmanager.rest.exception;
 
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentInstanceException;
+import com.telefonica.euro_iaas.paasmanager.exception.InvalidSecurityGroupRequestException;
 
 /**
  * Class that contain the information related to the error code.
@@ -36,6 +37,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(30, "Entity not found", "(.*)EntityNotFoundException(.*)", 404),
     ALREADY_EXIST(31, "Entity already exist", "(.*)AlreadyExistEntityException(.*)", 409),
     ALREADY_EXIST2(32, "Invalid environment", "(.*)already exists(.*)", 409),
+    TIERINSTANCE_ALREADY_EXIST(33,"TierInstance Already exists", "(.*)InvalidEntityException(.*)TierInstance Already exists(.*)", 409),
     ENVIRONMENT_IN_USE(40,
             "The environment is being used by an instance",
             "(.*)InvalidEntityException: (.*)is being used(.*)",
@@ -43,8 +45,16 @@ public enum ErrorCode {
     INVALID_NUMBER_INITIAL_VMS_IN_TIER(70, "Invalid Tier. Number of Initial VMs is not correct", 
             		"(.*)InvalidEntityException(.*)Error in the Number initial(.*)", 400),
     NAME_NO_VALID(41, "The name is not valid", "(.*)InvalidEntityException:(.*)", 400),
-    INFRASTRUCTURE(50, "OpenStack infrastructure failure", "(.*)InfrastructureException(.*)", 500),
+    OPENSTACK_ERROR_CREATINGSERVER (50, "Openstack error creating a server/assigning floating ip", "(.*)InfrastructureException(.*)Error interacting with OpenStack(.*)", 500),
+    OPENSTACK_ERROR_FEDERATING_NETWORKS (51, "Error federating the networks", "(.*)InfrastructureException(.*)Error federating the networks(.*)", 500),
+    OPENSTACK_ERROR_CREATING_SECGROUPS (52, "It is not possible to create the security group", "(.*)InvalidSecurityGroupRequestException(.*)", 500),
+    INFRASTRUCTURE(52, "OpenStack infrastructure failure", "(.*)InfrastructureException(.*)", 500),
     INVALID_ENVIRONMENT(60, "Invalid Environment Instance", "(.*)InvalidEnvironmentInstanceException(.*)", 400),
+    INVALID_INITIAL_NUMBER_REPLICAS(70, "The number of replicas is not valid",
+    		"(.*)InvalidEntityException:(.*)The number of replicas is not valid(.*)",
+    		400),
+ 	PRODUCTINSTANCE_ALREADY_EXIST (90, "ProductInstance Already Exist", "(.*)ProductInstallatorException (.*)already exists(.*)", 400),
+ 	ERROR_INSTALLING_A_PRODUCT (91, "Error installing a product ", "(.*)ProductInstallatorException (.*)Error installing product(.*)", 400),
     DEFAULT(500, "Internal PaasManager Server error", "(?s).*", 500);
 
     private final int code;

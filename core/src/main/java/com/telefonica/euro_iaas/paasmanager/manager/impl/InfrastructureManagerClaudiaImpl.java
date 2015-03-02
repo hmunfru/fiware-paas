@@ -98,8 +98,8 @@ public class InfrastructureManagerClaudiaImpl implements InfrastructureManager {
     }
 
     public EnvironmentInstance createInfrasctuctureEnvironmentInstance(EnvironmentInstance environmentInstance,
-            Set<Tier> tiers, ClaudiaData claudiaData) throws InfrastructureException, InvalidVappException,
-            InvalidOVFException, InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException {
+            Set<Tier> tiers, ClaudiaData claudiaData) throws InfrastructureException,
+            InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException {
 
         // Deploy MVs
         log.info("Creating infrastructure for environment instance " + environmentInstance.getBlueprintName());
@@ -139,25 +139,14 @@ public class InfrastructureManagerClaudiaImpl implements InfrastructureManager {
                 log.info("Number of networks " + tierInstance.getNetworkInstances().size() + " floatin ip "
                         + tierInstance.getTier().getFloatingip());
 
-                try {
-                    log.info("Inserting in database ");
-                    tierInstance = insertTierInstanceBD(claudiaData, environmentInstance.getEnvironment().getName(),
-                            tierInstance);
-                    log.info("Return: Number of networks " + tierInstance.getNetworkInstances().size()
-                            + " floating ip " + tierInstance.getTier().getFloatingip());
-                    environmentInstance.addTierInstance(tierInstance);
-                    environmentInstanceDao.update(environmentInstance);
-                } catch (EntityNotFoundException e) {
-                    log.error("Entity Not found: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                } catch (InvalidEntityException e) {
-                    log.error("Invalid: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                } catch (AlreadyExistsEntityException e) {
-                    log.error("AllReady found: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                }
-
+                log.info("Inserting in database ");
+                tierInstance = insertTierInstanceBD(claudiaData, environmentInstance.getEnvironment().getName(),
+                		tierInstance);
+                log.info("Return: Number of networks " + tierInstance.getNetworkInstances().size() 
+                		+ " floating ip " + tierInstance.getTier().getFloatingip());
+                environmentInstance.addTierInstance(tierInstance);
+                environmentInstanceDao.update(environmentInstance);
+                
                 try {
                     tierInstanceManager.update(claudiaData, environmentInstance.getEnvironment().getName(),
                             tierInstance);

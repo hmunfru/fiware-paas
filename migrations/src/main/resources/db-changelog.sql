@@ -329,3 +329,17 @@ ALTER TABLE networkinstance ALTER COLUMN external SET NOT NULL;
 ALTER TABLE attribute ADD COLUMN type character varying(255) NULL;
 UPDATE attribute SET type='Plain' WHERE 1=1;
 ALTER TABLE attribute ALTER COLUMN type SET NOT NULL;
+
+-- Change that corrresponds to bug/CLAUDIA-4454 Linking securitygroups to tierinstances instead of tiers -->
+--changeset jmms392:7-1
+ALTER TABLE tierinstance ADD COLUMN securitygroup_id INT8;
+--changeset jmms392:7-2
+ALTER TABLE tierinstance ADD CONSTRAINT fk_tierinstance_securitygroup FOREIGN KEY (securitygroup_id) REFERENCES securitygroup(id) NOT DEFERRABLE;
+--changeset jmms392:7-3
+UPDATE tierinstance SET securitygroup_id=subquery.securitygroup_id FROM 
+(SELECT securitygroup_id, id FROM  tier) AS subquery WHERE tierinstance.tier_id=subquery.id;
+--changeset jmms392:7-4
+ALTER TABLE tier drop CONSTRAINT fk_tier_securitygroup;
+--changeset jmms392:7-5
+ALTER TABLE tier DROP COLUMN securitygroup_id;
+

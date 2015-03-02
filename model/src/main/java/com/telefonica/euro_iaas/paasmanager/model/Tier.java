@@ -38,7 +38,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 
 import org.hibernate.Hibernate;
 
@@ -84,19 +83,12 @@ public class Tier {
     private String payload;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tier_has_productReleases", joinColumns =
-            { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) },
-              inverseJoinColumns = { @JoinColumn(name = "productRelease_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tier_has_productReleases", joinColumns = { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "productRelease_ID", nullable = false, updatable = false) })
     private List<ProductRelease> productReleases;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "tier_has_networks", joinColumns =
-            { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) },
-              inverseJoinColumns = { @JoinColumn(name = "network_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tier_has_networks", joinColumns = { @JoinColumn(name = "tier_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "network_ID", nullable = false, updatable = false) })
     private Set<Network> networks;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private SecurityGroup securityGroup;
 
     private String region = "";
 
@@ -141,10 +133,13 @@ public class Tier {
 
     /**
      * @param name
-     * @param maximum_number_instances
-     * @param minimum_number_instances
-     * @param initial_number_instances
+     * @param maximumNumberInstances
+     * @param minimumNumberInstances
+     * @param initialNumberInstances
      * @param productReleases
+     * @param flavour
+     * @param image
+     * @param icono
      */
 
     public Tier(String name, Integer maximumNumberInstances, Integer minimumNumberInstances,
@@ -374,10 +369,6 @@ public class Tier {
         return productReleases;
     }
 
-    public SecurityGroup getSecurityGroup() {
-        return this.securityGroup;
-    }
-
     public String getVdc() {
         return vdc;
     } /*
@@ -502,10 +493,6 @@ public class Tier {
         this.productReleases = productReleases;
     }
 
-    public void setSecurityGroup(SecurityGroup securityGroup) {
-        this.securityGroup = securityGroup;
-    }
-
     /**
      * Set a vdc.
      * 
@@ -535,9 +522,9 @@ public class Tier {
         tierDto.setFlavour(getFlavour());
         tierDto.setImage(getImage());
         tierDto.setRegion(getRegion());
-        if (this.getSecurityGroup() != null) {
-            tierDto.setSecurityGroup(this.getSecurityGroup().getName());
-        }
+        /*
+         * if (this.getSecurityGroup() != null) { tierDto.setSecurityGroup(this.getSecurityGroup().getName()); }
+         */
         tierDto.setKeypair(getKeypair());
         tierDto.setFloatingip(getFloatingip());
 
@@ -573,13 +560,6 @@ public class Tier {
      */
     public String toJson() {
         String payload = "{\"server\": " + "{\"key_name\": \"" + getKeypair() + "\", ";
-        if (getSecurityGroup() != null) {
-            payload += "\"security_groups\": [{ \"name\": \"" + getSecurityGroup().getName() + "\"}], ";
-        }
-        /*
-         * if (getNetworks() != null) { payload = payload + "\"networks\": ["; for (Network net: this.getNetworks()){
-         * payload = payload + "{ \"uuid\": \"" + net.getIdNetwork() + "\"}"; } payload = payload + "], "; }
-         */
 
         payload += "\"region\":\"" + getRegion() + "\",";
         payload += "\"flavorRef\": \"" + getFlavour() + "\", " + "\"imageRef\": \"" + getImage() + "\", "
@@ -643,9 +623,6 @@ public class Tier {
         }
         if (Hibernate.isInitialized(this.networks)) {
             sb.append("[networks = ").append(this.networks).append("]");
-        }
-        if (Hibernate.isInitialized(this.securityGroup)) {
-            sb.append("[securityGroup = ").append(this.securityGroup).append("]");
         }
         sb.append("[region = ").append(this.region).append("]");
         sb.append("]");

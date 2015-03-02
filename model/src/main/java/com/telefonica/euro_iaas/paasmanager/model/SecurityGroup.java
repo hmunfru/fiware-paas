@@ -25,13 +25,21 @@
 package com.telefonica.euro_iaas.paasmanager.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+//import java.util.Set;
+
+
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -57,7 +65,7 @@ public class SecurityGroup {
 
     @OneToMany
     private List<Rule> rules;
-
+    
     /**
      * Constructor.
      */
@@ -87,7 +95,7 @@ public class SecurityGroup {
         }
         rules.add(rule);
     }
-
+    
     /**
      * Delete a rule in the security group.
      *
@@ -139,7 +147,7 @@ public class SecurityGroup {
     public List<Rule> getRules() {
         return rules;
     }
-
+    
     public void setDescription(String description) {
         this.description = description;
     }
@@ -171,7 +179,7 @@ public class SecurityGroup {
         }
         return rules;
     }
-
+    
     /**
      * Json.
      *

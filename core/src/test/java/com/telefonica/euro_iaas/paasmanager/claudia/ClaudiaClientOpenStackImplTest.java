@@ -146,7 +146,7 @@ public class ClaudiaClientOpenStackImplTest {
         openStackRegion = mock(OpenStackRegion.class);
         fileUtils = new FileUtilsImpl();
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
-        when(systemPropertiesProvider.getProperty(anyString())).thenReturn("src/main/resources/userdata");
+        when(systemPropertiesProvider.getProperty(anyString())).thenReturn("src/test/resources/userdata");
         claudiaClientOpenStack.setNetworkInstanceManager(networkInstanceManager);
         claudiaClientOpenStack.setOpenStackUtil(openStackUtil);
         claudiaClientOpenStack.setFileUtils(fileUtils);

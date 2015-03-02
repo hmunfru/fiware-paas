@@ -29,6 +29,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.http.conn.HttpClientConnectionManager;
+
 import com.telefonica.euro_iaas.paasmanager.model.Task;
 
 /**
@@ -38,21 +40,23 @@ import com.telefonica.euro_iaas.paasmanager.model.Task;
  */
 public class TaskNotificatorImpl implements TaskNotificator {
 
-    private Client client;
+    HttpClientConnectionManager httpConnectionManager;
 
     /**
      * {@inheritDoc}
      */
     public void notify(String url, Task task) {
+        Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
         WebTarget webResource = client.target(url);
         webResource.request(MediaType.APPLICATION_XML).post(Entity.entity(null, MediaType.APPLICATION_JSON));
     }
 
-    /**
-     * @param client
-     *            the client to set
-     */
-    public void setClient(Client client) {
-        this.client = client;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
 }

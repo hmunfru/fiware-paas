@@ -44,6 +44,12 @@ The PaaS Manager is a maven application:
         (created target/rpm/paasmanager/RPMS/noarch/paasmanager-XXXX.noarch.rpm)
 
 
+Please, be aware  that the supported installation method is the RPM package. If you use other method, some extra steps may be required. For example you would need to generate manually the certificate (See the section about "Configuring the HTTPS certificate" for more information):
+
+.. code::
+
+   fiware-paas/bin/generateselfsigned.sh
+
 Installation  (for CentOS)
 ==========================
 
@@ -108,6 +114,7 @@ After that, you can install the paas manager just doing:
 
     yum install paas-manager
 
+
 Configuring the database
 ------------------------
 
@@ -135,6 +142,47 @@ To create the tables in the databases, just go to
     postgres=# \i db-changelog.sql
     exit
 
+Configuring the HTTPS certificate
+---------------------------------
+
+The service is configured to use HTTPS to secure the communication between clients and the server. One central point in HTTPS security is the certificate which guarantee the server identity.
+
+Quickest solution: using a self-signed certificate
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+The service works "out of the box" against passive attacks (e.g. a sniffer) because a self-signed certificated is generated automatically when the RPM is installed. Any certificate includes a special field call "CN" (Common name) with the identity of the host: the generated certificate uses as identity the IP of the host.
+
+The IP used in the certificate should be the public IP (i.e. the floating IP). The script which generates the certificate knows the public IP asking to an Internet service (http://ifconfig.me/ip). Usually this obtains the floating IP of the server, but of course it wont work without a direct connection to Internet.
+
+If you need to regenerate a self-signed certificate with a different IP address (or better, a convenient configured hostname), please run:
+
+.. code::
+
+    /opt/fiware-paas/bin/generateselfsigned.sh myhost.mydomain.org
+
+By the way, the self-signed certificate is at /etc/keystorejetty. This file wont be overwritten although you reinstall the package. The same way, it wont be removed automatically if you uninstall de package.
+
+Advanced solution: using certificates signed by a CA
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+Although a self-signed certificate works against passive attack, it is not enough by itself to prevent active attacks, specifically a "man in the middle attack" where an attacker try to impersonate the server. Indeed, any browser warns user against self-signed certificates. To avoid these problems, a certificate conveniently signed by a CA may be used.
+
+If you need a certificate signed by a CA, the more cost effective and less intrusive practice when an organization has several services is to use a wildcard certificate, that is, a common certificate among all the servers of a DNS domain. Instead of using an IP or hostname in the CN, an expression as "*.fiware.org" is used.
+
+This solution implies:
+
+* The service must have a DNS name in the domain specified in the wildcard certificate. For example, if the domain is "*.fiware.org" a valid name may be "paasmanager.fiware.org".
+* The clients should use this hostname instead of the IP
+* The file /etc/keystorejetty must be replaced with another one generated from the wildcard certificate, the corresponding private key and other certificates signing the wild certificate.
+
+It's possible that you already have a wild certificate securing your portal, but Apache server uses a different file format. A tool is provided to import a wildcard certificate, a private key and a chain of certificates, into /etc/keystorejetty:
+
+.. code::
+
+    # usually, on an Apache installation, the certificate files are at /etc/ssl/private
+    /opt/fiware-paas/bin/importcert.sh key.pem cert.crt chain.crt
+
+If you have a different configuration, for example your organization has got its own PKI, please refer to: http://docs.codehaus.org/display/JETTY/How%2bto%2bconfigure%2bSSL
 
 Configure Paas-manager application
 ----------------------------------  
@@ -205,8 +253,7 @@ Now you need to execute:
     chkconfig fiware-paas on
     service fiware-paas start
 
-
-Configuring the PaaS Manager in the keystone 
+Configuring the PaaS Manager in the keystone
 ============================================
 The FIWARE keystone is a endpoint catalogue which collects all the endpoint of the different services
 
@@ -264,7 +311,7 @@ Taking into account the results of the ps commands in the previous section, we t
   
 .. code::
 
-    netstat –p –a | grep $PID/java
+    netstat -p -a | grep $PID/java
 
 Where $PID is the PID of Java process obtained at the ps command described before, in the previous case 18641 tomcat and 23546 (postgresql). The expected results must be something similar to the following:
 

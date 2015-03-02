@@ -27,13 +27,13 @@ package com.telefonica.euro_iaas.paasmanager.dao.keystone.impl;
 import java.sql.Connection;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,7 @@ import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.keystone.TokenDao;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
+import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -50,6 +51,19 @@ public class TokenDaoIdmImpl implements TokenDao {
 
     private static Logger log = LoggerFactory.getLogger(TokenDaoIdmImpl.class);
     private SystemPropertiesProvider systemPropertiesProvider;
+
+    /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
 
     /*
      * @PersistenceContext(unitName = "keystone") private EntityManager entityManagerFactoryKeystone;
@@ -64,7 +78,8 @@ public class TokenDaoIdmImpl implements TokenDao {
         String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
         log.debug("actionUri: " + url);
 
-        Client client = ClientBuilder.newClient();
+        Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+
         Response response;
 
         WebTarget wr = client.target(url);

@@ -620,7 +620,6 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
 
     protected CloseableHttpClient getHttpClient() {
         return HttpClients.custom().setConnectionManager(httpConnectionManager).build();
-
     }
 
     /**

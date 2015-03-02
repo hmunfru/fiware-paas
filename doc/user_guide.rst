@@ -322,7 +322,13 @@ This operation lists the environments stored in the catalogue. The following exa
                     <initial_number_instances>1</initial_number_instances>
                     <maximum_number_instances>1</maximum_number_instances>
                     <minimum_number_instances>1</minimum_number_instances>
-                    <name>{tier-id}</name>               
+                    <name>{tier-id}</name>
+                    <networkDto>
+                    	<networkName>Internet</networkName>
+                    	<subNetworkDto>
+                    		<subnetName>sub-net-Internet</subnetName>
+                    	</subNetworkDto>
+                    </networkDto>
                     <productReleases>                  
                         <product>postgresql</product>
                         <version>0.0.3</version>
@@ -367,7 +373,13 @@ with the following payload
                 <initial_number_instances>1</initial_number_instances>
                 <maximum_number_instances>1</maximum_number_instances>
                 <minimum_number_instances>1</minimum_number_instances>
-                <name>{tier-id}</name>               
+                <name>{tier-id}</name>
+                <networkDto>
+                	<networkName>Internet</networkName>
+                	<subNetworkDto>
+                		<subnetName>sub-net-Internet</subnetName>
+                	</subNetworkDto>
+                </networkDto>               
                 <productReleases>                  
                     <product>postgresql</product>
                     <version>0.0.3</version>
@@ -424,6 +436,12 @@ with the following payload
 		<minimumNumberInstances>1</minimumNumberInstances>
 		<initialNumberInstances>1</initialNumberInstances>
 		<maximumNumberInstances>1</maximumNumberInstances>
+		<networkDto>
+			<networkName>Internet</networkName>
+			<subNetworkDto>
+				<subnetName>sub-net-Internet</subnetName>
+			</subNetworkDto>
+		</networkDto>
 		<name>{tier-name}</name>
 		<image>0dbf8aff-5dc5-4d6c-9f9c-1e6801e0b629</image>
 		<flavour>2</flavour>
@@ -453,6 +471,12 @@ This operation obtains a response with the following format:
 			<maximumNumberInstances>3</maximumNumberInstances>
 			<minimumNumberInstances>1</minimumNumberInstances>
 			<initialNumberInstances>1</initialNumberInstances>
+ 			<networkDto>
+				<networkName>Internet</networkName>
+			 	<subNetworkDto>
+					<subnetName>sub-net-Internet</subnetName>
+				</subNetworkDto>
+			</networkDto>
  			<productReleaseDtos>
 				<productName>mongodbshard</productName>
 				<productDescription>mongodb shard 2.2.3</productDescription>
@@ -487,6 +511,12 @@ This operation obtains a response with the following format:
 		<maximumNumberInstances>3</maximumNumberInstances>
 		<minimumNumberInstances>1</minimumNumberInstances>
 		<initialNumberInstances>1</initialNumberInstances>
+ 		<networkDto>
+			<networkName>Internet</networkName>
+			<subNetworkDto>
+				<subnetName>sub-net-Internet</subnetName>
+			</subNetworkDto>
+		</networkDto>
  		<productReleaseDtos>
 			<productName>mongodbshard</productName>
 			<productDescription>mongodb shard 2.2.3</productDescription>
@@ -518,6 +548,12 @@ with the following payload
 		<initialNumberInstances>1</initialNumberInstances>
 		<maximumNumberInstances>1</maximumNumberInstances>
 		<name>{tier-name}</name>
+		<networkDto>
+			<networkName>Internet</networkName>
+			<subNetworkDto>
+				<subnetName>sub-net-Internet</subnetName>
+			</subNetworkDto>
+		</networkDto>
 		<image>0dbf8aff-5dc5-4d6c-9f9c-1e6801e0b629</image>
 		<flavour>2</flavour>
 		<keypair>jesusmmovilla57</keypair>

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -41,11 +40,13 @@ import javax.ws.rs.core.Response;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
+import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -60,18 +61,22 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     private static Logger log = LoggerFactory.getLogger(OpenStackRegionImpl.class);
     private RegionCache regionCache;
 
-    /**
-     * Default constructor. It creates a jersey client.
-     */
-    public OpenStackRegionImpl() {
-        client = ClientBuilder.newClient();
-        regionCache = new RegionCache();
-    }
+    private HttpClientConnectionManager httpConnectionManager;
 
     /**
      * the properties configuration.
      */
     private SystemPropertiesProvider systemPropertiesProvider;
+
+    /**
+     * Default constructor. It creates a jersey client.
+     */
+    public OpenStackRegionImpl() {
+
+        client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+
+        regionCache = new RegionCache();
+    }
 
     @Override
     public String getEndPointByNameAndRegionName(String type, String regionName, String token)
@@ -444,6 +449,14 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
         log.debug("Obtained chef-server endpoint " + url);
         return url;
+    }
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
 }

@@ -41,6 +41,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtil;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
+import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.sdc.client.SDCClient;
 import com.telefonica.euro_iaas.sdc.client.exception.ResourceNotFoundException;
 
@@ -61,9 +63,26 @@ import com.telefonica.euro_iaas.sdc.client.exception.ResourceNotFoundException;
 public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
 
     private static Logger log = LoggerFactory.getLogger(ProductReleaseSdcDaoImpl.class);
-    private Client client;
+    private Client client = null;
     private SDCUtil sDCUtil;
     private SDCClient sDCClient;
+
+    /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
+    ProductReleaseSdcDaoImpl() {
+
+    }
 
     /**
      * load product from sdc
@@ -213,6 +232,13 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
         this.client = client;
     }
 
+    public Client getClient() {
+        if (this.client == null) {
+            this.client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        }
+        return this.client;
+    }
+
     public void setSDCUtil(SDCUtil sDCUtil) {
         this.sDCUtil = sDCUtil;
     }
@@ -222,9 +248,8 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
     }
 
     private Invocation.Builder createWebResource(String url, String token, String tenant) {
-        // client.addFilter(new LoggingFilter(System.out));
 
-        WebTarget webResource = client.target(url);
+        WebTarget webResource = getClient().target(url);
         Invocation.Builder builder = webResource.request(MediaType.APPLICATION_JSON);
 
         builder.header("X-Auth-Token", token);

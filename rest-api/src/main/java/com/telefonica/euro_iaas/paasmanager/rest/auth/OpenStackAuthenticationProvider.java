@@ -29,13 +29,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 import org.openstack.docs.identity.api.v2.Role;
 import org.slf4j.Logger;
@@ -50,6 +50,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.rest.util.TokenCache;
+import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -100,11 +101,16 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     private Client client;
 
     /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    /**
      * Default constructor.
      */
     public OpenStackAuthenticationProvider() {
 
-        client = ClientBuilder.newClient();
+        client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
         oSAuthToken = null;
         tokenCache = new TokenCache();
     }
@@ -153,7 +159,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
 
         String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
 
-        Client client1 = ClientBuilder.newClient();
+        Client client1 = PoolHttpClient.getInstance(httpConnectionManager).getClient();
         configureOpenStackAuthenticationToken(keystoneURL, adminUser, adminPass, adminTenant, client1);
 
         String[] adminCredentials = tokenCache.getAdmin();
@@ -317,6 +323,14 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     public void setoSAuthToken(OpenStackAuthenticationToken oSAuthToken) {
         this.oSAuthToken = oSAuthToken;
+    }
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
 }

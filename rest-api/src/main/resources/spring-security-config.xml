@@ -9,12 +9,12 @@
 
     <http auto-config="false" create-session="stateless"
           entry-point-ref="http401EntryPoint">
-        <intercept-url pattern="/api/**" />
+        <intercept-url pattern="/api/**"/>
         <!-- <intercept-url pattern="/**" access="ROLE_USER" /> -->
         <intercept-url pattern="/**" requires-channel="https"/>
         <custom-filter after="EXCEPTION_TRANSLATION_FILTER" ref="openStackFilter"/>
     </http>
-    
+
     <beans:bean id="http401EntryPoint"
                 class="com.telefonica.euro_iaas.paasmanager.rest.auth.RestAuthenticationEntryPoint">
     </beans:bean>
@@ -39,6 +39,8 @@
     <beans:bean id="openStackAuthProvider"
                 class="com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider">
         <beans:property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>
+        <beans:property name="httpConnectionManager" ref="httpConnectionManager"/>
+
     </beans:bean>
 
 </beans:beans>

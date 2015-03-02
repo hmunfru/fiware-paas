@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -40,6 +39,7 @@ import javax.ws.rs.core.Response;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,18 +50,29 @@ import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.Rule;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 
 /**
  * @author henar munoz
  */
 public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
-    private SystemPropertiesProvider systemPropertiesProvider;
-
     private static Logger log = LoggerFactory.getLogger(OpenstackFirewallingClientImpl.class);
 
     private OpenStackRegion openStackRegion;
+
+    /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
 
     /**
      * Deploy a rule in the security group.
@@ -82,7 +93,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
         try {
 
-            Client client = ClientBuilder.newClient();
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
             Response response = null;
 
@@ -156,7 +167,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
         try {
 
-            Client client = ClientBuilder.newClient();
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
             Response response;
 
             WebTarget wr = client.target(url);
@@ -213,8 +224,8 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         log.debug("actionUri: " + url);
 
         try {
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
-            Client client = ClientBuilder.newClient();
             log.debug("url: " + url);
             Response response;
 
@@ -266,8 +277,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         log.debug("actionUri: " + url);
 
         try {
-
-            Client client = ClientBuilder.newClient();
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
             Response response;
 
@@ -348,8 +358,8 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         String url = null;
         url = getNovaEndPoint(region, token) + vdc + "/os-security-groups";
         log.debug("actionUri: " + url);
+        Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
-        Client client = ClientBuilder.newClient();
         Response response;
 
         WebTarget wr = client.target(url);
@@ -392,7 +402,8 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
         try {
 
-            Client client = ClientBuilder.newClient();
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+
             Response response;
 
             WebTarget wr = client.target(url);
@@ -433,13 +444,6 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         JSONObject jsonObject = JSONObject.fromObject(response);
         JSONObject computeFault = JSONObject.fromObject(jsonObject.get("computeFault"));
         return computeFault.getString("message");
-    }
-
-    /**
-     * @param systemPropertiesProvider
-     */
-    public void setSystemPropertiesProvider(SystemPropertiesProvider systemPropertiesProvider) {
-        this.systemPropertiesProvider = systemPropertiesProvider;
     }
 
     public OpenStackRegion getOpenStackRegion() {

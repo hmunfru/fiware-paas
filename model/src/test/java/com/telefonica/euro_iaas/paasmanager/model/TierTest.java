@@ -65,13 +65,13 @@ public class TierTest extends TestCase {
         tier.setRegion("regionOne");
 
         SecurityGroup securityGroup = new SecurityGroup("nanme", "description");
-        securityGroup.addRule(new Rule("ipProtocol", "fromPort", "toPort", "sourceGroup", "cidr"));
-        tier.setSecurityGroup(securityGroup);
+        /*securityGroup.addRule(new Rule("ipProtocol", "fromPort", "toPort", "sourceGroup", "cidr"));
+        tier.setSecurityGroup(securityGroup);*/
 
         TierDto tierDto = tier.toDto();
         Tier tier3 = tierDto.fromDto("vdc", "env");
 
-        assertEquals(tier.getSecurityGroup().getRules().size(), 1);
+       // assertEquals(tier.getSecurityGroup().getRules().size(), 1);
         assertEquals(tier.getInitialNumberInstances(), initial);
         assertEquals(tier.getMaximumNumberInstances(), maximum);
         assertEquals(tier.getMinimumNumberInstances(), minimum);

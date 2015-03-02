@@ -3,7 +3,6 @@ Feature: As a FIWARE user
          so that I can work with blueprints safely
 
 
-  @skip @CLAUDIA-4505
   Scenario Outline: Create new environment with invalid Content-Type header
     Given a content-type header value "<content_type>"
     When  I request the creation of an environment with data:

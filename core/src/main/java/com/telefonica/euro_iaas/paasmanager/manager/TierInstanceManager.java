@@ -31,6 +31,7 @@ import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidProductInstanceRequestException;
+import com.telefonica.euro_iaas.paasmanager.exception.InvalidSecurityGroupRequestException;
 import com.telefonica.euro_iaas.paasmanager.exception.NotUniqueResultException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductReconfigurationException;
@@ -120,11 +121,12 @@ public interface TierInstanceManager {
 
     /**
      * @param tierInstance
-     * @return
+     * @return tierInstance
      * @throws InvalidEntityException
      * @throws InfrastructureException 
      */
-    TierInstance create(ClaudiaData claudiaa, String envName, TierInstance tierInstance) throws InvalidEntityException, InfrastructureException;
+    TierInstance create(ClaudiaData claudiaa, String envName, TierInstance tierInstance) 
+    		throws InvalidEntityException, InfrastructureException;
 
     /**
      * @param org

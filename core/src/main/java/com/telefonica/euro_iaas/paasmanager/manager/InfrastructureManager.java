@@ -55,7 +55,7 @@ public interface InfrastructureManager {
      * @throws EntityNotFoundException
      */
     EnvironmentInstance createInfrasctuctureEnvironmentInstance(EnvironmentInstance environmentInstance, Set<Tier> set,
-            ClaudiaData claudiaData) throws InfrastructureException, InvalidVappException, InvalidOVFException,
+            ClaudiaData claudiaData) throws InfrastructureException,
             InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException;
 
     /**

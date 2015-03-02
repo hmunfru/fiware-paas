@@ -400,7 +400,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         return networkInstance;
     }
 
-    /**
+    /**ƒ
      * Checks if a certain Server has been finally deleted from OpenStack.
      *
      * @param tierInstance

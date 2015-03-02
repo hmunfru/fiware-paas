@@ -59,9 +59,8 @@ public interface EnvironmentInstanceManager {
 
     EnvironmentInstance create(ClaudiaData claudiaData, EnvironmentInstance environmentInstance)
             throws EntityNotFoundException, InvalidEntityException, AlreadyExistsEntityException,
-            NotUniqueResultException, InfrastructureException, IPNotRetrievedException, ProductInstallatorException,
-            InvalidEnvironmentRequestException, InvalidProductInstanceRequestException, InvalidOVFException,
-            InvalidVappException;
+            InfrastructureException, IPNotRetrievedException, ProductInstallatorException,
+            InvalidEnvironmentRequestException, InvalidProductInstanceRequestException;
 
     /**
      * Load an environentInstance

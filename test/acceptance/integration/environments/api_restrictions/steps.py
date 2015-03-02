@@ -30,12 +30,12 @@ from common_steps import sdc_product_provisioning_steps, paas_environment_provis
 dataset_utils = DatasetUtils()
 
 
-@step(u'a content-type header value (.*)')
+@step(u'a content-type header value "(.*)"')
 def content_type_header_value(step, content_type):
     world.headers.update({'Content-Type': content_type})
 
 
-@step(u'an accept header value (.*)')
+@step(u'an accept header value "(.*)"')
 def content_type_header_value(step, content_type):
     world.headers.update({'Accept': content_type})
 

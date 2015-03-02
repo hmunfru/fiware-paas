@@ -39,6 +39,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -56,10 +57,12 @@ public class ProductReleaseSdcDaoImplTest {
     @Before
     public void setUp() {
         productReleaseSdcDaoImpl = new ProductReleaseSdcDaoImpl();
-        Client client = mock(Client.class);
         SDCUtil sdcUtils = mock(SDCUtil.class);
-        productReleaseSdcDaoImpl.setClient(client);
         productReleaseSdcDaoImpl.setSDCUtil(sdcUtils);
+        HttpClientConnectionManager httpConnectionManager = mock(HttpClientConnectionManager.class);
+        Client client = mock(Client.class);
+        productReleaseSdcDaoImpl.setClient(client);
+        productReleaseSdcDaoImpl.setHttpConnectionManager(httpConnectionManager);
         WebTarget webResource = mock(WebTarget.class);
         builder = mock(Invocation.Builder.class);
 

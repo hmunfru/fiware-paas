@@ -16,20 +16,20 @@
 # Start daemonized chef-client and DEM monitoring
 # Key from http://apt.opscode.com/packages@opscode.com.gpg.key
 runcmd:
-     - mkdir /etc/chef
-     - curl -L http://repositories.testbed.fi-ware.org/webdav/chef/install.sh | bash
-     - OHAI_TIME_DIR="$(find / -name ohai_time.rb)"
-     - sed -i 's/ohai_time Time.now.to_f/ohai_time Time.now/' ${OHAI_TIME_DIR}
-     - mkdir -p /var/log/chef
-     - chef-client -d -i 60 -s 6 -L /var/log/chef/client.log
-     - curl -L -s -k https://xifisvn.esl.eng.it/wp3/software/DEM_Adapter/install.sh | bash
-
-
+ - OHAI_TIME_DIR="$(find / -name ohai_time.rb)"
+ - sed -i 's/ohai_time Time.now.to_f/ohai_time Time.now/' ${OHAI_TIME_DIR}
+ - chef-client -d -i 60 -s 6 -L /var/log/chef/client.log
+ - curl -L -s -k https://xifisvn.esl.eng.it/wp3/software/DEM_Adapter/install.sh | bash
 
 chef:
+ # boolean to run or not run chef
+ exec: false
 
  # Valid values are 'gems' and 'packages' and 'omnibus'
- install_type: "packages"
+ install_type: "omnibus"
+
+ # 'omnibus', change the url to download
+ omnibus_url: "http://repositories.testbed.fi-ware.org/webdav/chef/install.sh"
 
  # Boolean: run 'install_type' code even if chef-client
  #          appears already installed.
@@ -68,6 +68,6 @@ puppet:
 
 
 
- # Capture all subprocess output into a logfile
+# Capture all subprocess output into a logfile
 # Useful for troubleshooting cloud-init issues
 output: {all: '| tee -a /var/log/cloud-init-output.log'}

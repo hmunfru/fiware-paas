@@ -39,6 +39,38 @@ Feature: Create an instance of an environment in a tenant
         And the task ends with "SUCCESS" status
 
 
+    @env_dependant
+    Scenario: Create instance of an environment with several tiers in different regions
+        Given the paas manager is up and properly configured
+        And a list of tiers has been defined with data:
+            | name      | region | image                                | networks | products                   |
+            | tierqatr  | Trento | 6e2519b8-1b36-4669-b6fe-ed2e77815b9f | netqatr  | testing_paas_product=0.0.1 |
+            | tierqasp  | Spain  | 422128fe-02a2-44ca-b9a7-67ec69809e5e | netqasp  | testing_paas_product=0.0.1 |
+        And an environment has already been created with the previous tiers and data:
+            | name     | description |
+            | envqareg | descqa      |
+        When I request the creation of an instance of the environment "envqareg" using data:
+            | name      | description    |
+            | instqareg | instancedescqa |
+        Then I receive an "OK" response with a task
+        And the task ends with "SUCCESS" status
+
+
+    @env_dependant
+    Scenario: Create instance of an environment with several tiers in different regions
+        Given the paas manager is up and properly configured
+        And a list of tiers has been defined with data:
+            | name      | region | image                                |
+            | tierqasp  | Spain  | 422128fe-02a2-44ca-b9a7-67ec69809e5e |
+            | tierqatr  | Trento | 6e2519b8-1b36-4669-b6fe-ed2e77815b9f |
+        And an environment has already been created with the previous tiers and data:
+            | name     | description |
+            | envqareg | descqa      |
+        When I request the creation of an instance of the environment "envqareg" using data:
+            | name      | description    |
+            | instqareg | instancedescqa |
+        Then I receive an "OK" response with a task
+        And the task ends with "SUCCESS" status
 
     Scenario Outline: Create instance of an environment with tiers with different valid data (1/3)
     # Split in three parts due to OpenStack limits that cannot be easily overridden

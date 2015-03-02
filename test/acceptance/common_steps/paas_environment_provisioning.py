@@ -26,7 +26,7 @@ from lettuce import world
 from lettuce_tools.dataset_utils.dataset_utils import DatasetUtils
 
 from tools.tier import Tier
-from tools.constants import NAME, PAAS, TIER_IMAGE, PRODUCTS, NETWORKS
+from tools.constants import NAME, PAAS, TIER_IMAGE, PRODUCTS, NETWORKS, TIER_REQUEST_REGION, TIER_REQUEST_IMAGE
 
 dataset_utils = DatasetUtils()
 
@@ -62,6 +62,12 @@ def process_the_list_of_tiers(step):
         data = dataset_utils.prepare_data(row)
         tier = Tier(data.get(NAME), world.config[PAAS][TIER_IMAGE])
         tier.parse_and_add_products(data.get(PRODUCTS))
+
+        if TIER_REQUEST_IMAGE in data:
+            tier.tier_image = data.get(TIER_REQUEST_IMAGE)
+
+        if TIER_REQUEST_REGION in data:
+            tier.region = data.get(TIER_REQUEST_REGION)
 
         # For each product, check if there are defined attributes
         for paas_product_with_attributes in world.paas_product_list_with_attributes:

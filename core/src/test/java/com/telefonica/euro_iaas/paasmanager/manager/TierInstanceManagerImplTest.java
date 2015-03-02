@@ -24,6 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.manager;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
@@ -45,19 +46,25 @@ import org.mockito.Mockito;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.euro_iaas.paasmanager.claudia.FirewallingClient;
+import com.telefonica.euro_iaas.paasmanager.dao.SecurityGroupDao;
 import com.telefonica.euro_iaas.paasmanager.dao.TierInstanceDao;
+import com.telefonica.euro_iaas.paasmanager.manager.impl.SecurityGroupManagerImpl;
 import com.telefonica.euro_iaas.paasmanager.manager.impl.TierInstanceManagerImpl;
 import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.EnvironmentInstance;
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
+import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 import com.telefonica.euro_iaas.paasmanager.model.ProductInstance;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
+import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
+import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
  * @author jesus.movilla
@@ -65,13 +72,15 @@ import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 public class TierInstanceManagerImplTest extends TestCase {
 
     private TierInstanceDao tierInstanceDao;
+    private TierManager tierManager;
+    private ProductInstanceManager productInstanceManager;
     private InfrastructureManager infrastructureManager;
     private ProductReleaseManager productReleaseManager;
-    private ProductInstanceManager productInstanceManager;
-    private TierManager tierManager;
     private EnvironmentManager enviromentManager;
     private EnvironmentInstanceManager environmentInstanceManager;
-
+    private SecurityGroupManager securityGroupManager;
+    private SystemPropertiesProvider systemPropertiesProvider;
+    
     private Tier tierProductShard = null;
     private Tier tierProductConfig = null;
     private Tier tierProductMongos = null;
@@ -95,21 +104,27 @@ public class TierInstanceManagerImplTest extends TestCase {
         claudiaData.setUser(user);
 
         tierInstanceDao = mock(TierInstanceDao.class);
-        infrastructureManager = mock(InfrastructureManager.class);
-        productReleaseManager = mock(ProductReleaseManager.class);
-        productInstanceManager = mock(ProductInstanceManager.class);
-        environmentInstanceManager = mock(EnvironmentInstanceManager.class);
         tierManager = mock(TierManager.class);
+        productInstanceManager = mock(ProductInstanceManager.class);
+        infrastructureManager = mock(InfrastructureManager.class);
+        productReleaseManager = mock(ProductReleaseManager.class);        
         enviromentManager = mock(EnvironmentManager.class);
-
+        environmentInstanceManager = mock(EnvironmentInstanceManager.class);
+        securityGroupManager = mock(SecurityGroupManager.class);
+        systemPropertiesProvider = mock (SystemPropertiesProvider.class);
+        
         manager = new TierInstanceManagerImpl();
 
-        manager.setInfrastructureManager(infrastructureManager);
+        manager.setTierInstanceDao(tierInstanceDao);        
+        manager.setTierManager(tierManager);        
         manager.setProductInstanceManager(productInstanceManager);
-        manager.setTierInstanceDao(tierInstanceDao);
-        manager.setTierManager(tierManager);
-        manager.setEnvironmentInstanceManager(environmentInstanceManager);
+        manager.setInfrastructureManager(infrastructureManager);
+        manager.setProductReleaseManager(productReleaseManager);        
         manager.setEnvironmentManager(enviromentManager);
+        manager.setEnvironmentInstanceManager(environmentInstanceManager);
+        manager.setSecurityGroupManager(securityGroupManager);
+        manager.setSystemPropertiesProvider(systemPropertiesProvider);
+        
 
         VM host = new VM(null, "hostname", "domain");
 
@@ -122,7 +137,9 @@ public class TierInstanceManagerImplTest extends TestCase {
         tierProductConfig.setMinimumNumberInstances(new Integer(1));
         tierProductConfig.setName("tierconfig");
         tierProductConfig.setProductReleases(productReleasesConfig);
-
+        
+        SecurityGroup secGroup = new SecurityGroup("name", "description");
+                
         Attribute att = new Attribute("balancer", "mongos", "description");
         List<Attribute> lAtt = new ArrayList();
         lAtt.add(att);
@@ -138,6 +155,7 @@ public class TierInstanceManagerImplTest extends TestCase {
         tierProductShard.setMinimumNumberInstances(new Integer(1));
         tierProductShard.setName("tiershard");
         tierProductShard.setProductReleases(productReleasesShards);
+        //tierProductShard.setSecurityGroup(secGroup);
 
         List<ProductRelease> productReleaseBalancer = new ArrayList<ProductRelease>();
         ProductRelease productReleaseMongos = new ProductRelease("mongos", "2.0");
@@ -166,7 +184,15 @@ public class TierInstanceManagerImplTest extends TestCase {
 
         when(productInstanceManager.create(any(ClaudiaData.class), any(ProductInstance.class))).thenReturn(
                 productInstance);
+        when(securityGroupManager.load(anyString())).thenReturn(secGroup);
+        when(securityGroupManager.create(anyString(), anyString(), anyString(), any(SecurityGroup.class))).thenReturn(
+        		secGroup);
 
+        when(systemPropertiesProvider.getProperty(any(String.class))).thenReturn("FIWARE");
+        
+        when(productReleaseManager.loadWithMetadata(any(String.class))).thenReturn(productReleaseShard);
+        
+        
         Set<Tier> tiers = new HashSet<Tier>();
         tiers.add(tierProductConfig);
         tiers.add(tierProductShard);
@@ -201,7 +227,9 @@ public class TierInstanceManagerImplTest extends TestCase {
 
         VM host = new VM(null, "hostname", "domain");
         TierInstance tierInstance = new TierInstance(tierProductConfig, "tierInsatnce", "nametierInstance-tier-1", host);
-
+        //tierProductShard.setRegion("Region");
+        //tierInstance.setTier(tierProductShard);
+        
         TierInstance tierInstanceCreated = manager.create(claudiaData, "env", tierInstance);
 
         assertEquals(tierInstanceCreated.getName(), tierInstanceCreated.getName());
@@ -286,5 +314,4 @@ public class TierInstanceManagerImplTest extends TestCase {
         // when(tierInstanceDao.load(any(String.class))).thenReturn(tierInstance);
         manager.remove(tierInstanceCreated);
     }
-
 }

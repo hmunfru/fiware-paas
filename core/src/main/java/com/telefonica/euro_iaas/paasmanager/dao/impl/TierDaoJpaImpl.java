@@ -217,9 +217,9 @@ public class TierDaoJpaImpl extends AbstractBaseDao<Tier, String> implements Tie
 
     @Override
     public Tier loadComplete(Tier newTier) throws EntityNotFoundException {
-        Query query = getEntityManager()
-                .createQuery(
-                        "select p from Tier p fetch all properties where p.name = :name and p.vdc =:vdc and p.environmentname= :environmentname");
+        Query query = getEntityManager().createQuery(
+                "select p from Tier p fetch all"
+                        + " properties where p.name = :name and p.vdc =:vdc and p.environmentname= :environmentname");
         query.setParameter("name", newTier.getName());
         query.setParameter("vdc", newTier.getVdc());
         query.setParameter("environmentname", newTier.getEnviromentName());
@@ -232,7 +232,6 @@ public class TierDaoJpaImpl extends AbstractBaseDao<Tier, String> implements Tie
             if (tier.getProductReleases() != null) {
                 tier.getProductReleases().size();
             }
-            tier.getSecurityGroup();
         } catch (Exception e) {
             String message = " Tier does not exist in database ";
             throw new EntityNotFoundException(Tier.class, message, newTier.getName());

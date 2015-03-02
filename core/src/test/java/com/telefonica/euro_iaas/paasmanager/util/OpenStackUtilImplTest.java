@@ -41,6 +41,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,6 +111,9 @@ public class OpenStackUtilImplTest {
         paasManagerUser = new PaasManagerUser("user", "aa", authorities);
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+
+        HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
+        openStackUtil.setHttpConnectionManager(httpClientConnectionManager);
 
         httpResponse = mock(CloseableHttpResponse.class);
         statusLine = mock(StatusLine.class);
@@ -308,18 +312,15 @@ public class OpenStackUtilImplTest {
 
     /**
      * it lists the subnets.
-     *
+     * 
      * @throws OpenStackException
      * @throws IOException
      */
     @Test
     public void shouldListSubNetworks() throws OpenStackException, IOException {
 
-        when(openOperationUtil.
-            getAdminUser(any(PaasManagerUser.class))).
-            thenReturn(paasManagerUser);
-        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class)))
-            .thenReturn("ok");
+        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
         String response = openStackUtil.listSubNetworks(paasManagerUser, "region");
 
         // then

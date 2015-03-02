@@ -89,7 +89,7 @@ public class OpenStackSyncImplTest {
         List<Tier> tiers = new ArrayList<Tier>();
         List<ProductRelease> pReleases = new ArrayList<ProductRelease>();
 
-        secGroup = new SecurityGroup();
+        /*secGroup = new SecurityGroup();
         secGroup.setName("name");
         secGroup.setDescription("desc");
         secGroup.setIdSecurityGroup("1");
@@ -100,9 +100,10 @@ public class OpenStackSyncImplTest {
         differentSecGroup.setDescription("desc2");
         differentSecGroup.setIdSecurityGroup("2");
         differentSecGroup.addRule(new Rule("ipProtocol2", "fromPort2", "toPort2", "sourceGroup2", "cidr2"));
-
+		*/
+        
         Tier tier = new Tier("name", 1, 1, 1, pReleases, "flavour", "image", "icono");
-        tier.setSecurityGroup(secGroup);
+        //tier.setSecurityGroup(secGroup);
         tiers.add(tier);
 
         List<TierInstance> tierInstances = new ArrayList<TierInstance>();

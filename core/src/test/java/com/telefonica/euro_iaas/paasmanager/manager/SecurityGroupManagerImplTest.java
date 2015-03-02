@@ -114,7 +114,8 @@ public class SecurityGroupManagerImplTest {
                 .destroySecurityGroup(anyString(), anyString(), anyString(), any(SecurityGroup.class));
 
         when(securityGroupDao.create(any(SecurityGroup.class))).thenReturn(securityGroup);
-
+        when(securityGroupDao.load(anyString())).thenReturn(securityGroup);
+        
         securityGroupManager.destroy("region", "token", "vdc", securityGroup);
 
     }

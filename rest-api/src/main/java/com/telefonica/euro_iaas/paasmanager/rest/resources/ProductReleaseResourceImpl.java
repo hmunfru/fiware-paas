@@ -124,7 +124,7 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
             Tier tier = tierManager.load(tierName, vdc, environmentName);
             tier.addProductRelease(productRelease);
-            tierManager.addSecurityGroupToProductRelease(claudiaData, tier, productRelease);
+            //tierManager.addSecurityGroupToProductRelease(claudiaData, tier, productRelease);
             tierManager.update(tier);
 
         } catch (InvalidEntityException e) {

@@ -60,7 +60,7 @@ public class ProductInstanceManagerImpl implements ProductInstanceManager {
 
     public ProductInstance install(TierInstance tierInstance, ClaudiaData claudiaData,
             EnvironmentInstance environmentInstance, ProductRelease productRelease)
-            throws ProductInstallatorException, InvalidProductInstanceRequestException, NotUniqueResultException,
+            throws ProductInstallatorException, InvalidProductInstanceRequestException,
             InvalidEntityException {
         log.info("Installing software " + productRelease.getProduct() + " in tier Instance " + tierInstance.getName()
                 + " in vdc " + claudiaData.getVdc());
