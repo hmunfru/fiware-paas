@@ -188,7 +188,6 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
             // try {
             environmentManager.create(claudiaData, environmentDto.fromDto(org, vdc));
         } catch (Exception e) {
-            e.printStackTrace();
             log.warn(e.getMessage());
             throw new APIException(e);
         }
