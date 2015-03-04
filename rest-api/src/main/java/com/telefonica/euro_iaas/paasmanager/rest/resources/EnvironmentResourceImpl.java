@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentManager;
-import com.telefonica.euro_iaas.paasmanager.manager.impl.EnvironmentManagerImpl;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentDto;
@@ -71,7 +70,7 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
     @Autowired
     private EnvironmentResourceValidator environmentResourceValidator;
 
-    private static Logger log = LoggerFactory.getLogger(EnvironmentManagerImpl.class);
+    private static Logger log = LoggerFactory.getLogger(EnvironmentResourceImpl.class);
 
     /**
      * Delete an specific environment instance.
@@ -189,7 +188,7 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
             // try {
             environmentManager.create(claudiaData, environmentDto.fromDto(org, vdc));
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.warn(e.getMessage());
             throw new APIException(e);
         }
     }

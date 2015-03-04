@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.manager.impl.EnvironmentManagerImpl;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.ErrorCode;
 
@@ -45,7 +44,7 @@ import com.telefonica.euro_iaas.paasmanager.rest.exception.ErrorCode;
  */
 public class ErrorHandler extends HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(EnvironmentManagerImpl.class);
+    private static Logger log = LoggerFactory.getLogger(ErrorHandler.class);
 
     /**
      * Method to handle GET method request.
@@ -62,7 +61,7 @@ public class ErrorHandler extends HttpServlet {
         PrintWriter out = getOutputStream(response);
 
         String responseMessage = createResponseMessage(request, response);
-        log.info("response message: " + responseMessage);
+        log.info("response message: " + responseMessage + " for request:" + request.toString());
 
         out.println(responseMessage);
         out.flush();
@@ -84,7 +83,7 @@ public class ErrorHandler extends HttpServlet {
         Integer code = (Integer) request.getAttribute("javax.servlet.error.status_code");
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
 
-        log.debug("message: " + message + " code: " + code + " ");
+        log.info("message: " + message + " code: " + code + " ");
 
         if (throwable != null) {
             throwable.printStackTrace();
