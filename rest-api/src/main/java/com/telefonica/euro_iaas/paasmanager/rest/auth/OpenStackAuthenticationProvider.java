@@ -35,6 +35,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
+import net.sf.ehcache.Cache;
+
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 import org.openstack.docs.identity.api.v2.Role;
@@ -333,4 +335,10 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         this.httpConnectionManager = httpConnectionManager;
     }
 
+    /**
+     * reset cache
+     */
+    public Cache getTokenCache() {
+        return tokenCache.getCache();
+    }
 }
