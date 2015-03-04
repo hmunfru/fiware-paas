@@ -103,7 +103,7 @@ public class TokenCache {
      * @return
      */
     public String[] getAdmin() {
-        if (cache.isKeyInCache("admin")) {
+        if (cache.isKeyInCache("admin") && (cache.get("admin") != null)) {
             return (String[]) cache.get("admin").getObjectValue();
         } else {
             return null;
@@ -126,5 +126,14 @@ public class TokenCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * get ehcache
+     * 
+     * @return
+     */
+    public Cache getCache() {
+        return cache;
     }
 }
