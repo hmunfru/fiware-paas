@@ -48,6 +48,7 @@ JAVA_OPTIONS="-Xmx1024m -Xms1024m"
 #   Extra options to pass to the JVM
 #
 # JETTY_HOME
+JETTY_HOME=/opt/fiware-paas
 #   Where Jetty is installed. If not set, the script will try go
 #   guess it by looking at the invocation path for the script
 #   The java system property "jetty.home" will be
