@@ -64,9 +64,11 @@ JETTY_HOME=/opt/fiware-paas
 #   Where the $NAME.pid file should be stored. It defaults to the
 #   first available of /var/run, /usr/var/run, JETTY_BASE and /tmp
 #   if not set.
+JETTY_RUN=$JETTY_HOME
 #
 # JETTY_PID
 #   The Jetty PID file, defaults to $JETTY_RUN/$NAME.pid
+JETTY_PID=$JETTY_RUN/jetty.pid
 #
 # JETTY_ARGS
 #   The default arguments to pass to jetty.
