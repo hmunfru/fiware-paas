@@ -21,20 +21,32 @@
  * For those usages not covered by the Apache version 2.0 License please contact with opensource@tid.es
  * </p>
  */
-
 package com.telefonica.euro_iaas.paasmanager.rest.util;
 
-import org.glassfish.jersey.jackson.JacksonFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import java.io.IOException;
 
-import com.telefonica.euro_iaas.paasmanager.util.MyObjectMapperProvider;
+import javax.ws.rs.client.ClientRequestContext;
 
-public class MyRESTAPIApp extends ResourceConfig {
-    public MyRESTAPIApp() {
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-        register(MyObjectMapperProvider.class);
-        register(JacksonFeature.class);
-        register(new MyLoggingFilter());
-        property("jersey.config.beanValidation.enableOutputValidationErrorEntity.server", "true");
+/**
+ * Extend LoggingFilter in order to disable stderr traces for jersey
+ */
+public class MyLoggingFilter extends LoggingFilter {
+
+    private static Logger log = LoggerFactory.getLogger(MyLoggingFilter.class);
+
+    public MyLoggingFilter() {
+        super(null, true);
+        System.out.println("MyLoggingFilter running");
     }
+
+    @Override
+    public void filter(ClientRequestContext context) throws IOException {
+        // Do nothing.
+        System.out.println("MyLoggingFilter: filter. do nothing.");
+    }
+
 }
