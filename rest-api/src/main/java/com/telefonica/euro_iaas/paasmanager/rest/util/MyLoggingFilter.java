@@ -40,13 +40,11 @@ public class MyLoggingFilter extends LoggingFilter {
 
     public MyLoggingFilter() {
         super(null, true);
-        System.out.println("MyLoggingFilter running");
     }
 
     @Override
     public void filter(ClientRequestContext context) throws IOException {
         // Do nothing.
-        System.out.println("MyLoggingFilter: filter. do nothing.");
     }
 
 }
