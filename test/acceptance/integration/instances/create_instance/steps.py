@@ -28,8 +28,8 @@ import json
 from tools.constants import NAME, DESCRIPTION, METADATA_NID_NOVA_KEY, METADATA_NID
 from common_steps import sdc_product_provisioning_steps, paas_environment_provisioning
 from tools.utils import raw_httplib_request_to_python_dic
-from nose.tools import assert_equal, assert_is_not_none, assert_equals
-from tools.nova_request import get_server_id_by_partial_name, get_metadata_value
+from nose.tools import assert_equal, assert_is_not_none, assert_equals, assert_in
+from tools.nova_request import get_server_id_by_partial_name, get_metadata_value, get_ports_from_rules
 
 dataset_utils = DatasetUtils()
 
@@ -40,7 +40,6 @@ def _check_metadata_for_tier_in_nova(tier_name, metadata_key, metadata_value):
     assert_equal(raw_response.status, 200, "Error to obtain the server list. HTTP status code is not the expected")
 
     body_response = raw_httplib_request_to_python_dic(raw_response)
-    print body_response
     sub_instance_name = "{}-{}".format(world.instance_name, tier_name)
     server_id = get_server_id_by_partial_name(body_response, sub_instance_name)
     assert_is_not_none(server_id, "Server has not been found with sub-name " + sub_instance_name)
@@ -50,7 +49,6 @@ def _check_metadata_for_tier_in_nova(tier_name, metadata_key, metadata_value):
     assert_equal(raw_response.status, 200, "Error to obtain server details. HTTP status code is not the expected")
 
     body_response = raw_httplib_request_to_python_dic(raw_response)
-    print body_response
     nid_metadata_value = get_metadata_value(body_response, metadata_key)
     assert_equals(str(nid_metadata_value), str(metadata_value))
 
@@ -163,3 +161,26 @@ def the_created_instances_have_not_nid_metadata(step):
 
         print "NID value expected:", metadata_value
         _check_metadata_for_tier_in_nova(tier.name, METADATA_NID_NOVA_KEY, metadata_value)
+
+
+@step(u'the created security group has rules with "(TCP|UDP)" ports "([^"]*)"')
+def the_created_sec_group_has_rules(step, protocol, open_ports):
+    open_ports_list = []
+    if "" != open_ports:
+        open_ports_list = open_ports.split(' ')
+
+    # Add default port '22'
+    if protocol == 'TCP':
+        open_ports_list.append('22')
+
+    # Get Sec. Group from Nova
+    raw_response = world.nova_request.get_security_group_list()
+    assert_equal(raw_response.status, 200, "Error to obtain Sec. Groups list. HTTP status code is not the expected")
+
+    body_response = raw_httplib_request_to_python_dic(raw_response)
+    rules_tcp_ports_list = get_ports_from_rules(body_response, world.instance_name, protocol=protocol)
+
+    # Check expected ports
+    assert_equals(len(open_ports_list), len(rules_tcp_ports_list))
+    for expected_port in open_ports_list:
+        assert_in(expected_port, rules_tcp_ports_list)
