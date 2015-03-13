@@ -124,6 +124,7 @@ def the_product_group1_is_created_in_sdc(step, product_name, product_version):
 @step(u'the product "([^"]*)" with version "([^"]*)" is created in SDC with attributes:$')
 def the_product_group1_is_created_in_sdc_with_attributes(step, product_name, product_version):
     sdc_product_provisioning_steps.product_is_created_in_sdc_with_attributes(step, product_name, product_version)
+    paas_environment_provisioning.process_following_instance_attributes(step, product_name)
 
 
 @step(u'the product "([^"]*)" with version "([^"]*)" is created in SDC with metadatas:$')
