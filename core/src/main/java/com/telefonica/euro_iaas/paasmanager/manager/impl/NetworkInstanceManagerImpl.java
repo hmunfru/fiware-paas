@@ -40,9 +40,8 @@ import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.RouterManager;
 import com.telefonica.euro_iaas.paasmanager.manager.SubNetworkInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
-import com.telefonica.euro_iaas.paasmanager.model.EnvironmentInstance;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.Port;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -80,7 +79,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             if (!existsInOpenstack (claudiaData, networkInstance, region)) {
             	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id "
                     + networkInstance.getIdNetwork() + " does no exists in Openstack") ;
-            	this.deleteInDb(networkInstance);
+            	this.deleteInDb(networkInstance, claudiaData.getVdc(), region);
             	return false;
 
             } else {
@@ -169,6 +168,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      */
     private void restoreNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
             throws EntityNotFoundException, InvalidEntityException, InfrastructureException {
+        this.deleteInDb(networkInstance, claudiaData.getVdc(), region);
         for (SubNetworkInstance subNet : networkInstance.getSubNets()) {
             if (subNetworkInstanceManager.isSubNetworkDeployed(claudiaData, subNet, region)) {
                 subNetworkInstanceManager.delete(claudiaData, subNet, region);
@@ -176,11 +176,6 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         }
         log.info("Deleting the network");
         networkClient.destroyNetwork(claudiaData, networkInstance, region);
-
-        networkInstance.setSubNets(null);
-        networkInstanceDao.update(networkInstance);
-        networkInstanceDao.remove(networkInstance);
-
     }
 
     /**
@@ -221,23 +216,24 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             throws InvalidEntityException, InfrastructureException {
         log.info("Destroying network " + networkInstance.getNetworkName()
             + " region " + region);
+        try {
+            networkInstance = load(networkInstance.getNetworkName(),
+                claudiaData.getVdc(), region);
+        } catch (EntityNotFoundException e) {
+            log.error("Error to remove the network in BD " + e.getMessage());
+            throw new InvalidEntityException(networkInstance);
+        }
 
         if (!canBeDeleted(claudiaData, networkInstance, region)) {
-            log.info("The network cannot be deleted due to existing ports");
+            log.info("The network cannot be deleted since it is using by another" +
+                "blueprint");
             return;
         }
 
+        log.info("Deleting from DB");
+        deleteInDb(networkInstance, claudiaData.getVdc(), region);
+
         log.info("Deleting the public interface");
-        try {
-            log.info("Loading network " + networkInstance.getNetworkName()
-                + "  " + claudiaData.getVdc() + " " + region);
-            networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(),
-                claudiaData.getVdc(), region);
-        } catch (Exception e) {
-            log.error("It is not possible to find the network "
-                + e.getMessage());
-            throw new InvalidEntityException(networkInstance);
-        }
         try {
             networkClient.deleteNetworkToPublicRouter(claudiaData,
                 networkInstance, region);
@@ -248,42 +244,36 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
         log.info("Deleting the subnets");
         Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
-        networkInstance.getSubNets().clear();
-        networkInstanceDao.update(networkInstance);
         for (SubNetworkInstance subNet : subNetAux) {
             subNetworkInstanceManager.delete(claudiaData, subNet, region);
         }
         log.info("Deleting the network");
         networkClient.destroyNetwork(claudiaData, networkInstance, region);
+    }
+
+
+
+    private void deleteInDb(NetworkInstance networkInstance, String vdc, String region)
+        throws InvalidEntityException {
+        log.info("Destroying network in DB" + networkInstance.getNetworkName());
+
         try {
+            networkInstance = load(networkInstance.getNetworkName(),
+                vdc, region);
+            Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
+            log.info("Deleting the subnets " + subNetAux.size());
+            networkInstance.getSubNets().clear();
+            networkInstanceDao.update(networkInstance);
+            for (SubNetworkInstance subNet : subNetAux) {
+                log.info ("Delete subnet " + subNet.getName());
+                subNetworkInstanceManager.deleteInBD(subNet);
+            }
+            log.info("Deleting the network");
             networkInstanceDao.remove(networkInstance);
         } catch (Exception e) {
             log.error("Error to remove the network in BD " + e.getMessage());
             throw new InvalidEntityException(networkInstance);
         }
-
-    }
-
-    private void deleteInDb(NetworkInstance networkInstance)
-        throws InvalidEntityException {
-    log.info("Destroying network in DB" + networkInstance.getNetworkName()
-        + " " + networkInstance.getSubNets().size() );
-
-    Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
-    log.info("Deleting the subnets " + subNetAux.size());
-    networkInstance.getSubNets().clear();
-    networkInstanceDao.update(networkInstance);
-    for (SubNetworkInstance subNet : subNetAux) {
-    	log.info ("Delete subnet " + subNet.getName());
-    	subNetworkInstanceManager.deleteInBD(subNet);
-    }
-    log.info("Deleting the network");
-    try {
-    	networkInstanceDao.remove(networkInstance);
-    } catch (Exception e) {
-    	log.error("Error to remove the network in BD " + e.getMessage());
-    	throw new InvalidEntityException(networkInstance);
-    }
 
 }
 
@@ -296,24 +286,20 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     public boolean canBeDeleted(ClaudiaData claudiaData,
                                 NetworkInstance networkInstance, String region)
             throws InvalidEntityException, InfrastructureException {
-        log.info("Obtaining ports from network"
+        log.info("Checking if any blueprint is using the network"
             + networkInstance.getNetworkName());
 
-        List<Port> ports = networkClient.listPortsFromNetwork(claudiaData, region,
-                networkInstance.getIdNetwork());
-        log.info("List ports " + ports.size());
-        if (ports.size() == 0) {
-            return true;
-        } else {
-            String strPorts = "";
-            for (Port port : ports) {
-                strPorts = strPorts + " " + port.getNetworkId();
-            }
-            log.info("It is not possible to undeply the network since there "
-                + " are VMs associated to it " + strPorts);
+        try {
+            List<TierInstance> lTierInstance = networkInstanceDao.
+                findTierInstanceUsedByNetwork(networkInstance.getNetworkName(),
+                claudiaData.getVdc(), region);
+            if (lTierInstance.size() > 0)
+                return false;
+        } catch (EntityNotFoundException e) {
+            log.warn("Not network Instance found");
             return false;
-
         }
+        return true;
     }
 
     /**

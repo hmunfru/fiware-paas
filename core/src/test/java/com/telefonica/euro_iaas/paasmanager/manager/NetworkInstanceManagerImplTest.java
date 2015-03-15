@@ -38,9 +38,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-
 import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
@@ -51,6 +48,7 @@ import com.telefonica.euro_iaas.paasmanager.manager.impl.NetworkInstanceManagerI
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Port;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetwork;
@@ -184,18 +182,17 @@ public class NetworkInstanceManagerImplTest {
         ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
-        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenThrow(
-                new EntityNotFoundException(Network.class, "test", net));
+        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).
+            thenReturn(netInst);
         when(systemPropertiesProvider.getProperty("key")).thenReturn("VALUE");
         Mockito.doNothing().when(networkClient)
-                .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+            .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
         Mockito.doNothing().when(networkClient)
-                .addNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+            .addNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
         when(subNetworkInstanceManager.create(any(ClaudiaData.class), any(SubNetworkInstance.class), anyString()))
-                .thenThrow(InfrastructureException.class);
-        when(
-                subNetworkInstanceManager.isSubNetworkDeployed(any(ClaudiaData.class), any(SubNetworkInstance.class),
-                        anyString())).thenReturn(false);
+            .thenThrow(InfrastructureException.class);
+        when(subNetworkInstanceManager.isSubNetworkDeployed(any(ClaudiaData.class), any(SubNetworkInstance.class),
+            anyString())).thenReturn(false);
 
         Mockito.doNothing().when(routerManager)
                 .create(any(ClaudiaData.class), any(RouterInstance.class), any(NetworkInstance.class), anyString());
@@ -264,21 +261,46 @@ public class NetworkInstanceManagerImplTest {
         verify(networkInstanceDao).remove(any(NetworkInstance.class));
 
     }
-    
+
+    /**
+     * It tests that the network cannot be deleted.
+     * @throws Exception
+     */
     @Test
-    public void testCanbeDeleted() throws Exception {
+    public void testCannotBeDeleted() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
         ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
+        List<TierInstance> lTierInstance = new ArrayList();
+        lTierInstance.add(new TierInstance());
 
         // When
-        List<Port> ports = new ArrayList<Port> ();
-        ports.add(new Port ());
-        when(networkClient.listPortsFromNetwork(any(ClaudiaData.class), anyString(), anyString())).thenReturn(ports);
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+                anyString(), anyString())).thenReturn(lTierInstance);
 
         // Verify
         boolean result = networkInstanceManager.canBeDeleted(claudiaData, net, "region");
         assertEquals (result, false);
+    }
+
+    /**
+     * It tests that the network can be deleted.
+     * @throws Exception
+     */
+    @Test
+    public void testCanBeDeleted() throws Exception {
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
+        List<TierInstance> lTierInstance = new ArrayList();
+
+        // When
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+            anyString(), anyString())).thenReturn(lTierInstance);
+
+        // Verify
+        boolean result = networkInstanceManager.canBeDeleted(claudiaData, net, "region");
+        assertEquals (result, true);
     }
 
     @Test
@@ -286,8 +308,12 @@ public class NetworkInstanceManagerImplTest {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
         ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
+        List<TierInstance> lTierInstance = new ArrayList();
+        lTierInstance.add(new TierInstance());
 
         // When
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+            anyString(), anyString())).thenReturn(lTierInstance);
         List<Port> ports = new ArrayList<Port> ();
         ports.add(new Port ());
         when(networkClient.listPortsFromNetwork(any(ClaudiaData.class), anyString(),
