@@ -94,6 +94,11 @@ public class SecurityGroupManagerImplTest {
 
     }
 
+    /**
+     * It test the security groups when there are rules equals but
+     * tcp and udp
+     * @throws Exception
+     */
     @Test
     public void testCreateSecurityGroupUpdTcprules() throws Exception {
 
@@ -105,25 +110,23 @@ public class SecurityGroupManagerImplTest {
         assertEquals(securityGroup.getRules().size(), 2);
     }
 
+    /**
+     * It tests deleting security group.
+     * @throws Exception
+     */
     @Test
     public void testDeleteSecurityGroup() throws Exception {
 
         SecurityGroup securityGroup = new SecurityGroup("name", "description");
-
         Rule rule = new Rule("TCP", "8080", "8080", "", "0.0.0.0/0");
-
         securityGroup.addRule(rule);
 
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "dd");
-
         Mockito.doNothing().doThrow(new RuntimeException()).when(ruleManager)
-                .destroy(anyString(), anyString(), anyString(), any(Rule.class));
-
-        Mockito.doNothing().doThrow(new RuntimeException()).when(securityGroupDao).remove(any(SecurityGroup.class));
-
+            .destroy(anyString(), anyString(), anyString(), any(Rule.class));
+        Mockito.doNothing().doThrow(new RuntimeException()).when(securityGroupDao)
+            .remove(any(SecurityGroup.class));
         Mockito.doNothing().doThrow(new RuntimeException()).when(firewallingClient)
-                .destroySecurityGroup(anyString(), anyString(), anyString(), any(SecurityGroup.class));
-
+            .destroySecurityGroup(anyString(), anyString(), anyString(), any(SecurityGroup.class));
         when(securityGroupDao.create(any(SecurityGroup.class))).thenReturn(securityGroup);
         when(securityGroupDao.load(anyString())).thenReturn(securityGroup);
         
