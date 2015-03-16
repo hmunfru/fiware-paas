@@ -96,10 +96,10 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
     }
 
     /**
-     *
-     * @param name
-     * @param vdc
-     * @param region
+     * It get the tier instance which have the concrete network.
+     * @param name: the network name
+     * @param vdc: the vdc
+     * @param region: the region
      * @return
      * @throws EntityNotFoundException
      */
@@ -115,10 +115,8 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
         try {
             tierInstanceList = (List<TierInstance>) query.getResultList();
         } catch (NoResultException e) {
-            String message = " No TierInstance found in the database with network Instance: " + name + " vdc " + vdc + " region "
-                + region + " Exception: "
-
-                + e.getMessage();
+            String message = " No TierInstance found in the database with network Instance: " +
+                name + " vdc " + vdc + " region " + region + " Exception: " + e.getMessage();
             log.debug(message);
             throw new EntityNotFoundException(NetworkInstance.class, "name", name);
         }

@@ -69,21 +69,21 @@ public class NetworkInstandSubNetInstDaoJpaImplTest {
     public static String VDC = "vdc";
 
     @Test
-     public void testNetworkNoSubNet() throws Exception {
+    public void testNetworkNoSubNet() throws Exception {
 
-        NetworkInstance network = new NetworkInstance(NETWORK_NAME+1, "vdc", REGION);
+        NetworkInstance network = new NetworkInstance(NETWORK_NAME + 1, "vdc", REGION);
 
         network = networkInstanceDao.create(network);
         assertNotNull(network);
-        assertEquals(network.getNetworkName(), NETWORK_NAME+1);
+        assertEquals(network.getNetworkName(), NETWORK_NAME + 1);
         assertEquals(network.getSubNets().size(), 0);
 
         List<NetworkInstance> networks = networkInstanceDao.findAll();
         assertNotNull(networks);
 
-        NetworkInstance networkOut = networkInstanceDao.load(NETWORK_NAME+1,VDC, REGION);
+        NetworkInstance networkOut = networkInstanceDao.load(NETWORK_NAME + 1, VDC, REGION);
         assertNotNull(networkOut);
-        assertEquals(networkOut.getNetworkName(), NETWORK_NAME+1);
+        assertEquals(networkOut.getNetworkName(), NETWORK_NAME + 1);
         assertEquals(networkOut.getSubNets().size(), 0);
 
     }

@@ -206,21 +206,22 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     }
 
     /**
-     * To remove a network.
-     *
-     * @params claudiaData
-     * @params network
+     * It deletes a network in DB and in Openstack.
+     * @param claudiaData
+     * @param networkInstance
+     * @param region
+     * @throws InvalidEntityException
+     * @throws InfrastructureException
      */
-    public void delete(ClaudiaData claudiaData,
-                       NetworkInstance networkInstance, String region)
-            throws InvalidEntityException, InfrastructureException {
-        log.info("Destroying network " + networkInstance.getNetworkName()
-            + " region " + region);
+    public void delete(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
+        throws InvalidEntityException, InfrastructureException {
+
+        log.info("Destroying network " + networkInstance.getNetworkName() + " region " + region);
         try {
             networkInstance = load(networkInstance.getNetworkName(),
                 claudiaData.getVdc(), region);
         } catch (EntityNotFoundException e) {
-            log.error("Error to remove the network in BD " + e.getMessage());
+            log.error("Error to remove the network in BD, since it is not exist in BD " + e.getMessage());
             throw new InvalidEntityException(networkInstance);
         }
 
@@ -261,14 +262,12 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             networkInstance = load(networkInstance.getNetworkName(),
                 vdc, region);
             Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
-            log.info("Deleting the subnets " + subNetAux.size());
             networkInstance.getSubNets().clear();
             networkInstanceDao.update(networkInstance);
             for (SubNetworkInstance subNet : subNetAux) {
-                log.info ("Delete subnet " + subNet.getName());
+                log.info ("Delete subnet in BD " + subNet.getName());
                 subNetworkInstanceManager.deleteInBD(subNet);
             }
-            log.info("Deleting the network");
             networkInstanceDao.remove(networkInstance);
         } catch (Exception e) {
             log.error("Error to remove the network in BD " + e.getMessage());
@@ -288,18 +287,22 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             throws InvalidEntityException, InfrastructureException {
         log.info("Checking if any blueprint is using the network"
             + networkInstance.getNetworkName());
-
+        boolean isDeleted = false;
         try {
             List<TierInstance> lTierInstance = networkInstanceDao.
                 findTierInstanceUsedByNetwork(networkInstance.getNetworkName(),
                 claudiaData.getVdc(), region);
-            if (lTierInstance.size() > 0)
-                return false;
+            if (lTierInstance.size() > 0) {
+                isDeleted = false;
+            } else {
+                isDeleted = true;
+            }
+
         } catch (EntityNotFoundException e) {
             log.warn("Not network Instance found");
-            return false;
+            isDeleted = false;
         }
-        return true;
+        return isDeleted;
     }
 
     /**
