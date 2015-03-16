@@ -119,6 +119,22 @@ public class NetworkInstandSubNetInstDaoJpaImplTest {
 
     }
 
+    /**
+     * It test finding tier instances no existing network.
+     * @throws Exception
+     */
+    @Test
+    public void testFindTierInstanceNoNetwork() throws Exception {
+
+        TierInstance tierInst = new TierInstance ();
+        tierInst.setName("tiername_nonexisting_net");
+        tierInstanceDao.create(tierInst);
+        List<TierInstance> networkOut = networkInstanceDao.
+            findTierInstanceUsedByNetwork("netname_nonexisting", "vdc", "region");
+        assertNotNull(networkOut);
+        assertEquals(networkOut.size(), 0);
+    }
+
     @Test
     public void testNetworkWithSubNets() throws Exception {
 

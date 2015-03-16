@@ -125,7 +125,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             networkClient.addNetworkToPublicRouter(claudiaData, networkInstance, region);
             log.info("Storing network instance " + networkInstance.getNetworkName() + " vdc "
                     + claudiaData.getVdc());
-            networkInstance = networkInstanceDao.create(networkInstance);
+            networkInstance = createInDB(networkInstance);
         } catch (InfrastructureException e) {
             log.warn("There is an error to deploy an subNet " + e.getMessage());
             restoreNetwork(claudiaData, networkInstance, region);
@@ -168,8 +168,9 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      */
     private void restoreNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
             throws EntityNotFoundException, InvalidEntityException, InfrastructureException {
+        Set<SubNetworkInstance> subNets = networkInstance.cloneSubNets();
         this.deleteInDb(networkInstance, claudiaData.getVdc(), region);
-        for (SubNetworkInstance subNet : networkInstance.getSubNets()) {
+        for (SubNetworkInstance subNet : subNets) {
             if (subNetworkInstanceManager.isSubNetworkDeployed(claudiaData, subNet, region)) {
                 subNetworkInstanceManager.delete(claudiaData, subNet, region);
             }
@@ -350,7 +351,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     private NetworkInstance createInBD (ClaudiaData data,
                                         NetworkInstance netInstance,
                                         String region)
-        throws EntityNotFoundException, AlreadyExistsEntityException {
+        throws EntityNotFoundException, AlreadyExistsEntityException, InvalidEntityException {
 
         netInstance = networkClient.loadNetwork(data, netInstance, region);
         Set<SubNetworkInstance> subNetAxu = netInstance.cloneSubNets();
@@ -360,7 +361,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
             netInstance.addSubNet(subNet);
 
         }
-        netInstance = networkInstanceDao.create(netInstance);
+        netInstance = this.createInDB(netInstance);
         return netInstance;
     }
 
