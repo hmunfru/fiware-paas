@@ -26,6 +26,8 @@ package com.telefonica.euro_iaas.paasmanager.model;
 
 import junit.framework.TestCase;
 import net.sf.json.JSONObject;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -110,5 +112,36 @@ public class SecurityGroupTest extends TestCase {
         assertEquals(rule.getSourceGroup(), "sourcegroup");
         assertNotNull(rule.toJSON());
 
+    }
+
+    /**
+     * It tests rule equality with ip protocol different.
+     * @throws Exception
+     */
+    @Test
+    public void testEqualRule() throws Exception {
+        Rule rule = new Rule();
+        rule.setCidr("cidr");
+        rule.setFromPort("fromport");
+        rule.setIdParent("idparent");
+        rule.setIdRule("idrule");
+        rule.setSourceGroup("sourcegroup");
+        rule.setToPort("toPort");
+        rule.setIpProtocol("ipProtocol");
+
+        Rule rule2 = new Rule();
+        rule2.setCidr("cidr");
+        rule2.setFromPort("fromport");
+        rule2.setIdParent("idparent");
+        rule2.setIdRule("idrule");
+        rule2.setSourceGroup("sourcegroup");
+        rule2.setToPort("toPort");
+        rule2.setIpProtocol("ipProtocol2");
+
+        List<Rule> rules = new ArrayList();
+        rules.add(rule);
+
+        assertFalse(rule.equals(rule2));
+        assertFalse(rules.contains(rule2));
     }
 }

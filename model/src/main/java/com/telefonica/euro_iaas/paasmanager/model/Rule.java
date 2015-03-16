@@ -194,6 +194,9 @@ public class Rule {
         if (this.idparent != null && !this.idparent.equals(other.idparent)) {
             return false;
         }
+        if (!this.ipProtocol.equals(other.ipProtocol)) {
+            return false;
+        }
 
         return true;
     }

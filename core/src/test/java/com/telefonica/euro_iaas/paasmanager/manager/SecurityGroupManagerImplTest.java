@@ -95,6 +95,17 @@ public class SecurityGroupManagerImplTest {
     }
 
     @Test
+    public void testCreateSecurityGroupUpdTcprules() throws Exception {
+
+        SecurityGroup securityGroup = new SecurityGroup("name", "description");
+        Rule rule = new Rule("TCP", "8080", "8080", "", "0.0.0.0/0");
+        securityGroup.addRule(rule);
+        rule = new Rule("UDP", "8080", "8080", "", "0.0.0.0/0");
+        securityGroup.addRule(rule);
+        assertEquals(securityGroup.getRules().size(), 2);
+    }
+
+    @Test
     public void testDeleteSecurityGroup() throws Exception {
 
         SecurityGroup securityGroup = new SecurityGroup("name", "description");
