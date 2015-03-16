@@ -130,7 +130,6 @@ public class SubNetworkInstanceManagerImplTest {
         
         // Verify
         subNetworkInstanceManager.delete(claudiaData, subnetInst, "region");
-        verify (subNetworkInstanceDao).remove(any(SubNetworkInstance.class));
         verify(networkClient).destroySubNetwork(any(ClaudiaData.class), any(SubNetworkInstance.class), anyString());
        
      
