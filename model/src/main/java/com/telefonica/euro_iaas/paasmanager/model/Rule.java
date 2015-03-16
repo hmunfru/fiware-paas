@@ -165,40 +165,46 @@ public class Rule {
 
     }
 
+    /**
+     * It compares two rule objects.
+     * @param rule
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
+        boolean isEquals = true;
         if (this == obj) {
-            return true;
+            isEquals = true;
         }
         if (obj == null) {
-            return false;
+            isEquals = false;
         }
         if (getClass() != obj.getClass()) {
-            return false;
+            isEquals = false;
         }
-        Rule other = (Rule) obj;
+        Rule rule = (Rule) obj;
         if (id == null) {
-            if (other.id != null) {
-                return false;
+            if (rule.id != null) {
+                isEquals = false;
             }
         }
-        if (!this.fromPort.equals(other.fromPort)) {
-            return false;
+        if (!this.fromPort.equals(rule.fromPort)) {
+            isEquals = false;
         }
-        if (!this.toPort.equals(other.toPort)) {
-            return false;
+        if (!this.toPort.equals(rule.toPort)) {
+            isEquals = false;
         }
-        if (!this.cidr.equals(other.cidr)) {
-            return false;
+        if (!this.cidr.equals(rule.cidr)) {
+            isEquals = false;
         }
-        if (this.idparent != null && !this.idparent.equals(other.idparent)) {
-            return false;
+        if (this.idparent != null && !this.idparent.equals(rule.idparent)) {
+            isEquals = false;
         }
-        if (!this.ipProtocol.equals(other.ipProtocol)) {
-            return false;
+        if (!this.ipProtocol.equals(rule.ipProtocol)) {
+            isEquals = false;
         }
 
-        return true;
+        return isEquals;
     }
 
     @Override
