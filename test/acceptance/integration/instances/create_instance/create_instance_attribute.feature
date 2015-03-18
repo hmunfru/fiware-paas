@@ -10,16 +10,16 @@ Feature: Create an instance of an environment in a tenant
     Scenario: Create instance of an environment with two tier with products and attributes using chef
         Given the paas manager is up and properly configured
         And the product installator to be used is "chef"
-        And the product "testing_paas_product" with version "0.0.1" is created in SDC with attributes:
+        And the product "testing_paas_product_att_01" with version "0.0.1" is created in SDC with attributes:
             | key               | value               | type    |
             | custom_att_02     | default_value_plain | Plain   |
-        And the product "testing_paas_product_02" with version "0.0.1" is created in SDC with attributes:
+        And the product "testing_paas_product_att_02" with version "0.0.1" is created in SDC with attributes:
             | key               | value           | type    |
             | custom_att_01     | IP(tiernameqa1) | IP      |
         And a list of tiers has been defined with data:
             | name        | products                      |
-            | tiernameqa1 | testing_paas_product=0.0.1    |
-            | tiernameqa2 | testing_paas_product_02=0.0.1 |
+            | tiernameqa1 | testing_paas_product_att_01=0.0.1    |
+            | tiernameqa2 | testing_paas_product_att_02=0.0.1 |
         And an environment has already been created with the previous tiers and data:
             | name    | description |
             | env-qa | descqa       |

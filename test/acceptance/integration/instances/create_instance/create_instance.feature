@@ -39,7 +39,7 @@ Feature: Create an instance of an environment in a tenant
         And the task ends with "SUCCESS" status
 
 
-    @env_dependant
+    @happy_path @env_dependant
     Scenario: Create instance of an environment with several tiers in different regions
         Given the paas manager is up and properly configured
         And a list of tiers has been defined with data:
@@ -265,6 +265,7 @@ Feature: Create an instance of an environment in a tenant
         And the task ends with "SUCCESS" status
 
 
+    @happy_path
     Scenario Outline: Create instance of an environment with one tier with products and networks
         Given the paas manager is up and properly configured
         And a list of tiers has been defined with data:
