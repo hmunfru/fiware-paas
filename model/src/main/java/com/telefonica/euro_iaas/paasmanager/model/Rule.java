@@ -197,17 +197,24 @@ public class Rule {
         if (this.ipProtocol != null && this.ipProtocol.equals(aRule.ipProtocol)) {
             if (this.fromPort.equals(aRule.fromPort) && this.toPort.equals(aRule.toPort)) {
                 // We can have either CIDR or parent rule
-                if (this.idparent != null &&  this.idparent.equals(aRule.idparent)) {
-                    result = true;
-                } else if (this.cidr != null && this.cidr.equals(aRule.cidr)) {
-                    result = true;
-                } else {
-                    result = false;
+                if (this.cidr != null) {
+                    if (aRule.cidr != null && this.cidr.equals(aRule.cidr)) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+                } else { // this.idparent have to be != null by definition
+                    if (aRule.idparent != null && this.idparent.equals(aRule.idparent)) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
                 }
-            } else {
+
+            } else { // fromPorts or toPorts are different
                 result = false;
             }
-        } else {
+        } else { //ipProtocols are different
             result = false;
         }
 
