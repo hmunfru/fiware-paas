@@ -233,8 +233,6 @@ public class Rule {
         
         if (this == aObject) {
             result = true;
-        } else {
-            result = false;
         }
         
         return result;
