@@ -1,6 +1,8 @@
 <%@page import="org.springframework.web.context.WebApplicationContext" %>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" %>
+<%@ page import="org.apache.http.conn.routing.HttpRoute" %>
+<%@ page import="org.apache.http.HttpHost" %>
 <%
 
     //Get version of application
@@ -20,10 +22,14 @@
 
     String stats = poolingHttpClientConnectionManager.getTotalStats().toString();
 
+    String stats2= poolingHttpClientConnectionManager.getStats(new HttpRoute(new HttpHost(""))).toString();
+
+
 %>
 
 <%=applVersion%><br>
-<%=buildNumber%><br>
+<%=buildNumber%><br><br>
+HttpPool:<br>
 <%=stats%>
 
 

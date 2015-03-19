@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.sdc.client.SDCClient;
 import com.telefonica.euro_iaas.sdc.model.Task;
 
 /**
