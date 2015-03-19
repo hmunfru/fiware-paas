@@ -167,35 +167,66 @@ public class Rule {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+        boolean result = false;
+        
+        result = this.checkObject(obj);
+        
+        if (result == false) {
+            Rule aRule = (Rule) obj;
+            result = this.checkProtocol(aRule);
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Rule other = (Rule) obj;
-        if (id == null) {
-            if (other.id != null) {
-                return false;
+            
+        return result;
+    }
+
+
+    /**
+     * Check that the Ports, protocol, CIDR and Parent are the same for a Rule.
+     *
+     * @param aRule The rule to compare.
+     * @return true if they are the same, otherwise false.
+     */
+    public boolean checkProtocol(Rule aRule) {
+        boolean result = false;
+
+        if (this.ipProtocol != null && this.ipProtocol.equals(aRule.ipProtocol)) {
+            if (this.fromPort.equals(aRule.fromPort) && this.toPort.equals(aRule.toPort)) {
+                // We can have either CIDR or parent rule
+                if (this.idparent != null &&  this.idparent.equals(aRule.idparent)) {
+                    result = true;
+                } else if (this.cidr != null && this.cidr.equals(aRule.cidr)) {
+                    result = true;
+                } else {
+                    result = false;
+                }
+            } else {
+                result = false;
             }
-        }
-        if (!this.fromPort.equals(other.fromPort)) {
-            return false;
-        }
-        if (!this.toPort.equals(other.toPort)) {
-            return false;
-        }
-        if (!this.cidr.equals(other.cidr)) {
-            return false;
-        }
-        if (this.idparent != null && !this.idparent.equals(other.idparent)) {
-            return false;
+        } else {
+            result = false;
         }
 
-        return true;
+        return result;
+
+    }
+
+    /**
+     * Check that the Objects are equals or different.
+     *
+     * @param aObject The rule to compare.
+     * @return true if they are the same, otherwise false.
+     */
+    public boolean checkObject(Object aObject) {
+        boolean result = false;
+        
+        if (this == aObject) {
+            result = true;
+        } else {
+            result = false;
+        }
+        
+        return result;
+        
     }
 
     @Override
