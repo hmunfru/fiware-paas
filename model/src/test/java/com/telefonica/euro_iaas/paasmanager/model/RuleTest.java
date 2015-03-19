@@ -62,7 +62,7 @@ public class RuleTest {
 
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with same CIDR.
      *
      * @throws Exception
      */
@@ -88,7 +88,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with different CIDR.
      *
      * @throws Exception
      */
@@ -114,7 +114,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with same CIDR but different from port.
      *
      * @throws Exception
      */
@@ -140,7 +140,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with same CIDR but different from port.
      *
      * @throws Exception
      */
@@ -166,7 +166,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with different CIDR.
      *
      * @throws Exception
      */
@@ -192,7 +192,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule with different parent rule.
      *
      * @throws Exception
      */
@@ -218,7 +218,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule, origin with parent rule and destination with CIDR.
      *
      * @throws Exception
      */
@@ -244,7 +244,7 @@ public class RuleTest {
     }
 
     /**
-     * Test the equal protocol of a Rule.
+     * Test the equal protocol of a Rule, origin with CIDR and destination with parent rule.
      *
      * @throws Exception
      */
@@ -266,6 +266,32 @@ public class RuleTest {
         otherRule.setIdParent("a CIDR");
 
         assertFalse(aRule.checkProtocol(otherRule));
+
+    }
+
+    /**
+     * Test the equal protocol of a Rule with same parent rule.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testProtocolEqualProtocol9() throws Exception {
+        Rule aRule = new Rule();
+        Rule otherRule = new Rule();
+
+        aRule.setIpProtocol("TCP");
+        otherRule.setIpProtocol("TCP");
+
+        aRule.setFromPort("8080");
+        otherRule.setFromPort("8080");
+
+        aRule.setToPort("");
+        otherRule.setToPort("");
+
+        aRule.setIdParent("1234");
+        otherRule.setIdParent("1234");
+
+        assertTrue(aRule.checkProtocol(otherRule));
 
     }
 

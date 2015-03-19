@@ -165,6 +165,11 @@ public class Rule {
 
     }
 
+    /**
+     * Check if two rules are equals.
+     * @param obj The destination rule, in Object format, to be compared.
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         boolean result = false;
