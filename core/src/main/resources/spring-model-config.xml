@@ -10,9 +10,17 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
     </bean>
 
 
-    <bean id="sDCClient" lazy-init="true"
-          class="com.telefonica.euro_iaas.sdc.client.SDCClient">
+    <bean id="sdcClientConfig" lazy-init="true"
+          class="com.telefonica.euro_iaas.paasmanager.util.impl.SDCClientConfigImpl">
+        <constructor-arg name="httpConnectionManager" ref="httpConnectionManager"/>
+
     </bean>
+
+    <bean id="sDCClient" lazy-init="true"
+          class="com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient">
+        <property name="sdcClientConfig" ref="sdcClientConfig"/>
+    </bean>
+
     <bean id="sDCUtil" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtilImpl">
         <property name="sDCClient" ref="sDCClient"/>

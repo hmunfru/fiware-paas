@@ -85,8 +85,11 @@ public class SecurityGroupTest extends TestCase {
         Rule rule2 = new Rule("TCP", "80", "80", "", "0.0.0.0/0");
         assertEquals(rule.equals(rule2), true);
 
+        // Usually we cannot have at the same time CIDR and Security Group parent...
+        rule.setCidr(null);
+        rule2.setCidr(null);
         rule.setIdParent("1");
-        rule.setIdParent("2");
+        rule2.setIdParent("2");
         assertEquals(rule.equals(rule2), false);
     }
 

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
+import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtil;
 import com.telefonica.euro_iaas.paasmanager.manager.InfrastructureManager;
 import com.telefonica.euro_iaas.paasmanager.manager.ProductReleaseManager;
@@ -50,7 +51,6 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductInstance;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.sdc.client.SDCClient;
 import com.telefonica.euro_iaas.sdc.client.exception.ResourceNotFoundException;
 import com.telefonica.euro_iaas.sdc.client.services.ChefClientService;
 import com.telefonica.euro_iaas.sdc.model.dto.ChefClient;
@@ -233,7 +233,7 @@ public class ProductInstallatorSdcImpl implements ProductInstallator {
             }
             ips = ips.substring(0, ips.length() - 1);
             newAtt.setValue(ips);
-        }else{
+        } else {
             newAtt.setValue(attribute.getValue());
         }
 
@@ -514,9 +514,8 @@ public class ProductInstallatorSdcImpl implements ProductInstallator {
     }
 
     /*
-     * private Map<String, String> getHeaders(ClaudiaData claudiaData) {
-     * Map<String, String> headers = new HashMap<String, String>();
-     * headers.put("X-Auth-Token", claudiaData.getUser().getToken());
+     * private Map<String, String> getHeaders(ClaudiaData claudiaData) { Map<String, String> headers = new
+     * HashMap<String, String>(); headers.put("X-Auth-Token", claudiaData.getUser().getToken());
      * headers.put("Tenant-ID", claudiaData.getUser().getTenantId()); }
      */
 

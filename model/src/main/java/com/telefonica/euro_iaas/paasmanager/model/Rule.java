@@ -167,44 +167,77 @@ public class Rule {
 
     /**
      * It compares two rule objects.
-     * @param rule
+     * Check if two rules are equals.
+     * @param obj The destination rule, in Object format, to be compared.
      * @return
      */
     @Override
     public boolean equals(Object obj) {
-        boolean isEquals = true;
-        if (this == obj) {
-            isEquals = true;
+        boolean result = false;
+        
+        result = this.checkObject(obj);
+        
+        if (result == false) {
+            Rule aRule = (Rule) obj;
+            result = this.checkProtocol(aRule);
         }
-        if (obj == null) {
-            isEquals = false;
-        }
-        if (getClass() != obj.getClass()) {
-            isEquals = false;
-        }
-        Rule rule = (Rule) obj;
-        if (id == null) {
-            if (rule.id != null) {
-                isEquals = false;
+            
+        return result;
+    }
+
+
+    /**
+     * Check that the Ports, protocol, CIDR and Parent are the same for a Rule.
+     *
+     * @param aRule The rule to compare.
+     * @return true if they are the same, otherwise false.
+     */
+    public boolean checkProtocol(Rule aRule) {
+        boolean result = false;
+
+        if (this.ipProtocol != null && this.ipProtocol.equals(aRule.ipProtocol)) {
+            if (this.fromPort.equals(aRule.fromPort) && this.toPort.equals(aRule.toPort)) {
+                // We can have either CIDR or parent rule
+                if (this.cidr != null) {
+                    if (aRule.cidr != null && this.cidr.equals(aRule.cidr)) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+                } else { // this.idparent have to be != null by definition
+                    if (aRule.idparent != null && this.idparent.equals(aRule.idparent)) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+                }
+
+            } else { // fromPorts or toPorts are different
+                result = false;
             }
-        }
-        if (!this.fromPort.equals(rule.fromPort)) {
-            isEquals = false;
-        }
-        if (!this.toPort.equals(rule.toPort)) {
-            isEquals = false;
-        }
-        if (!this.cidr.equals(rule.cidr)) {
-            isEquals = false;
-        }
-        if (this.idparent != null && !this.idparent.equals(rule.idparent)) {
-            isEquals = false;
-        }
-        if (!this.ipProtocol.equals(rule.ipProtocol)) {
-            isEquals = false;
+        } else { //ipProtocols are different
+            result = false;
         }
 
-        return isEquals;
+
+        return result;
+
+    }
+
+    /**
+     * Check that the Objects are equals or different.
+     *
+     * @param aObject The rule to compare.
+     * @return true if they are the same, otherwise false.
+     */
+    public boolean checkObject(Object aObject) {
+        boolean result = false;
+        
+        if (this == aObject) {
+            result = true;
+        }
+        
+        return result;
     }
 
     @Override
