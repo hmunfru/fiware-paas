@@ -69,7 +69,7 @@ public class SDCClientConfigImpl extends SdcClientConfigImp implements SdcClient
     @Override
     public Client getClient() {
 
-        Client client = ClientBuilder.newBuilder().sslContext(getStx()).build();
+        Client client = ClientBuilder.newBuilder().sslContext(getStx()).hostnameVerifier(getHostnameVerifier()).build();
         client.register(clientConfig);
 
         return client;
