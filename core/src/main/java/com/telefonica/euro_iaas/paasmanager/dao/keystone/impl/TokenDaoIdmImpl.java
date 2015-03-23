@@ -80,29 +80,34 @@ public class TokenDaoIdmImpl implements TokenDao {
 
         Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
-        Response response;
+        Response response = null;
+        try {
+            WebTarget wr = client.target(url);
 
-        WebTarget wr = client.target(url);
+            String payload = "{\"auth\":{\"passwordCredentials\":{\"username\": \"admin\", \"password\": \"openstack\"}, \"tenantName\": "
+                    + "\"" + tenantId + "\"}}";
 
-        String payload = "{\"auth\":{\"passwordCredentials\":{\"username\": \"admin\", \"password\": \"openstack\"}, \"tenantName\": "
-                + "\"" + tenantId + "\"}}";
+            Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
 
-        Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+            builder = builder.header("Content-type", "application/json");
+            builder = builder.header("Accept", "application/xml");
 
-        builder = builder.header("Content-type", "application/json");
-        builder = builder.header("Accept", "application/xml");
+            response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
-        response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
-
-        if (response.getStatus() != 200) {
-            String message = "Error calling OpenStack to an valid token. " + "Status " + response.getStatus();
-            throw new OpenStackException(message);
+            if (response.getStatus() != 200) {
+                String message = "Error calling OpenStack to an valid token. " + "Status " + response.getStatus();
+                throw new OpenStackException(message);
+            }
+            String resp = response.readEntity(String.class);
+            log.debug(resp);
+            Token token = extractToken(resp);
+            token.setTenantId(tenantId);
+            return token;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
-        String resp = response.readEntity(String.class);
-        log.debug(resp);
-        Token token = extractToken(resp);
-        token.setTenantId(tenantId);
-        return token;
     }
 
     private Token extractToken(String payload) {

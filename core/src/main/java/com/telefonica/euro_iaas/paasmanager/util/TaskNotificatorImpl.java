@@ -28,6 +28,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.http.conn.HttpClientConnectionManager;
 
@@ -47,8 +48,17 @@ public class TaskNotificatorImpl implements TaskNotificator {
      */
     public void notify(String url, Task task) {
         Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
-        WebTarget webResource = client.target(url);
-        webResource.request(MediaType.APPLICATION_XML).post(Entity.entity(null, MediaType.APPLICATION_JSON));
+        Response response = null;
+        try {
+            WebTarget webResource = client.target(url);
+            response = webResource.request(MediaType.APPLICATION_XML).post(Entity.entity(null,
+
+            MediaType.APPLICATION_JSON));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
     }
 
     public HttpClientConnectionManager getHttpConnectionManager() {

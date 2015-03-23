@@ -26,8 +26,6 @@ package com.telefonica.euro_iaas.paasmanager.dao.sdc.impl;
 
 import static com.telefonica.euro_iaas.paasmanager.util.Configuration.SDC_SERVER_MEDIATYPE;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +33,12 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +116,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
             }
 
         } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
+            String message = "Error calling SDC to obtain the product: " + e.getMessage();
             log.error(message);
             throw new SdcException(message);
         } catch (ResourceNotFoundException e) {
@@ -131,47 +129,51 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
     }
 
     public List<String> findAllProducts(String token, String tenant) throws SdcException {
+        Response response = null;
+
         try {
             String url = sDCUtil.getSdcUtil(token) + "/catalog/product";
             log.debug("url: " + url);
 
             Invocation.Builder builder = createWebResource(url, token, tenant);
             builder = builder.accept(MediaType.APPLICATION_JSON);
-            InputStream inputStream = builder.get(InputStream.class);
-            String response;
-            response = IOUtils.toString(inputStream);
-            return fromSDCToProductNames(response);
-        } catch (IOException e) {
-            String message = "Error calling SDC to obtain the products ";
+            response = builder.get();
+            String responseJSON = response.readEntity(String.class);
+            return fromSDCToProductNames(responseJSON);
+        } catch (Exception e) {
+            String message = "Error calling SDC to obtain the all product list " + e.getMessage();
+            ;
             log.error(message);
             throw new SdcException(message);
-        } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
-            log.error(message);
-            throw new SdcException(message);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
     }
 
     public List<ProductRelease> findAllProductReleasesOfProduct(String pName, String token, String tenant)
             throws SdcException {
+        Response response = null;
         try {
             String url = sDCUtil.getSdcUtil(token) + "/catalog/product/" + pName + "/release";
             log.debug("url: " + url);
 
             Invocation.Builder builder = createWebResource(url, token, tenant);
             builder = builder.accept(MediaType.APPLICATION_JSON);
-            InputStream inputStream = builder.get(InputStream.class);
-            String response = IOUtils.toString(inputStream);
-            return fromSDCToPaasManager(response);
-        } catch (IOException e) {
-            String message = "Error calling SDC to obtain the products ";
+            response = builder.get();
+            String responseJSON = response.readEntity(String.class);
+
+            return fromSDCToPaasManager(responseJSON);
+        } catch (Exception e) {
+            String message = "Error calling SDC to obtain the product release list: " + e.getMessage();
             log.error(message);
             throw new SdcException(message);
-        } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
-            log.error(message);
-            throw new SdcException(message);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
     }
