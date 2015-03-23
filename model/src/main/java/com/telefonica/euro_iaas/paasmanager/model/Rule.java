@@ -166,6 +166,7 @@ public class Rule {
     }
 
     /**
+     * It compares two rule objects.
      * Check if two rules are equals.
      * @param obj The destination rule, in Object format, to be compared.
      * @return
@@ -218,6 +219,7 @@ public class Rule {
             result = false;
         }
 
+
         return result;
 
     }
@@ -236,7 +238,6 @@ public class Rule {
         }
         
         return result;
-        
     }
 
     @Override
