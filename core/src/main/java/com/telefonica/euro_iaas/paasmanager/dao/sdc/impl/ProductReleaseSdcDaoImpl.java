@@ -116,7 +116,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
             }
 
         } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
+            String message = "Error calling SDC to obtain the product: " + e.getMessage();
             log.error(message);
             throw new SdcException(message);
         } catch (ResourceNotFoundException e) {
@@ -141,7 +141,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
             String responseJSON = response.readEntity(String.class);
             return fromSDCToProductNames(responseJSON);
         } catch (Exception e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
+            String message = "Error calling SDC to obtain the all product list " + e.getMessage();
             ;
             log.error(message);
             throw new SdcException(message);
@@ -167,7 +167,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
 
             return fromSDCToPaasManager(responseJSON);
         } catch (Exception e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
+            String message = "Error calling SDC to obtain the product release list: " + e.getMessage();
             log.error(message);
             throw new SdcException(message);
         } finally {
