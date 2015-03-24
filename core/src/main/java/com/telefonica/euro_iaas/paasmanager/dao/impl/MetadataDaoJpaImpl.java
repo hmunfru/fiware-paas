@@ -38,8 +38,8 @@ import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 public class MetadataDaoJpaImpl extends AbstractBaseDao<Metadata, String> implements MetadataDao {
 
     /*
-     * Find all the attribute in paas-manager database
-     * @return metadata, the list of attribute
+     * Find all the metadata in paas-manager database
+     * @return metadata, the list of metadata
      */
     public List<Metadata> findAll() {
         return super.findAll(Metadata.class);
@@ -47,8 +47,8 @@ public class MetadataDaoJpaImpl extends AbstractBaseDao<Metadata, String> implem
 
     /*
      * Find an attribute by name-searching
-     * @param name, the name of the artifact
-     * @return attribute, the attribute
+     * @param name, the name of the metadata
+     * @return metadata, the metadata
      */
     public Metadata load(String name) throws EntityNotFoundException {
         return super.loadByField(Metadata.class, "name", name);
