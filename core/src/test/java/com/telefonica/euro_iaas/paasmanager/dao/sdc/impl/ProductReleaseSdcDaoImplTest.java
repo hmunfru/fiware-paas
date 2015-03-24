@@ -96,31 +96,6 @@ public class ProductReleaseSdcDaoImplTest {
 
     }
 
-    /**
-     * Tests the findAllProducts functionality
-     * 
-     * @throws SdcException
-     */
-    @Test
-    public void testFindAllProductReleasesOfaProduct() throws SdcException {
-        // given
-
-        String productReleasesList = "{\"productRelease\":{\"releaseNotes\":\"Tomcat server 6\",\"version\":\"6\",\"product\":{\"name\":\"tomcat\",\"description\":\"tomcat J2EE container\",\"attributes\":{\"key\":\"clave\",\"value\":\"valor\"}},\"supportedOOSS\":[{\"description\":\"Ubuntu 10.04\",\"name\":\"Ubuntu\",\"osType\":\"94\",\"version\":\"10.04\"},{\"description\":\"Debian 5\",\"name\":\"Debian\",\"osType\":\"95\",\"version\":\"5\"},{\"description\":\"Centos 2.9\",\"name\":\"Centos\",\"osType\":\"76\",\"version\":\"2.9\"}]}}";
-
-        Response response = mock(Response.class);
-
-        when(builder.get()).thenReturn(response);
-        when(response.readEntity(String.class)).thenReturn(productReleasesList);
-
-        List<ProductRelease> productReleases = productReleaseSdcDaoImpl.findAllProductReleasesOfProduct("tomcat",
-                "token", "tenant");
-
-        // then
-        assertNotNull(productReleases);
-        assertEquals(1, productReleases.size());
-
-    }
-
     @Test
     public void testFromStringToProductReleasesTwoProductReleases() throws Exception {
         // given
