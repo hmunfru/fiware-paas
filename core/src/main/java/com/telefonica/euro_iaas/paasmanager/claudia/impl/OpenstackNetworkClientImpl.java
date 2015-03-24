@@ -573,9 +573,9 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
 
         List<Port> ports = listPortsFromNetwork(claudiaData, region, netInstance.getInterfaceNetId());
         if (ports.size() > 0) {
-            String msm = "Error to delete the interface from public router  " + netInstance.getNetworkName() +
+            String mns = "Error to delete the interface from public router  " + netInstance.getNetworkName() +
                 " to the public router : They are still used ports";
-            log.warn(msm);
+            log.warn(mns);
             return;
         }
 

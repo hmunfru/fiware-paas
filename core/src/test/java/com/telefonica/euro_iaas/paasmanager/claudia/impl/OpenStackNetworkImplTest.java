@@ -30,7 +30,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
@@ -297,11 +299,12 @@ public class OpenStackNetworkImplTest {
     public void shouldDeleteNetworkToPublicRouter() throws OpenStackException, InfrastructureException {
 
         // when
-        String response = "{\"ports\": [ {\"status\": \"ACTIVE\",\"name\": \"\",  \"admin_state_up\": true, \"network_id\": "
-            + "\"6a609412-3f04-485c-b269-b1a9b9ecb6bf\", \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\",\"binding:vif_type\": \"ovs\","
-            + "\"device_owner\": \"network:dhcp\", \"binding:capabilities\": {\"port_filter\": true}, \"mac_address\": \"fa:16:3e:54:1a:40\","
-            + "\"fixed_ips\": [ {\"subnet_id\": \"601ec829-a166-4b39-9c74-166cc76f251b\", \"ip_address\": \"172.31.0.3\"}],"
-            + "\"id\": \"07fd27d2-9ce1-48f3-be83-c7d2b7041a1a\", \"security_groups\": [], \"device_id\": \"dhcpfa3e6aae-2140-5176-877a-2f67684a3165-6a609412-3f04-485c-b269-b1a9b9ecb6bf\""
+        String response = "{\"ports\": [ {\"status\": \"ACTIVE\",\"name\": \"\",  \"admin_state_up\": true, " +
+            "\"network_id\": \"ID2\", \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
+            + "\"device_owner\": \"compute:None\", \"binding:capabilities\": {\"port_filter\": true}, "
+            + "\"fixed_ips\": [ {\"subnet_id\": \"ID2\", \"ip_address\": \"172.31.0.3\"}],"
+            + "\"id\": \"07fd27d2-9ce1-48f3-be83-c7d2b7041a1a\", \"security_groups\": [], \"device_id\":" +
+            " \"dhcpfa3e6aae-2140-5176-877a-2f67684a3165-6a609412-3f04-485c-b269-b1a9b9ecb6bf\""
             + "}]}";
 
         when(openStackUtil.listPorts(any(PaasManagerUser.class), anyString())).thenReturn(response);
@@ -338,6 +341,8 @@ public class OpenStackNetworkImplTest {
             anyString())).thenReturn(response);
         openStackNetworkImpl.deleteNetworkToPublicRouter(claudiaData, net, REGION);
 
+        verify(openStackUtil, never()).deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
+            anyString());
     }
 
     @Test
