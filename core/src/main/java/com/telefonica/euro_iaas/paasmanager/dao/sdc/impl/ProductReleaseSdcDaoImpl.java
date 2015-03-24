@@ -153,31 +153,6 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
 
     }
 
-    public List<ProductRelease> findAllProductReleasesOfProduct(String pName, String token, String tenant)
-            throws SdcException {
-        Response response = null;
-        try {
-            String url = sDCUtil.getSdcUtil(token) + "/catalog/product/" + pName + "/release";
-            log.debug("url: " + url);
-
-            Invocation.Builder builder = createWebResource(url, token, tenant);
-            builder = builder.accept(MediaType.APPLICATION_JSON);
-            response = builder.get();
-            String responseJSON = response.readEntity(String.class);
-
-            return fromSDCToPaasManager(responseJSON);
-        } catch (Exception e) {
-            String message = "Error calling SDC to obtain the product release list: " + e.getMessage();
-            log.error(message);
-            throw new SdcException(message);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-
-    }
-
     private List<String> fromSDCToProductNames(String sdcproducts) {
 
         JSONObject jsonNodeProducts = JSONObject.fromObject(sdcproducts);
