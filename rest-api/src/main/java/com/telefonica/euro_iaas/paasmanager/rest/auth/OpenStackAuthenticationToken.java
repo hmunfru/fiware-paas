@@ -127,8 +127,8 @@ public class OpenStackAuthenticationToken {
 
         log.info("generate new valid token for admin");
 
+        Response response = null;
         try {
-            Response response;
 
             WebTarget wr = this.client.target(url);
 
@@ -164,6 +164,10 @@ public class OpenStackAuthenticationToken {
             }
         } catch (Exception ex) {
             throw new AuthenticationConnectionException("Error in authentication: " + ex);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
         return credential;

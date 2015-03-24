@@ -91,11 +91,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         String payload = rule.toJSON();
         log.debug(payload);
 
+        Response response = null;
         try {
 
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
-
-            Response response = null;
 
             WebTarget wr = client.target(url);
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
@@ -138,6 +137,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
                 throw new InfrastructureException(e.getMessage());
             }
 
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -165,10 +168,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         String payload = securityGroup.toJSON();
         log.debug(payload);
 
+        Response response = null;
         try {
 
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
-            Response response;
 
             WebTarget wr = client.target(url);
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
@@ -210,6 +213,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
                 throw new InfrastructureException(e.getMessage());
             }
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
     }
@@ -223,11 +230,11 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         String url = getNovaEndPoint(region, token) + vdc + "/os-security-group-rules/" + rule.getIdRule();
         log.debug("actionUri: " + url);
 
+        Response response = null;
         try {
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
             log.debug("url: " + url);
-            Response response;
 
             WebTarget wr = client.target(url);
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
@@ -262,6 +269,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
                 throw new InfrastructureException(e.getMessage());
             }
 
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
     }
@@ -276,10 +287,9 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         String url = getNovaEndPoint(region, token) + vdc + "/os-security-groups/" + securityGroup.getIdSecurityGroup();
         log.debug("actionUri: " + url);
 
+        Response response = null;
         try {
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
-
-            Response response;
 
             WebTarget wr = client.target(url);
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
@@ -315,6 +325,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
             } else {
 
                 throw new InfrastructureException(e.getMessage());
+            }
+        } finally {
+            if (response != null) {
+                response.close();
             }
         }
 
