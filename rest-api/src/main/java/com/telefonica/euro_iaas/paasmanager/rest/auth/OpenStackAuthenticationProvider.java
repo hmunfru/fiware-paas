@@ -182,8 +182,6 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
                 Invocation.Builder builder = tokens.request();
                 response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", adminCredentials[0]).get();
 
-                response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", adminCredentials[0]).get();
-
                 if (response.getStatus() == CODE_200) {
                     // Validate user's token
                     authenticateResponse = response.readEntity(AuthenticateResponse.class);
