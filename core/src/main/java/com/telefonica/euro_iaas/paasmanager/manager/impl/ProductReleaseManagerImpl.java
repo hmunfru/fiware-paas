@@ -110,11 +110,8 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
             ProductRelease pRelease = productReleaseSdcDao.load(product, version, data);
             try {
                 productRelease = productReleaseDao.load(name);
-                productRelease = productReleaseDao.update(productRelease);
-
-                boolean isNew;
+               
                 for (Attribute attribute : pRelease.getAttributes()) {
-                    isNew = false;
                     Attribute newAttribute = productRelease.getAttribute(attribute.getKey());
                     if (newAttribute == null) {
                         newAttribute = new Attribute();
@@ -127,7 +124,6 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
                 }
 
                 for (Metadata metadata : pRelease.getMetadatas()) {
-                    isNew = false;
                     Metadata newMetadata = productRelease.getMetadata(metadata.getKey());
                     if (newMetadata == null) {
                         newMetadata = new Metadata();
