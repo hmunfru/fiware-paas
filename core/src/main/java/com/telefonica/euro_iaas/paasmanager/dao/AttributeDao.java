@@ -28,7 +28,7 @@ import com.telefonica.euro_iaas.commons.dao.BaseDAO;
 import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 
 /**
- * Defines the methods needed to persist Artifact objects.
+ * Defines the methods needed to persist Attribute objects.
  * 
  * @author Jesus M. Movilla
  * @version $Id: $

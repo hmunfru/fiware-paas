@@ -33,6 +33,7 @@ import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.MetadataDao;
+import com.telefonica.euro_iaas.paasmanager.dao.AttributeDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.dao.sdc.ProductReleaseSdcDao;
 import com.telefonica.euro_iaas.paasmanager.exception.SdcException;
@@ -49,7 +50,8 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
 
     private ProductReleaseDao productReleaseDao;
     private ProductReleaseSdcDao productReleaseSdcDao;
-    private MetadataDao metadataDao;
+    private MetadataDao metadataDao; 
+    private AttributeDao attributeDao;
     private static Logger log = LoggerFactory.getLogger(ProductReleaseManagerImpl.class);
 
     /*
@@ -116,12 +118,10 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
                     Attribute newAttribute = productRelease.getAttribute(attribute.getKey());
                     if (newAttribute == null) {
                         newAttribute = new Attribute();
-                        isNew = true;
-                    }
-                    newAttribute.setKey(attribute.getKey());
-                    newAttribute.setValue(attribute.getValue());
-                    newAttribute.setDescription(attribute.getDescription());
-                    if (isNew) {
+                        newAttribute.setKey(attribute.getKey());
+                        newAttribute.setValue(attribute.getValue());
+                        newAttribute.setDescription(attribute.getDescription());
+                        newAttribute = attributeDao.create(newAttribute);
                         productRelease.addAttribute(newAttribute);
                     }
                 }
@@ -226,5 +226,13 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
     public void setMetadataDao(MetadataDao metadataDao) {
         this.metadataDao = metadataDao;
     }
+    /**
+     * @param attributeDao
+     *            the attributeDao to set
+     */
+    public void setAttributeDao(AttributeDao attributeDao) {
+        this.attributeDao = attributeDao;
+    }
+
 
 }

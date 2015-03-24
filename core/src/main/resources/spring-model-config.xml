@@ -59,6 +59,7 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
         <property name="productReleaseDao" ref="productReleaseDao"/>
         <property name="productReleaseSdcDao" ref="productReleaseSdcDao"/>
         <property name="metadataDao" ref="metadataDao"/>
+        <property name="attributeDao" ref="attributeDao"/>
     </bean>
     <bean id="tierManager" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.manager.impl.TierManagerImpl">
