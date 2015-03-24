@@ -568,7 +568,16 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
      */
     public void deleteNetworkToPublicRouter(ClaudiaData claudiaData, NetworkInstance netInstance, String region)
             throws InfrastructureException {
-        log.info("Delete Interfact from net " + netInstance.getNetworkName() + " to public router in region " + region);
+        log.info("Delete Interfact from net " + netInstance.getNetworkName() +
+            " to public router in region " + region);
+
+        List<Port> ports = listPortsFromNetwork(claudiaData, region, netInstance.getInterfaceNetId());
+        if (ports.size() > 0) {
+            String msm = "Error to delete the interface from public router  " + netInstance.getNetworkName() +
+                " to the public router : They are still used ports";
+            log.warn(msm);
+            return;
+        }
 
         try {
             openStackUtil.deleteInterfaceToPublicRouter(claudiaData.getUser(), netInstance, region);
