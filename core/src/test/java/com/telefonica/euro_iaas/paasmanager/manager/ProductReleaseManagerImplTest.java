@@ -93,6 +93,7 @@ public class ProductReleaseManagerImplTest extends TestCase {
             .thenReturn(productReleaseSDC);
         when(productReleaseDao.load(any(String.class))).thenReturn(productReleasePM);
         when(metadataDao.create(any(Metadata.class))).thenReturn(metadata_diff);
+        when(metadataDao.load(any(String.class))).thenReturn(metadata_diff);
     }
     
     @Test

@@ -130,11 +130,21 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
                         newMetadata.setKey(metadata.getKey());
                         newMetadata.setValue(metadata.getValue());
                         newMetadata.setDescription(metadata.getDescription());
-                    	newMetadata = metadataDao.create(newMetadata);
-                        productRelease.addMetadata(newMetadata);
+                       	newMetadata = metadataDao.create(newMetadata);
+
+                       	productRelease.addMetadata(newMetadata);
+                        productReleaseDao.update(productRelease);
+                    } else {
+                    	//if metadata Value has been modified in SDC
+                    	if (!(newMetadata.getValue().equals(metadata.getValue()))) {
+                            newMetadata.setValue(metadata.getValue());
+                            newMetadata = metadataDao.update(newMetadata);
+                            
+                            productRelease.addMetadata(newMetadata);
+                            productRelease.deleteMetadata(metadata);
+                    	}
                     }
                 }
-                productReleaseDao.update(productRelease);
             } catch (Exception ex) {
                 log.info("Product don't exist in database: creates");
                 productRelease = create(pRelease);

@@ -50,8 +50,8 @@ public class MetadataDaoJpaImpl extends AbstractBaseDao<Metadata, String> implem
      * @param name, the name of the metadata
      * @return metadata, the metadata
      */
-    public Metadata load(String name) throws EntityNotFoundException {
-        return super.loadByField(Metadata.class, "name", name);
+    public Metadata load(String key) throws EntityNotFoundException {
+        return super.loadByField(Metadata.class, "key", key);
     }
 
 }
