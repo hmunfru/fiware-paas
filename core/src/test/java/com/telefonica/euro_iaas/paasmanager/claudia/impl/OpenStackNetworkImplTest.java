@@ -309,9 +309,7 @@ public class OpenStackNetworkImplTest {
 
         when(openStackUtil.listPorts(any(PaasManagerUser.class), anyString())).thenReturn(response);
         NetworkInstance net = new NetworkInstance("router", "vdc", "region");
-        SubNetworkInstance subNet = new SubNetworkInstance("dd", "vdc", "region", "ID");
-        subNet.setIdSubNet("ID");
-        net.addSubNet(subNet);
+        net.setIdNetwork("ID");
         when(openStackUtil.deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
                         anyString())).thenReturn(response);
         openStackNetworkImpl.deleteNetworkToPublicRouter(claudiaData, net, REGION);
@@ -334,9 +332,7 @@ public class OpenStackNetworkImplTest {
 
         when(openStackUtil.listPorts(any(PaasManagerUser.class), anyString())).thenReturn(response);
         NetworkInstance net = new NetworkInstance("router", "vdc", "region");
-        SubNetworkInstance subNet = new SubNetworkInstance("dd", "vdc", "region", "ID");
-        subNet.setIdSubNet("ID");
-        net.addSubNet(subNet);
+        net.setIdNetwork("ID");
         when(openStackUtil.deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
             anyString())).thenReturn(response);
         openStackNetworkImpl.deleteNetworkToPublicRouter(claudiaData, net, REGION);
