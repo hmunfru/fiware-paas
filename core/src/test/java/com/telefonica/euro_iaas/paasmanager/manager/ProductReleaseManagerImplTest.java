@@ -29,11 +29,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.AttributeDao;
@@ -44,7 +41,6 @@ import com.telefonica.euro_iaas.paasmanager.manager.impl.ProductReleaseManagerIm
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 
 import junit.framework.TestCase;
 
@@ -60,24 +56,19 @@ public class ProductReleaseManagerImplTest extends TestCase {
     private ProductRelease productReleasePM = null;
     private ProductRelease productReleaseSDC = null;
 
-    private PaasManagerUser user;
     private ClaudiaData claudiaData;
     
     Metadata metadata_diff = new Metadata("key_diff", "value_diff");
 	    
-	@Override
+    @Override
     @Before
     public void setUp() throws Exception {
-		/*claudiaData = new ClaudiaData("org", "vdc", "service");
-        user = new PaasManagerUser("user", "password", new ArrayList<GrantedAuthority>());
-        claudiaData.setUser(user);*/
+        productReleaseDao = mock(ProductReleaseDao.class);
+        productReleaseSdcDao = mock(ProductReleaseSdcDao.class);
+        metadataDao = mock (MetadataDao.class);
+        attributeDao = mock (AttributeDao.class);
+        claudiaData = mock (ClaudiaData.class);
         
-		productReleaseDao = mock(ProductReleaseDao.class);
-		productReleaseSdcDao = mock(ProductReleaseSdcDao.class);
-		metadataDao = mock (MetadataDao.class);
-		attributeDao = mock (AttributeDao.class);
-		claudiaData = mock (ClaudiaData.class);
-		
         manager = new ProductReleaseManagerImpl();
 
         manager.setAttributeDao(attributeDao);   
@@ -98,9 +89,9 @@ public class ProductReleaseManagerImplTest extends TestCase {
         
         productReleaseSDC.addMetadata(metadata_diff);
         
-        when(productReleaseSdcDao.load(eq("product"), eq("version"), any(ClaudiaData.class))).thenReturn(productReleaseSDC);
+        when(productReleaseSdcDao.load(eq("product"), eq("version"), any(ClaudiaData.class)))
+            .thenReturn(productReleaseSDC);
         when(productReleaseDao.load(any(String.class))).thenReturn(productReleasePM);
-       //when(productReleaseDao.update(any(ProductRelease.class))).thenReturn(productReleasePM);
         when(metadataDao.create(any(Metadata.class))).thenReturn(metadata_diff);
     }
     
