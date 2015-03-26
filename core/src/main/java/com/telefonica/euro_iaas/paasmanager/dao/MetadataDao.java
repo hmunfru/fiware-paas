@@ -21,18 +21,18 @@
  * For those usages not covered by the Apache version 2.0 License please contact with opensource@tid.es
  * </p>
  */
-
 package com.telefonica.euro_iaas.paasmanager.dao;
 
 import com.telefonica.euro_iaas.commons.dao.BaseDAO;
-import com.telefonica.euro_iaas.paasmanager.model.Attribute;
+import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 
 /**
- * Defines the methods needed to persist Attribute objects.
+ * Defines the methods needed to persist Metadata objects.
  * 
  * @author Jesus M. Movilla
  * @version $Id: $
  */
-public interface AttributeDao extends BaseDAO<Attribute, String> {
+
+public interface MetadataDao extends BaseDAO<Metadata, String> {
 
 }

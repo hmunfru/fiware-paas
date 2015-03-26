@@ -56,5 +56,4 @@ public interface ProductReleaseDao extends BaseDAO<ProductRelease, String> {
      * @return
      */
     ProductRelease loadProductReleaseWithMetadata(String name) throws EntityNotFoundException;
-
 }

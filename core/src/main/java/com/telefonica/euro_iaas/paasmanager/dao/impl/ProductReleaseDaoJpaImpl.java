@@ -68,7 +68,7 @@ public class ProductReleaseDaoJpaImpl extends AbstractBaseDao<ProductRelease, St
         }
         return productRelease;
     }
-
+ 
     private ProductRelease findByProductReleaseWithMetadataAndAtt(String name) throws EntityNotFoundException {
 
         Query query = getEntityManager().createQuery(

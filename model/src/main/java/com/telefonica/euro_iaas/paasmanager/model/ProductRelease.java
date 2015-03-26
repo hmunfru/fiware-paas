@@ -40,13 +40,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.telefonica.euro_iaas.paasmanager.model.dto.ProductReleaseDto;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -185,7 +185,29 @@ public class ProductRelease {
         }
         transitableReleases.add(transitableRelease);
     }
-
+    
+    /**
+     * Remove a metadata .
+     *
+     * @param metadata
+     */
+    public void deleteMetadata(Metadata metadata) {
+        if (metadatas.contains(metadata)) {
+        	metadatas.remove(metadata);
+        }
+    }
+    
+    /**
+     * Remove a attribute .
+     *
+     * @param attribute
+     */
+    public void deleteAttribute(Attribute attribute) {
+        if (attributes.contains(attribute)) {
+        	attributes.remove(attribute);
+        }
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
