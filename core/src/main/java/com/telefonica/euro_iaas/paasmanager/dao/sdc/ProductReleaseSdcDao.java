@@ -56,13 +56,4 @@ public interface ProductReleaseSdcDao {
 
     List<String> findAllProducts(String token, String tenant) throws SdcException;
 
-    /**
-     * Load all productRelease of a product from SDC.
-     * 
-     * @return a list with the product names present in SDC
-     * @throws SdcException
-     */
-
-    List<ProductRelease> findAllProductReleasesOfProduct(String pName, String token, String tenant) throws SdcException;
-
 }

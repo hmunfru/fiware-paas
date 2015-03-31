@@ -47,9 +47,9 @@ Documentation
 
 .. IMAGES
 
-.. |Build Status| image:: https://coveralls.io/repos/telefonicaid/fiware-paas/badge.png?branch=develop
+.. |Build Status| image::  https://travis-ci.org/telefonicaid/fiware-paas.svg
    :target: https://travis-ci.org/telefonicaid/fiware-paas
-.. |Coverage Status| image:: https://travis-ci.org/telefonicaid/fiware-paas.svg 
+.. |Coverage Status| image:: https://coveralls.io/repos/telefonicaid/fiware-paas/badge.png?branch=develop
    :target: https://coveralls.io/r/telefonicaid/fiware-paas
 .. |StackOverflow| image:: http://b.repl.ca/v1/help-stackoverflow-orange.png
    :target: https://travis-ci.org/telefonicaid/fiware-paas

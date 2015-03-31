@@ -89,7 +89,7 @@ public class OpenStackRegionImpl implements OpenStackRegion {
             log.debug("Get url for sdc in region " + url);
             return url;
         } else {
-            String responseJSON = callToKeystone(token, tokenadmin);
+            String responseJSON = getJSONWithEndpoints(token, tokenadmin);
 
             String result = parseEndpoint(token, responseJSON, type, regionName);
             if (result == null) {
@@ -103,8 +103,8 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
     public String getTokenAdmin() throws OpenStackException {
 
-        Response response = getEndPointsThroughTokenRequest();
-        return parseToken(response.readEntity(String.class));
+        String responseJSON = getEndPointsThroughTokenRequest();
+        return parseToken(responseJSON);
 
     }
 
@@ -181,18 +181,12 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     public List<String> getRegionNames(String token) throws OpenStackException {
 
         String tokenAdmin = this.getTokenAdmin();
-        String responseJSON = callToKeystone(token, tokenAdmin);
+        String responseJSON = getJSONWithEndpoints(token, tokenAdmin);
         return parseRegionName(responseJSON, "nova");
 
     }
 
-    private String callToKeystone(String token, String tokenAdmin) throws OpenStackException {
-        Response response = getJSONWithEndpoints(token, tokenAdmin);
-        return response.readEntity(String.class);
-
-    }
-
-    private Response getJSONWithEndpoints(String token, String tokenadmin) throws OpenStackException {
+    private String getJSONWithEndpoints(String token, String tokenadmin) throws OpenStackException {
         String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens/" + token
                 + "/endpoints";
 
@@ -201,25 +195,34 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         Invocation.Builder builder = webResource.request(MediaType.APPLICATION_JSON);
         builder.header("X-Auth-Token", tokenadmin);
 
-        Response response = builder.get();
+        Response response = null;
 
-        int code = response.getStatus();
-        log.debug("code " + code);
+        try {
+            response = builder.get();
 
-        if (code != 200) {
-            String message = "Failed : HTTP (url:" + url + ") error code : " + code + " body: "
-                    + response.readEntity(String.class);
+            int code = response.getStatus();
+            log.debug("code " + code);
 
-            if (code == 501) {
-                log.warn(message);
-                response = getEndPointsThroughTokenRequest();
-            } else {
-                log.error(message);
-                throw new OpenStackException(message);
+            String responseJSON = response.readEntity(String.class);
+            if (code != 200) {
+                String message = "Failed : HTTP (url:" + url + ") error code : " + code + " body: " + responseJSON;
+
+                if (code == 501) {
+                    log.warn(message);
+                    responseJSON = getEndPointsThroughTokenRequest();
+                } else {
+                    log.error(message);
+                    throw new OpenStackException(message);
+                }
+
             }
+            return responseJSON;
 
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
-        return response;
     }
 
     private String parseEndpoint(String token, String response, String type, String regionName)
@@ -384,35 +387,43 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return token;
     }
 
-    public Response getEndPointsThroughTokenRequest() throws OpenStackException {
+    public String getEndPointsThroughTokenRequest() throws OpenStackException {
         String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
         log.debug("actionUri: " + url);
 
-        Response response;
+        Response response = null;
 
-        WebTarget wr = client.target(url);
+        try {
 
-        String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
-        String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
-        String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+            WebTarget wr = client.target(url);
 
-        String payload = "{\"auth\": {\"tenantName\": \"" + adminTenant + "\", \""
-                + "passwordCredentials\":{\"username\": \"" + adminUser + "\"," + " \"password\": \"" + adminPass
-                + "\"}}}";
+            String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+            String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+            String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
 
-        Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+            String payload = "{\"auth\": {\"tenantName\": \"" + adminTenant + "\", \""
+                    + "passwordCredentials\":{\"username\": \"" + adminUser + "\"," + " \"password\": \"" + adminPass
+                    + "\"}}}";
 
-        response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
+            Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
 
-        int httpCode = response.getStatus();
-        if (httpCode != 200) {
-            String message = "Error calling OpenStack for valid token. " + "Status " + httpCode + ": "
-                    + response.readEntity(String.class);
-            log.warn(message);
-            throw new OpenStackException(message);
+            response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
+
+            int httpCode = response.getStatus();
+            String responseJSON = response.readEntity(String.class);
+            if (httpCode != 200) {
+                String message = "Error calling OpenStack for valid token. " + "Status " + httpCode + ": "
+                        + responseJSON;
+                log.warn(message);
+                throw new OpenStackException(message);
+            }
+
+            return responseJSON;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
-
-        return response;
 
     }
 

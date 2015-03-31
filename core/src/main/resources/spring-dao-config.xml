@@ -47,5 +47,6 @@
           class="com.telefonica.euro_iaas.paasmanager.dao.impl.SecurityGroupDaoJpaImpl"/>
     <bean id="attributeDao" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.dao.impl.AttributeDaoJpaImpl"/>
-
+    <bean id="metadataDao" lazy-init="true"
+          class="com.telefonica.euro_iaas.paasmanager.dao.impl.MetadataDaoJpaImpl"/>
 </beans>

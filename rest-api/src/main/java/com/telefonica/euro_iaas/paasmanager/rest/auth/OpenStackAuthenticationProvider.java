@@ -111,8 +111,6 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * Default constructor.
      */
     public OpenStackAuthenticationProvider() {
-
-        client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
         oSAuthToken = null;
         tokenCache = new TokenCache();
     }
@@ -175,15 +173,14 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         log.debug("adminToken : " + adminCredentials[0]);
 
         AuthenticateResponse authenticateResponse = tokenCache.getAuthenticateResponse(token, tenantId);
-
+        Response response = null;
         try {
             if (authenticateResponse == null) {
 
-                WebTarget webResource = client.target(keystoneURL);
+                WebTarget webResource = getClient().target(keystoneURL);
                 WebTarget tokens = webResource.path("tokens").path(token);
                 Invocation.Builder builder = tokens.request();
-                Response response = builder.accept(MediaType.APPLICATION_XML)
-                        .header("X-Auth-Token", adminCredentials[0]).get();
+                response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", adminCredentials[0]).get();
 
                 if (response.getStatus() == CODE_200) {
                     // Validate user's token
@@ -208,6 +205,10 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         } catch (Exception e) {
             log.warn("Exception in authentication: " + e);
             throw new AuthenticationServiceException("Unknown problem", e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -311,6 +312,14 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public Client getClient() {
+
+        if (this.client == null) {
+            this.client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        }
+        return this.client;
     }
 
     /**

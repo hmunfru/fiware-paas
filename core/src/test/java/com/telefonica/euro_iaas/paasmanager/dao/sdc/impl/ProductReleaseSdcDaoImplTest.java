@@ -30,15 +30,14 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,37 +84,15 @@ public class ProductReleaseSdcDaoImplTest {
         String jsonProducts = "{\"product\":[{\"name\":\"tomcat\",\"description\":\"tomcat J2EE container\",\"attributes\":{\"key\":\"clave\",\"value\":\"valor\"}},{\"name\":\"nodejs\",\"description\":\"nodejs\"},{\"name\":\"mysql\",\"description\":\"mysql\"},{\"name\":\"git\",\"description\":\"git\"},{\"name\":\"mongodbshard\",\"description\":\"mongodbshard\"},{\"name\":\"mongos\",\"description\":\"mongos\"},{\"name\":\"mongodbconfig\",\"description\":\"mongodbconfig\"},{\"name\":\"contextbroker\",\"description\":\"contextbroker\"},{\"name\":\"postgresql\",\"description\":\"db manager\",\"attributes\":[{\"key\":\"username\",\"value\":\"postgres\",\"description\":\"The administrator usename\"},{\"key\":\"password\",\"value\":\"postgres\",\"description\":\"The administrator password\"}]},{\"name\":\"haproxy\",\"description\":\"balancer\",\"attributes\":[{\"key\":\"key1\",\"value\":\"value1\",\"description\":\"keyvaluedesc1\"},{\"key\":\"key2\",\"value\":\"value2\",\"description\":\"keyvaluedesc2\"},{\"key\":\"sdccoregroupid\",\"value\":\"app_server_role\",\"description\":\"idcoregroup\"}]},{\"name\":\"test\",\"description\":\"test\",\"attributes\":{\"key\":\"clave\",\"value\":\"valor\"}},{\"name\":\"mediawiki\",\"description\":\"MediaWiki Product\",\"attributes\":[{\"key\":\"wikiname\",\"value\":\"Wiki to be shown\",\"description\":\"The name of the wiki\"},{\"key\":\"path\",\"value\":\"/demo\",\"description\":\"The url context to be displayed\"}]}]}";
         // String productReleasesList =
         // "{\"productRelease\":{\"releaseNotes\":\"Tomcat server 6\",\"version\":\"6\",\"product\":{\"name\":\"tomcat\",\"description\":\"tomcat J2EE container\",\"attributes\":{\"key\":\"clave\",\"value\":\"valor\"}},\"supportedOOSS\":[{\"description\":\"Ubuntu 10.04\",\"name\":\"Ubuntu\",\"osType\":\"94\",\"version\":\"10.04\"},{\"description\":\"Debian 5\",\"name\":\"Debian\",\"osType\":\"95\",\"version\":\"5\"},{\"description\":\"Centos 2.9\",\"name\":\"Centos\",\"osType\":\"76\",\"version\":\"2.9\"}]}}\"";
-        InputStream inputStream = IOUtils.toInputStream(jsonProducts);
+        Response response = mock(Response.class);
 
-        when(builder.get(InputStream.class)).thenReturn(inputStream);
+        when(builder.get()).thenReturn(response);
+        when(response.readEntity(String.class)).thenReturn(jsonProducts);
 
         List<String> products = productReleaseSdcDaoImpl.findAllProducts("token", "tenant");
 
         // then
         assertNotNull(products);
-
-    }
-
-    /**
-     * Tests the findAllProducts functionality
-     * 
-     * @throws SdcException
-     */
-    @Test
-    public void testFindAllProductReleasesOfaProduct() throws SdcException {
-        // given
-
-        String productReleasesList = "{\"productRelease\":{\"releaseNotes\":\"Tomcat server 6\",\"version\":\"6\",\"product\":{\"name\":\"tomcat\",\"description\":\"tomcat J2EE container\",\"attributes\":{\"key\":\"clave\",\"value\":\"valor\"}},\"supportedOOSS\":[{\"description\":\"Ubuntu 10.04\",\"name\":\"Ubuntu\",\"osType\":\"94\",\"version\":\"10.04\"},{\"description\":\"Debian 5\",\"name\":\"Debian\",\"osType\":\"95\",\"version\":\"5\"},{\"description\":\"Centos 2.9\",\"name\":\"Centos\",\"osType\":\"76\",\"version\":\"2.9\"}]}}";
-        InputStream inputStream = IOUtils.toInputStream(productReleasesList);
-
-        when(builder.get(InputStream.class)).thenReturn(inputStream);
-
-        List<ProductRelease> productReleases = productReleaseSdcDaoImpl.findAllProductReleasesOfProduct("tomcat",
-                "token", "tenant");
-
-        // then
-        assertNotNull(productReleases);
-        assertEquals(1, productReleases.size());
 
     }
 

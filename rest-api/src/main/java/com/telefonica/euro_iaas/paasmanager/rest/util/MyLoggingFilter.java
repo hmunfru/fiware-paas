@@ -21,18 +21,30 @@
  * For those usages not covered by the Apache version 2.0 License please contact with opensource@tid.es
  * </p>
  */
+package com.telefonica.euro_iaas.paasmanager.rest.util;
 
-package com.telefonica.euro_iaas.paasmanager.dao;
+import java.io.IOException;
 
-import com.telefonica.euro_iaas.commons.dao.BaseDAO;
-import com.telefonica.euro_iaas.paasmanager.model.Attribute;
+import javax.ws.rs.client.ClientRequestContext;
+
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Defines the methods needed to persist Attribute objects.
- * 
- * @author Jesus M. Movilla
- * @version $Id: $
+ * Extend LoggingFilter in order to disable stderr traces for jersey
  */
-public interface AttributeDao extends BaseDAO<Attribute, String> {
+public class MyLoggingFilter extends LoggingFilter {
+
+    private static Logger log = LoggerFactory.getLogger(MyLoggingFilter.class);
+
+    public MyLoggingFilter() {
+        super(null, true);
+    }
+
+    @Override
+    public void filter(ClientRequestContext context) throws IOException {
+        // Do nothing.
+    }
 
 }

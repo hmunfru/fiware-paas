@@ -10,9 +10,17 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
     </bean>
 
 
-    <bean id="sDCClient" lazy-init="true"
-          class="com.telefonica.euro_iaas.sdc.client.SDCClient">
+    <bean id="sdcClientConfig" lazy-init="true"
+          class="com.telefonica.euro_iaas.paasmanager.util.impl.SDCClientConfigImpl">
+        <constructor-arg name="httpConnectionManager" ref="httpConnectionManager"/>
+
     </bean>
+
+    <bean id="sDCClient" lazy-init="true"
+          class="com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient">
+        <property name="sdcClientConfig" ref="sdcClientConfig"/>
+    </bean>
+
     <bean id="sDCUtil" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtilImpl">
         <property name="sDCClient" ref="sDCClient"/>
@@ -50,6 +58,8 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
           class="com.telefonica.euro_iaas.paasmanager.manager.impl.ProductReleaseManagerImpl">
         <property name="productReleaseDao" ref="productReleaseDao"/>
         <property name="productReleaseSdcDao" ref="productReleaseSdcDao"/>
+        <property name="metadataDao" ref="metadataDao"/>
+        <property name="attributeDao" ref="attributeDao"/>
     </bean>
     <bean id="tierManager" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.manager.impl.TierManagerImpl">
@@ -186,6 +196,7 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
           class="com.telefonica.euro_iaas.paasmanager.claudia.impl.ClaudiaClientOpenStackImpl">
         <property name="openStackUtil" ref="openStackUtil"/>
         <property name="networkInstanceManager" ref="networkInstanceManager"/>
+        <property name="tierInstanceManager" ref="tierInstanceManager"/>
         <property name="openStackRegion" ref="openStackRegion"/>
         <property name="fileUtils" ref="fileUtils"/>
         <property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>

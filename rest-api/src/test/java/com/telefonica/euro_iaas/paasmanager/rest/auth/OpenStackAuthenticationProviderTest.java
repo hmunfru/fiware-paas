@@ -181,7 +181,7 @@ public class OpenStackAuthenticationProviderTest {
         openStackAuthenticationProvider.getTokenCache().get("admin").setTimeToLive(1);
         openStackAuthenticationProvider.getTokenCache().get("user token-user tenantId").setTimeToIdle(1);
         openStackAuthenticationProvider.getTokenCache().get("user token-user tenantId").setTimeToLive(1);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
 
         PaasManagerUser secondTimePaasManagerUser = openStackAuthenticationProvider.authenticationFiware("user token",
                 "user tenantId");

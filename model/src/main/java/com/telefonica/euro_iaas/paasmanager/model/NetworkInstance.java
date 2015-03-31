@@ -340,6 +340,18 @@ public class NetworkInstance {
     }
 
     /**
+     * It gets the network ID to be added to the router.
+     * @return
+     */
+
+    public String getInterfaceNetId() {
+        for (SubNetworkInstance subNet : this.getSubNets()) {
+            return subNet.getIdSubNet();
+        }
+        return "";
+    }
+
+    /**
      * It returns the string representations for rest rerquest.
      *
      * @return the json representation

@@ -30,7 +30,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
@@ -161,6 +163,7 @@ public class OpenStackNetworkImplTest {
     public void shouldLoadNotSharedNetworks() throws OpenStackException, InfrastructureException {
 
         // when
+
         when(openStackUtil.listNetworks(any(PaasManagerUser.class), anyString())).thenReturn(NETWORKS_STRING);
 
         List<NetworkInstance> networks = openStackNetworkImpl.loadNotSharedNetworks(claudiaData, REGION);
@@ -296,15 +299,46 @@ public class OpenStackNetworkImplTest {
     public void shouldDeleteNetworkToPublicRouter() throws OpenStackException, InfrastructureException {
 
         // when
-        String response = "ok";
+        String response = "{\"ports\": [ {\"status\": \"ACTIVE\",\"name\": \"\",  \"admin_state_up\": true, " +
+            "\"network_id\": \"ID2\", \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
+            + "\"device_owner\": \"compute:None\", \"binding:capabilities\": {\"port_filter\": true}, "
+            + "\"fixed_ips\": [ {\"subnet_id\": \"ID2\", \"ip_address\": \"172.31.0.3\"}],"
+            + "\"id\": \"07fd27d2-9ce1-48f3-be83-c7d2b7041a1a\", \"security_groups\": [], \"device_id\":" +
+            " \"dhcpfa3e6aae-2140-5176-877a-2f67684a3165-6a609412-3f04-485c-b269-b1a9b9ecb6bf\""
+            + "}]}";
+
+        when(openStackUtil.listPorts(any(PaasManagerUser.class), anyString())).thenReturn(response);
         NetworkInstance net = new NetworkInstance("router", "vdc", "region");
-        when(
-                openStackUtil.deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
+        net.setIdNetwork("ID");
+        when(openStackUtil.deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
                         anyString())).thenReturn(response);
         openStackNetworkImpl.deleteNetworkToPublicRouter(claudiaData, net, REGION);
 
         verify(openStackUtil).deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
                 anyString());
+    }
+
+    @Test
+    public void shouldDeleteNetworkToPublicRouterNoDeleted() throws OpenStackException, InfrastructureException {
+
+        // when
+        String response = "{\"ports\": [ {\"status\": \"ACTIVE\",\"name\": \"\",  \"admin_state_up\": true, " +
+            "\"network_id\": \"ID\", \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
+            + "\"device_owner\": \"compute:None\", \"binding:capabilities\": {\"port_filter\": true}, "
+            + "\"fixed_ips\": [ {\"subnet_id\": \"ID\", \"ip_address\": \"172.31.0.3\"}],"
+            + "\"id\": \"07fd27d2-9ce1-48f3-be83-c7d2b7041a1a\", \"security_groups\": [], \"device_id\":" +
+            " \"dhcpfa3e6aae-2140-5176-877a-2f67684a3165-6a609412-3f04-485c-b269-b1a9b9ecb6bf\""
+            + "}]}";
+
+        when(openStackUtil.listPorts(any(PaasManagerUser.class), anyString())).thenReturn(response);
+        NetworkInstance net = new NetworkInstance("router", "vdc", "region");
+        net.setIdNetwork("ID");
+        when(openStackUtil.deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
+            anyString())).thenReturn(response);
+        openStackNetworkImpl.deleteNetworkToPublicRouter(claudiaData, net, REGION);
+
+        verify(openStackUtil, never()).deleteInterfaceToPublicRouter(any(PaasManagerUser.class), any(NetworkInstance.class),
+            anyString());
     }
 
     @Test

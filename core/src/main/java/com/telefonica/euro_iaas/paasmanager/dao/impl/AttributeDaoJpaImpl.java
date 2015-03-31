@@ -50,8 +50,8 @@ public class AttributeDaoJpaImpl extends AbstractBaseDao<Attribute, String> impl
      * @param name, the name of the artifact
      * @return attribute, the attribute
      */
-    public Attribute load(String name) throws EntityNotFoundException {
-        return super.loadByField(Attribute.class, "name", name);
+    public Attribute load(String key) throws EntityNotFoundException {
+        return super.loadByField(Attribute.class, "key", key);
     }
 
 }
