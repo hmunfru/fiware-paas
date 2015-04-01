@@ -230,7 +230,7 @@ Update the following columns in the table configuration_properties:
 	 openstack-tcloud.keystone.tenant=<keystone.tenant>
 	 user_data_path=/opt/fiware-paas/resources/userdata
 
-where the values between bracket <> should be fund out despending on the openstack installation.
+where the values between bracket <> should be found out depending on the openstack installation.
 The updates of the columns are done in the following way
 
 .. code::
@@ -427,7 +427,7 @@ Taking into account the results of the ps commands in the previous section, we t
     netstat -p -a | grep $PID
 
 Where $PID is the PID of Java process obtained at the ps command described before, in the previous case 14054 jetty and 1327 (postgresql). 
-The expected results must be something similar for the postgres process:
+The expected results for the postgres process must be something like this output:
 
 .. code::
 
