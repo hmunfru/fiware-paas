@@ -27,11 +27,7 @@ package com.telefonica.euro_iaas.paasmanager.util;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import java.util.HashSet;
-
 import org.junit.Before;
-import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
@@ -160,8 +156,6 @@ public class ITTestOpenStackUtilImpl {
     OpenStackUtilImpl openStackUtil = null;
     SystemPropertiesProvider systemPropertiesProvider = null;
     PaasManagerUser user = null;
-    
-  
 
     /**
      * Build the payload to deploy a VM (createServer)
@@ -190,14 +184,14 @@ public class ITTestOpenStackUtilImpl {
      */
     @Before
     public void setup() {
-        user = new PaasManagerUser(username, authToken, new HashSet<GrantedAuthority>());
+        user = new PaasManagerUser(username, authToken);
         user.setToken(authToken);
         user.setTenantId(tenant);
         user.setUsername(username);
-        OpenOperationUtil openOperationUtil = mock (OpenOperationUtil.class);
-        OpenStackConfigUtil openStackConfigUtil = mock (OpenStackConfigUtil.class);
-        OpenStackRegion openStackRegion  = mock (OpenStackRegion.class);
-        openStackUtil = new OpenStackUtilImpl ();
+        OpenOperationUtil openOperationUtil = mock(OpenOperationUtil.class);
+        OpenStackConfigUtil openStackConfigUtil = mock(OpenStackConfigUtil.class);
+        OpenStackRegion openStackRegion = mock(OpenStackRegion.class);
+        openStackUtil = new OpenStackUtilImpl();
         openStackUtil.setOpenOperationUtil(openOperationUtil);
         openStackUtil.setOpenStackConfigUtil(openStackConfigUtil);
         openStackUtil.setOpenStackRegion(openStackRegion);
@@ -208,7 +202,7 @@ public class ITTestOpenStackUtilImpl {
     }
 
     // @Ignore
-    //@Test
+    // @Test
     public void testCreateGetDeleteServer() throws OpenStackException {
         try {
             // Creates a new VM
@@ -242,7 +236,7 @@ public class ITTestOpenStackUtilImpl {
      *             The exception from the server
      */
     // @Ignore
-    //@Test
+    // @Test
     public void testCreateServerAssignFloatingIP() throws OpenStackException {
         try {
             // Creates a new VM

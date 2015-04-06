@@ -33,8 +33,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -45,7 +43,6 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
@@ -105,10 +102,7 @@ public class OpenStackUtilImplTest {
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         openStackConfig = mock(OpenStackConfigUtil.class);
         openStackUtil.setOpenStackConfigUtil(openStackConfig);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new HashSet();
-        authorities.add(grantedAuthority);
-        paasManagerUser = new PaasManagerUser("user", "aa", authorities);
+        paasManagerUser = new PaasManagerUser("user", "aa");
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
 
@@ -312,18 +306,15 @@ public class OpenStackUtilImplTest {
 
     /**
      * it lists the subnets.
-     *
+     * 
      * @throws OpenStackException
      * @throws IOException
      */
     @Test
     public void shouldListSubNetworks() throws OpenStackException, IOException {
 
-        when(openOperationUtil.
-            getAdminUser(any(PaasManagerUser.class))).
-            thenReturn(paasManagerUser);
-        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class)))
-            .thenReturn("ok");
+        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
         String response = openStackUtil.listSubNetworks(paasManagerUser, "region");
 
         // then

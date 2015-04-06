@@ -32,8 +32,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -46,7 +44,6 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
@@ -100,10 +97,7 @@ public class OperationUtilImplTest {
         openOperationUtil.setHttpConnectionManager(httpClientConnectionManager);
         openOperationUtil.setSystemPropertiesProvider(systemPropertiesProvider);
 
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new HashSet();
-        authorities.add(grantedAuthority);
-        paasManagerUser = new PaasManagerUser("user", "aa", authorities);
+        paasManagerUser = new PaasManagerUser("user", "aa");
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
 
@@ -130,10 +124,8 @@ public class OperationUtilImplTest {
         Header header = mock(Header.class);
 
         // when
-        Collection<GrantedAuthority> authorities = new HashSet();
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        authorities.add(grantedAuthority);
-        PaasManagerUser user = new PaasManagerUser("user", "aa", authorities);
+
+        PaasManagerUser user = new PaasManagerUser("user", "aa");
         user.setToken("1234567891234567989");
         user.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
 

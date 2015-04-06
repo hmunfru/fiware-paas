@@ -22,7 +22,7 @@
  * </p>
  */
 
-package com.telefonica.euro_iaas.paasmanager.rest.util;
+package com.telefonica.euro_iaas.paasmanager.util;
 
 import java.io.InputStream;
 
@@ -31,12 +31,10 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
-import org.openstack.docs.identity.api.v2.AuthenticateResponse;
-
 /**
  * Create and manage the cache to the response of OpenStack for request the admin token. Based on ehcache open source.
  */
-public class TokenCache {
+public class TokenCache<T> {
 
     public static final String CACHE_NAME = "token";
 
@@ -81,10 +79,10 @@ public class TokenCache {
      * Put new a new AuthenticateResponse value using token like key, in cache.
      * 
      * @param key
-     * @param authenticateResponse
+     * @param t
      */
-    public void put(String key, AuthenticateResponse authenticateResponse) {
-        cache.put(new Element(key, authenticateResponse));
+    public void put(String key, T t) {
+        cache.put(new Element(key, t));
     }
 
     /**
@@ -117,12 +115,12 @@ public class TokenCache {
      * @param tenantId
      * @return
      */
-    public AuthenticateResponse getAuthenticateResponse(String token, String tenantId) {
+    public T getAuthenticateResponse(String token, String tenantId) {
         String key = token + "-" + tenantId;
 
         if (cache.isKeyInCache(key) && (cache.get(key) != null)) {
 
-            return (AuthenticateResponse) cache.get(key).getObjectValue();
+            return (T) cache.get(key).getObjectValue();
         } else {
             return null;
         }

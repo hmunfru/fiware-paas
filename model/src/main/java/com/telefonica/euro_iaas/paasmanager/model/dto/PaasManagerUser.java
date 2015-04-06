@@ -24,21 +24,10 @@
 
 package com.telefonica.euro_iaas.paasmanager.model.dto;
 
-import java.util.Collection;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.SpringSecurityCoreVersion;
-import org.springframework.security.core.userdetails.User;
-
 /**
- * @author dbermejo
+ * Encapsulates data user
  */
-public class PaasManagerUser extends User {
-
-    /**
-     * The Constant serialVersionUID.
-     */
-    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+public class PaasManagerUser {
 
     /**
      * The tenantId.
@@ -62,32 +51,16 @@ public class PaasManagerUser extends User {
 
     /**
      * Instantiates a new open stack user.
-     *
-     * @param username    the username
-     * @param password    the password
-     * @param authorities the authorities
+     * 
+     * @param username
+     *            the username
+     * @param token
+     *            the token
      */
-    public PaasManagerUser(final String username, final String password,
-                           final Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-        this.token = password;
+    public PaasManagerUser(final String username, final String token) {
+        this.token = token;
         this.username = username;
     }
-
-    // /**
-    // * Constructor.
-    // */
-    // public OpenStackUser() {
-    // super("a", "a", new HashSet<GrantedAuthority>());
-    // // super(((OpenStackUser)
-    // SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername(),
-    // // ((OpenStackUser)
-    // SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getToken(),
-    // // ((OpenStackUser) SecurityContextHolder.getContext()
-    // // .getAuthentication().getPrincipal()).getAuthorities());
-    // // this.tenant = ((OpenStackUser) SecurityContextHolder.getContext()
-    // // .getAuthentication().getPrincipal()).getTenant();
-    // }
 
     /**
      * @return the token
@@ -97,7 +70,8 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param token the token to set
+     * @param token
+     *            the token to set
      */
     public void setToken(String token) {
         this.token = token;
@@ -111,7 +85,8 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param tenantId the tenantId to set
+     * @param tenantId
+     *            the tenantId to set
      */
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -125,7 +100,8 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param tenantName the tenantName to set
+     * @param tenantName
+     *            the tenantName to set
      */
     public void setTenantName(String tenantName) {
         this.tenantName = tenantName;
@@ -139,18 +115,17 @@ public class PaasManagerUser extends User {
     }
 
     /**
-     * @param username the username to set
+     * @param username
+     *            the username to set
      */
     public void setUsername(String username) {
         this.username = username;
     }
 
     /**
-     * Constructs a <code>String</code> with all attributes
-     * in name = value format.
-     *
-     * @return a <code>String</code> representation
-     * of this object.
+     * Constructs a <code>String</code> with all attributes in name = value format.
+     * 
+     * @return a <code>String</code> representation of this object.
      */
     public String toString() {
         StringBuilder sb = new StringBuilder("[[PaasManagerUser]");
@@ -161,6 +136,5 @@ public class PaasManagerUser extends User {
         sb.append("]");
         return sb.toString();
     }
-
 
 }

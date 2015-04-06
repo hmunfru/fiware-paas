@@ -294,7 +294,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
 
             throw new RuntimeException("Tenant format unknown:\n " + tenantId);
         }
-        PaasManagerUser user2 = new PaasManagerUser(tenantId, token, user.getAuthorities());
+        PaasManagerUser user2 = new PaasManagerUser(tenantId, token);
         return user2;
     }
 

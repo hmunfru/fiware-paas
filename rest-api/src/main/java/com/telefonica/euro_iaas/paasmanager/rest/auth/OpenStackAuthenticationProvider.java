@@ -26,7 +26,6 @@ package com.telefonica.euro_iaas.paasmanager.rest.auth;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
@@ -39,7 +38,6 @@ import net.sf.ehcache.Cache;
 
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
-import org.openstack.docs.identity.api.v2.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -47,13 +45,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
-import com.telefonica.euro_iaas.paasmanager.rest.util.TokenCache;
 import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
 
 /**
  * The Class OpenStackAuthenticationProvider.
@@ -112,7 +110,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     public OpenStackAuthenticationProvider() {
         oSAuthToken = null;
-        tokenCache = new TokenCache();
+        tokenCache = new TokenCache<AuthenticateResponse>();
     }
 
     /*
@@ -172,7 +170,8 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         log.debug("Keystone URL : " + keystoneURL);
         log.debug("adminToken : " + adminCredentials[0]);
 
-        AuthenticateResponse authenticateResponse = tokenCache.getAuthenticateResponse(token, tenantId);
+        AuthenticateResponse authenticateResponse = (AuthenticateResponse) tokenCache.getAuthenticateResponse(token,
+                tenantId);
         Response response = null;
         try {
             if (authenticateResponse == null) {
@@ -228,16 +227,8 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
                     + " not valid for the tenantId provided:" + tenantId);
         }
 
-        Set<GrantedAuthority> authsSet = new HashSet<GrantedAuthority>();
-
-        if (authenticateResponse.getUser().getRoles() != null) {
-            for (Role role : authenticateResponse.getUser().getRoles().getRole()) {
-                authsSet.add(new GrantedAuthorityImpl(role.getName()));
-            }
-        }
-
         PaasManagerUser user = new PaasManagerUser(authenticateResponse.getUser().getOtherAttributes()
-                .get(new QName("username")), token, authsSet);
+                .get(new QName("username")), token);
 
         user.setTenantId(tenantId);
         user.setTenantName(authenticateResponse.getToken().getTenant().getName());
@@ -291,13 +282,14 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
             } else if (SYSTEM_FASTTRACK.equals(system)) {
                 user = authenticationFastTrack(username, tenantId);
             }
+            UserDetails userDetails = new User(username, user.getToken(), new HashSet<GrantedAuthority>());
+            return userDetails;
         } else {
             String str = "Missing tenantId header";
             log.info(str);
             throw new BadCredentialsException(str);
         }
 
-        return user;
     }
 
     /**

@@ -28,22 +28,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
-import java.util.HashSet;
 
 import net.sf.json.JSONObject;
 
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
 import com.telefonica.euro_iaas.paasmanager.model.keystone.User;
 
 /**
  * Test other model classes.
- *
+ * 
  * @author henar
  */
 public class Others {
@@ -52,22 +49,9 @@ public class Others {
     private static final String VDC = "vdc";
     private static final String SERVICE = "service";
 
-    @Test
-    public void testClaudiaData() throws Exception {
-
-        PaasManagerUser user = new PaasManagerUser("username", "myToken", new HashSet<GrantedAuthority>());
-        user.setTenantName("FIWARE");
-        ClaudiaData claudiaData = new ClaudiaData(ORG, VDC, SERVICE);
-        claudiaData.setUser(user);
-
-        assertEquals(claudiaData.getOrg(), ORG);
-        assertEquals(claudiaData.getVdc(), VDC);
-        assertEquals(claudiaData.getService(), SERVICE);
-        assertEquals(claudiaData.getUser().getTenantName(), "FIWARE");
-    }
-
     /**
      * Test the creation of a task.
+     * 
      * @throws Exception
      */
     @Test
@@ -83,7 +67,6 @@ public class Others {
         task.setError(taskError);
         task.setVdc("vdc");
 
-
         assertEquals(task.getStatus(), TaskStates.RUNNING);
         assertEquals(task.getHref(), "href");
         assertEquals(task.getDescription(), "description");
@@ -97,6 +80,7 @@ public class Others {
 
     /**
      * Test the creation of a Task with tier information.
+     * 
      * @throws Exception
      */
     @Test
@@ -112,16 +96,15 @@ public class Others {
         assertEquals(task.getExpireTime().intValue(), 1000);
         assertNotNull(task.getOwner());
 
-
     }
 
     /**
      * Test the creation of a Task with an error message.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskError() throws Exception {
-
 
         TaskError taskError = new TaskError();
         taskError.setMessage("error");
@@ -138,11 +121,11 @@ public class Others {
 
     /**
      * Test the creation of a error task with a reference.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskReference() throws Exception {
-
 
         TaskReference taskError = new TaskReference();
         taskError.setName("error");
@@ -157,11 +140,11 @@ public class Others {
 
     /**
      * Test the creation of a error task with no reference.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskReferenceII() throws Exception {
-
 
         TaskReference taskError = new TaskReference("http");
         taskError.setName("error");
@@ -172,7 +155,6 @@ public class Others {
         assertEquals(taskError.getType(), "errortype");
 
     }
-
 
     @Test
     public void testLimitFromJson() throws Exception {
@@ -287,11 +269,9 @@ public class Others {
         os.setOsType("type");
         os.setVersion("version");
 
-
         OS os2 = new OS("type");
         os2.setDescription("description");
         os2.setName("name2");
-
 
         assertEquals(os.getName(), "name");
         assertEquals(os.getOsType(), "type");
@@ -324,6 +304,5 @@ public class Others {
         assertEquals(vm.equals(vm2), false);
 
     }
-
 
 }

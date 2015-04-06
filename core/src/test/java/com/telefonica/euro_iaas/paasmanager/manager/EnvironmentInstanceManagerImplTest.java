@@ -108,7 +108,7 @@ public class EnvironmentInstanceManagerImplTest {
 
         claudiaData = new ClaudiaData("org", "vdc", "service");
         // Collection<GrantedAuthority> authorities = null;
-        user = new PaasManagerUser("user", "password", new ArrayList<GrantedAuthority>());
+        user = new PaasManagerUser("user", "password");
         claudiaData.setUser(user);
 
         // Environment
