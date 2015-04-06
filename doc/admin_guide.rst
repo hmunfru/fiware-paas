@@ -57,9 +57,14 @@ After that, you can install the paas manager just doing:
 
 .. code::
 
+	yum install fiware-paas
+
+or specifying the version
+
+.. code::
+
 	yum install fiware-paas-{version}-1.noarch
 
-where {version} is currently 1.4.0
 
 Install PaaS Manager from source
 --------------------------------
