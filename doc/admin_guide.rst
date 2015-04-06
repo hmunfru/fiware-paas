@@ -65,7 +65,7 @@ or specifying the version
 
 	yum install fiware-paas-{version}-1.noarch
 
-where {version} could be 1.5.0
+where {version} could 1.5.0
 
 Install PaaS Manager from source
 --------------------------------
