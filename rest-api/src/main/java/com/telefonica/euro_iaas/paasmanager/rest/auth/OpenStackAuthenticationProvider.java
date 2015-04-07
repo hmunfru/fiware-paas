@@ -66,14 +66,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * The system properties provider.
      */
     private SystemPropertiesProvider systemPropertiesProvider;
-    /**
-     * The Constant SYSTEM_FIWARE.
-     */
-    public static final String SYSTEM_FIWARE = "FIWARE";
-    /**
-     * The Constant SYSTEM_FASTTRACK.
-     */
-    public static final String SYSTEM_FASTTRACK = "FASTTRACK";
+
     /**
      * The Constant CODE_200. HTTP 200 ok
      */
@@ -126,20 +119,6 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     }
 
     /**
-     * Authentication fast track.
-     * 
-     * @param username
-     *            the username
-     * @param tenantId
-     *            the tenantId
-     * @return the open stack user
-     */
-    private PaasManagerUser authenticationFastTrack(String username, String tenantId) {
-        return null;
-
-    }
-
-    /**
      * Authentication fiware.
      * 
      * @param token
@@ -149,7 +128,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * @return the open stack user
      */
 
-    public PaasManagerUser authenticationFiware(String token, String tenantId) {
+    private PaasManagerUser authenticationFiware(String token, String tenantId) {
 
         OpenStackAccess openStackAccess = generateOpenStackAuthenticationToken();
 
@@ -262,18 +241,11 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     @Override
     protected final UserDetails retrieveUser(final String username,
             final UsernamePasswordAuthenticationToken authentication) {
-        String system = systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM);
-
-        PaasManagerUser paasManagerUser = null;
 
         if (null != authentication.getCredentials()) {
             String tenantId = authentication.getCredentials().toString();
 
-            if (SYSTEM_FIWARE.equals(system)) {
-                paasManagerUser = authenticationFiware(username, tenantId);
-            } else if (SYSTEM_FASTTRACK.equals(system)) {
-                paasManagerUser = authenticationFastTrack(username, tenantId);
-            }
+            PaasManagerUser paasManagerUser = authenticationFiware(username, tenantId);
 
             UserDetails userDetails = new User(paasManagerUser.getUserName(), paasManagerUser.getToken(),
                     new HashSet<GrantedAuthority>());
@@ -306,13 +278,6 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
             this.client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
         }
         return this.client;
-    }
-
-    /**
-     * Getter the oSAuthToken.
-     */
-    public OpenStackAuthenticationToken getoSAuthToken() {
-        return oSAuthToken;
     }
 
     /**

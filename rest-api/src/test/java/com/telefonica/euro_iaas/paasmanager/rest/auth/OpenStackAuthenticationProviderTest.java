@@ -52,9 +52,9 @@ import org.openstack.docs.identity.api.v2.UserForAuthenticateResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -129,16 +129,17 @@ public class OpenStackAuthenticationProviderTest {
 
         openStackAuthenticationProvider.getTokenCache().removeAll();
 
+        UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
+        when(authentication.getCredentials()).thenReturn("user tenantId");
+
         // When
-        PaasManagerUser paasManagerUser = openStackAuthenticationProvider.authenticationFiware("user token",
-                "user tenantId");
+        UserDetails userDetails = openStackAuthenticationProvider.retrieveUser("user token", authentication);
 
         // Then
         verify(response).readEntity(AuthenticateResponse.class);
         verify(user).getOtherAttributes();
-        assertNotNull(paasManagerUser);
-        assertEquals("user tenantId", paasManagerUser.getTenantId());
-        assertEquals("user token", paasManagerUser.getToken());
+        assertNotNull(userDetails);
+        assertEquals("user token", userDetails.getPassword());
 
     }
 
@@ -184,10 +185,10 @@ public class OpenStackAuthenticationProviderTest {
         when(user.getOtherAttributes()).thenReturn(map);
 
         openStackAuthenticationProvider.getTokenCache().removeAll();
-
+        UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
+        when(authentication.getCredentials()).thenReturn("user tenantId");
         // When
-        PaasManagerUser firstTimePaasManagerUser = openStackAuthenticationProvider.authenticationFiware("user token",
-                "user tenantId");
+        UserDetails firstTimeUserDetails = openStackAuthenticationProvider.retrieveUser("user token", authentication);
 
         // force expire elements now
         openStackAuthenticationProvider.getTokenCache().get("admin").setTimeToIdle(1);
@@ -196,18 +197,15 @@ public class OpenStackAuthenticationProviderTest {
         openStackAuthenticationProvider.getTokenCache().get("user token-user tenantId").setTimeToLive(1);
         Thread.sleep(2000);
 
-        PaasManagerUser secondTimePaasManagerUser = openStackAuthenticationProvider.authenticationFiware("user token",
-                "user tenantId");
+        UserDetails secondTimeUserDetails = openStackAuthenticationProvider.retrieveUser("user token", authentication);
 
         // Then
         verify(response, times(2)).readEntity(AuthenticateResponse.class);
         verify(user, times(2)).getOtherAttributes();
-        assertNotNull(firstTimePaasManagerUser);
-        assertEquals("user tenantId", firstTimePaasManagerUser.getTenantId());
-        assertEquals("user token", firstTimePaasManagerUser.getToken());
+        assertNotNull(firstTimeUserDetails);
+        assertEquals("user token", firstTimeUserDetails.getPassword());
 
-        assertEquals("user tenantId", secondTimePaasManagerUser.getTenantId());
-        assertEquals("user token", secondTimePaasManagerUser.getToken());
+        assertEquals("user token", secondTimeUserDetails.getPassword());
     }
 
     @Test
