@@ -35,8 +35,6 @@ import org.junit.Test;
 
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.User;
 
 /**
  * Test other model classes.
@@ -199,66 +197,6 @@ public class Others {
 
         assertEquals(template.getName(), "name");
         assertEquals(template.getTierInstance().getName(), "tiername");
-    }
-
-    @Test
-    public void testUser() throws Exception {
-        User user = new User();
-        user.setExtra("extra");
-        user.setId("id");
-        user.setName("name");
-
-        assertEquals(user.getName(), "name");
-        assertEquals(user.getId(), "id");
-        assertEquals(user.getExtra(), "extra");
-    }
-
-    @Test
-    public void testUserII() throws Exception {
-        User user = new User("id", "name", "extra");
-
-        assertEquals(user.getName(), "name");
-        assertEquals(user.getId(), "id");
-        assertEquals(user.getExtra(), "extra");
-    }
-
-    @Test
-    public void testUserIII() throws Exception {
-        User user = new User("id");
-
-        assertEquals(user.getId(), "id");
-    }
-
-    @Test
-    public void testToken() throws Exception {
-        Token token = new Token();
-        token.setExpires("expires");
-        token.setExtra("extra");
-        token.setId("id");
-        token.setTenantId("tenantId");
-
-        assertEquals(token.getExpires(), "expires");
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getExtra(), "extra");
-        assertEquals(token.getTenantId(), "tenantId");
-    }
-
-    @Test
-    public void testTokenII() throws Exception {
-        Token token = new Token("id", "expires", "extra");
-        assertEquals(token.getExpires(), "expires");
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getExtra(), "extra");
-    }
-
-    @Test
-    public void testTokenIII() throws Exception {
-        Token token = new Token("id");
-        JSONObject json = new JSONObject().fromObject("{\"tenantId\": \"tenantId\"}");
-
-        token.setTenantId(json);
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getTenantId(), "tenantId");
     }
 
     @Test

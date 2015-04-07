@@ -24,8 +24,6 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.auth;
 
-import java.util.ArrayList;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -33,12 +31,14 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnectionException;
+import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
  * Class to obtain a valid token from the OpenStack.
@@ -47,22 +47,6 @@ import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnect
  */
 public class OpenStackAuthenticationToken {
 
-    /**
-     * The log.
-     */
-    // private Timer timer;
-    /**
-     * The token ID.
-     */
-    private String token;
-    /**
-     * The tenant ID.
-     */
-    private String tenantId;
-    /**
-     * The expiration date of the token.
-     */
-    private static String date;
     /**
      * The url of the keystone service.
      */
@@ -81,40 +65,21 @@ public class OpenStackAuthenticationToken {
     private String pass;
 
     /**
-     * Rest client.
-     */
-    private Client client;
-    /**
      * The log.
      */
     private static Logger log = LoggerFactory.getLogger(OpenStackAuthenticationToken.class);
 
     /**
      * The default constructor of the class OpenStackAuthenticationToken.
-     * 
-     * @param params
-     *            The array of params with the values of url, tenant, user and password, together with the httpClient
-     *            and threshold.
      */
-    OpenStackAuthenticationToken(ArrayList<Object> params) {
-        initialize(params);
-    }
+    OpenStackAuthenticationToken(SystemPropertiesProvider systemPropertiesProvider) {
+        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
 
-    /**
-     * Function to initialize the data structure.
-     * 
-     * @param params
-     *            List of parameters to initialize.
-     */
-    public void initialize(ArrayList<Object> params) {
-        this.token = "";
-        this.tenantId = "";
-        this.url = (String) params.get(0);
-        this.tenant = (String) params.get(1);
-        this.user = (String) params.get(2);
-        this.pass = (String) params.get(3);
-        this.client = (Client) params.get(4);
+        user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
 
+        pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+
+        tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
     }
 
     /**
@@ -122,15 +87,16 @@ public class OpenStackAuthenticationToken {
      * 
      * @return The new credential (tenant id and token).
      */
-    public String[] getCredentials() {
-        String[] credential = new String[2];
+    public OpenStackAccess getAdminCredentials(Client client) {
+
+        OpenStackAccess openStackAccess = new OpenStackAccess();
 
         log.info("generate new valid token for admin");
 
         Response response = null;
         try {
 
-            WebTarget wr = this.client.target(url);
+            WebTarget wr = client.target(url);
 
             String payload = "{\"auth\": {\"tenantName\": \"" + tenant + "\", \""
                     + "passwordCredentials\":{\"username\": \"" + user + "\"," + " \"password\": \"" + pass + "\"}}}";
@@ -143,15 +109,16 @@ public class OpenStackAuthenticationToken {
 
                 JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
                 jsonObject = (JSONObject) jsonObject.get("access");
+                openStackAccess.setAccessJSON(jsonObject);
 
                 if (jsonObject.containsKey("token")) {
 
                     JSONObject tokenObject = (JSONObject) jsonObject.get("token");
-                    token = (String) tokenObject.get("id");
-                    tenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
+                    String token = (String) tokenObject.get("id");
+                    String tenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
 
-                    credential[0] = token;
-                    credential[1] = tenantId;
+                    openStackAccess.setToken(token);
+                    openStackAccess.setTenantId(tenantId);
                     log.info("generated new token for tenantId:" + tenantId);
 
                 }
@@ -170,8 +137,16 @@ public class OpenStackAuthenticationToken {
             }
         }
 
-        return credential;
+        return openStackAccess;
 
     }
 
+    /**
+     * get keystone url
+     * 
+     * @return
+     */
+    public String getKeystoneURL() {
+        return this.url;
+    }
 }

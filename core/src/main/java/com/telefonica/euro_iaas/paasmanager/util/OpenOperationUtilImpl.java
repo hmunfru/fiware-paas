@@ -60,7 +60,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 
 /**
  * @author jesus.movilla

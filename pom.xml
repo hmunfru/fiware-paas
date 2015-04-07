@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.telefonica.iot</groupId>
     <artifactId>paas-manager-server</artifactId>
@@ -323,6 +324,7 @@
                         <excludes>
                             <exclude>**/*Test*.class</exclude>
                             <exclude>**/model/**.class</exclude>
+                            <exclude>**/bean/**.class</exclude>
                             <exclude>org/openstack/**/*</exclude>
                             <exclude>org/w3/**/*</exclude>
                         </excludes>
@@ -491,16 +493,19 @@
                                     fi
                                     if echo $ip |grep ^127 &gt;/dev/null; then
                                     defaultdev=$(/sbin/route | awk '/^default/ { print $8}')
-                                    ip=$(ip addr show dev $defaultdev |awk '/inet / { X = split($2, A, "/") ; print A[1]}')
+                                    ip=$(ip addr show dev $defaultdev |awk '/inet / { X = split($2, A, "/") ; print
+                                    A[1]}')
                                     fi
 
                                     echo "Generating key and certificate with CN=$ip"
-                                    keytool -genkey -keyalg RSA -alias jetty -keystore /etc/keystorejetty -validity 730 -keypass password -storepass password -dname "CN=$ip, O=fiware" -keysize 2048
+                                    keytool -genkey -keyalg RSA -alias jetty -keystore /etc/keystorejetty -validity 730
+                                    -keypass password -storepass password -dname "CN=$ip, O=fiware" -keysize 2048
                                     chmod 640 /etc/keystorejetty
                                     echo "Done"
                                     fi
                                     # To see the certificate:
-                                    # keytool -list -storepass password -keystore /etc/keystorejetty -rfc |openssl x509 -text
+                                    # keytool -list -storepass password -keystore /etc/keystorejetty -rfc |openssl x509
+                                    -text
 
                                     #OBF of password is OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v
 

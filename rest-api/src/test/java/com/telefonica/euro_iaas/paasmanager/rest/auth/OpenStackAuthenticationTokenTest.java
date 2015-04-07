@@ -24,15 +24,14 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.auth;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -41,11 +40,28 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnectionException;
+import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 public class OpenStackAuthenticationTokenTest {
+
+    private SystemPropertiesProvider systemPropertiesProvider;
+    private final String keystoneUrl = "http://keystone";
+
+    @Before
+    public void setUp() {
+
+        systemPropertiesProvider = mock(SystemPropertiesProvider.class);
+        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL)).thenReturn(keystoneUrl);
+        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER)).thenReturn("user");
+        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS)).thenReturn("pass");
+        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT)).thenReturn("tenant");
+
+    }
 
     @Test
     public void getCredentialsTest() throws AuthenticationConnectionException, IOException {
@@ -53,8 +69,6 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-        ArrayList<Object> params = new ArrayList<Object>();
-        String url = "http://keystone";
 
         String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
                 + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
@@ -65,14 +79,8 @@ public class OpenStackAuthenticationTokenTest {
         WebTarget webTarget = mock(WebTarget.class);
         Invocation.Builder builder = mock(Invocation.Builder.class);
 
-        params.add(url);
-        params.add("tenant");
-        params.add("user");
-        params.add("passw");
-        params.add(client);
-
-        openStackAuthenticationToken = new OpenStackAuthenticationToken(params);
-        when(client.target(url)).thenReturn(webTarget);
+        openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+        when(client.target(keystoneUrl)).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
@@ -81,17 +89,17 @@ public class OpenStackAuthenticationTokenTest {
         when(response.readEntity(String.class)).thenReturn(payload);
 
         // when
-        String credentials[] = openStackAuthenticationToken.getCredentials();
+        OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
 
         // then
-        verify(client).target(url);
+        verify(client).target(keystoneUrl);
         verify(webTarget).request(MediaType.APPLICATION_JSON);
         verify(builder).accept(MediaType.APPLICATION_JSON);
         verify(response).getStatus();
         verify(response).readEntity(String.class);
-        assertNotNull(credentials);
-        assertEquals("0bd52c4b2fa09951aa057b4590c4aa6d", credentials[0]);
-        assertEquals("00000000000000000000000000001348", credentials[1]);
+        assertNotNull(openStackAccess);
+        assertEquals("0bd52c4b2fa09951aa057b4590c4aa6d", openStackAccess.getToken());
+        assertEquals("00000000000000000000000000001348", openStackAccess.getTenantId());
 
     }
 
@@ -100,9 +108,6 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-        ArrayList<Object> params = new ArrayList<Object>();
-        String url = "http://keystone";
-
         String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
                 + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
                 + "\"enabled\":\"true\",\"id\":\"00000000000000000000000000001348\",\"name\":\"tenantName\"}"
@@ -112,14 +117,9 @@ public class OpenStackAuthenticationTokenTest {
         WebTarget webTarget = mock(WebTarget.class);
         Invocation.Builder builder = mock(Invocation.Builder.class);
 
-        params.add(url);
-        params.add("tenant");
-        params.add("user");
-        params.add("passw");
-        params.add(client);
+        openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
 
-        openStackAuthenticationToken = new OpenStackAuthenticationToken(params);
-        when(client.target(url)).thenReturn(webTarget);
+        when(client.target(keystoneUrl)).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
@@ -128,7 +128,7 @@ public class OpenStackAuthenticationTokenTest {
         when(response.readEntity(String.class)).thenReturn(payload);
 
         // when
-        openStackAuthenticationToken.getCredentials();
+        openStackAuthenticationToken.getAdminCredentials(client);
 
         // then
 

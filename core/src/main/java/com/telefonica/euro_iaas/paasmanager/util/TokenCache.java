@@ -31,10 +31,12 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+
 /**
  * Create and manage the cache to the response of OpenStack for request the admin token. Based on ehcache open source.
  */
-public class TokenCache<T> {
+public class TokenCache {
 
     public static final String CACHE_NAME = "token";
 
@@ -76,13 +78,13 @@ public class TokenCache<T> {
     }
 
     /**
-     * Put new a new AuthenticateResponse value using token like key, in cache.
+     * Put new a new PaasManagerUser value using token like key, in cache.
      * 
      * @param key
-     * @param t
+     * @param paasManagerUser
      */
-    public void put(String key, T t) {
-        cache.put(new Element(key, t));
+    public void put(String key, PaasManagerUser paasManagerUser) {
+        cache.put(new Element(key, paasManagerUser));
     }
 
     /**
@@ -109,18 +111,18 @@ public class TokenCache<T> {
     }
 
     /**
-     * Get from cache the response of OpenStack by key. The key is token string.
+     * Get from cache the PaasManagerUser cached. The key is token string.
      * 
      * @param token
      * @param tenantId
      * @return
      */
-    public T getAuthenticateResponse(String token, String tenantId) {
+    public PaasManagerUser getPaasManagerUser(String token, String tenantId) {
         String key = token + "-" + tenantId;
 
         if (cache.isKeyInCache(key) && (cache.get(key) != null)) {
 
-            return (T) cache.get(key).getObjectValue();
+            return (PaasManagerUser) cache.get(key).getObjectValue();
         } else {
             return null;
         }

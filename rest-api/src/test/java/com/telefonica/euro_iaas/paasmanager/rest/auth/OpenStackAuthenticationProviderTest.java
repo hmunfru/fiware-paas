@@ -26,6 +26,7 @@ package com.telefonica.euro_iaas.paasmanager.rest.auth;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import org.junit.Before;
 import org.junit.Test;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
@@ -49,7 +51,7 @@ import org.openstack.docs.identity.api.v2.TenantForAuthenticateResponse;
 import org.openstack.docs.identity.api.v2.Token;
 import org.openstack.docs.identity.api.v2.UserForAuthenticateResponse;
 
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -58,6 +60,8 @@ import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 public class OpenStackAuthenticationProviderTest {
 
     private SystemPropertiesProvider systemPropertiesProvider;
+
+    private final String keystoneURL = "http://keystone.test";
 
     private OpenStackAuthenticationToken openStackAuthenticationToken;
 
@@ -69,8 +73,7 @@ public class OpenStackAuthenticationProviderTest {
 
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
 
-        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL)).thenReturn(
-                "http://keystone.test");
+        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL)).thenReturn(keystoneURL);
         when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER)).thenReturn("admin");
         when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS)).thenReturn("admin");
         when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT)).thenReturn(
@@ -86,8 +89,13 @@ public class OpenStackAuthenticationProviderTest {
         openStackAuthenticationProvider.setSystemPropertiesProvider(systemPropertiesProvider);
         openStackAuthenticationToken = mock(OpenStackAuthenticationToken.class);
         openStackAuthenticationProvider.setoSAuthToken(openStackAuthenticationToken);
-        when(openStackAuthenticationToken.getCredentials()).thenReturn(new String[] { "token1", "tenantId1" });
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("token1");
+        openStackAccess.setTenantId("tenantId1");
+
+        when(openStackAuthenticationToken.getAdminCredentials(any(Client.class))).thenReturn(openStackAccess);
         Client client = mock(Client.class);
+        when(openStackAuthenticationToken.getKeystoneURL()).thenReturn(keystoneURL);
         openStackAuthenticationProvider.setClient(client);
         WebTarget webResource = mock(WebTarget.class);
         WebTarget webResource2 = mock(WebTarget.class);
@@ -139,7 +147,12 @@ public class OpenStackAuthenticationProviderTest {
         openStackAuthenticationProvider.setSystemPropertiesProvider(systemPropertiesProvider);
         openStackAuthenticationToken = mock(OpenStackAuthenticationToken.class);
         openStackAuthenticationProvider.setoSAuthToken(openStackAuthenticationToken);
-        when(openStackAuthenticationToken.getCredentials()).thenReturn(new String[] { "token1", "tenantId1" });
+
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("token1");
+        openStackAccess.setTenantId("tenantId1");
+        when(openStackAuthenticationToken.getAdminCredentials(any(Client.class))).thenReturn(openStackAccess);
+        when(openStackAuthenticationToken.getKeystoneURL()).thenReturn(keystoneURL);
         Client client = mock(Client.class);
         openStackAuthenticationProvider.setClient(client);
         WebTarget webResource = mock(WebTarget.class);

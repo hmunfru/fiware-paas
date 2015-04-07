@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Before;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 
 /**
  * This is an Integration Test against OpenStack.
