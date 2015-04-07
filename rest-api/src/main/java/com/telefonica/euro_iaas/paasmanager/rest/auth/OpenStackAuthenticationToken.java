@@ -31,12 +31,12 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnectionException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -73,7 +73,7 @@ public class OpenStackAuthenticationToken {
      * The default constructor of the class OpenStackAuthenticationToken.
      */
     OpenStackAuthenticationToken(SystemPropertiesProvider systemPropertiesProvider) {
-        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
 
         user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
 

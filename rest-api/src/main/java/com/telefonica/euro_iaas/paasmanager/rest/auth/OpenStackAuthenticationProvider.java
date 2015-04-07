@@ -33,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import net.sf.ehcache.Cache;
 
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -45,10 +44,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
@@ -160,7 +162,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
             if (paasManagerUser == null) {
 
                 WebTarget webResource = getClient().target(oSAuthToken.getKeystoneURL());
-                WebTarget tokens = webResource.path("tokens").path(token);
+                WebTarget tokens = webResource.path(token);
                 Invocation.Builder builder = tokens.request();
                 response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", openStackAccess.getToken())
                         .get();
@@ -262,17 +264,19 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
             final UsernamePasswordAuthenticationToken authentication) {
         String system = systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM);
 
-        PaasManagerUser user = null;
+        PaasManagerUser paasManagerUser = null;
 
         if (null != authentication.getCredentials()) {
             String tenantId = authentication.getCredentials().toString();
 
             if (SYSTEM_FIWARE.equals(system)) {
-                user = authenticationFiware(username, tenantId);
+                paasManagerUser = authenticationFiware(username, tenantId);
             } else if (SYSTEM_FASTTRACK.equals(system)) {
-                user = authenticationFastTrack(username, tenantId);
+                paasManagerUser = authenticationFastTrack(username, tenantId);
             }
-            UserDetails userDetails = new User(username, user.getToken(), new HashSet<GrantedAuthority>());
+
+            UserDetails userDetails = new User(paasManagerUser.getUserName(), paasManagerUser.getToken(),
+                    new HashSet<GrantedAuthority>());
             return userDetails;
         } else {
             String str = "Missing tenantId header";
@@ -332,4 +336,27 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     public Cache getTokenCache() {
         return tokenCache.getCache();
     }
+
+    /**
+     * Add PaasManagerUser to claudiaData.
+     * 
+     * @param claudiaData
+     */
+    public static void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
+
+        PaasManagerUser paasManagerUser = new PaasManagerUser("unknown", "unknown");
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder
+                    .getContext().getAuthentication();
+            if (usernamePasswordAuthenticationToken != null) {
+                paasManagerUser.setToken(usernamePasswordAuthenticationToken.getPrincipal().toString());
+                paasManagerUser.setTenantId(usernamePasswordAuthenticationToken.getCredentials().toString());
+
+            }
+        }
+        paasManagerUser.setTenantId(claudiaData.getVdc());
+        claudiaData.setUser(paasManagerUser);
+
+    }
+
 }

@@ -24,6 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.resources;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -53,8 +54,6 @@ import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentInstanceDto;
-import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
-
 import com.telefonica.euro_iaas.paasmanager.rest.validation.EnvironmentInstanceResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -78,6 +77,7 @@ public class EnvironmentInstanceResourceImplTest {
 
     /**
      * Initialize the Unit Test.
+     * 
      * @throws Exception
      */
     @Before
@@ -149,10 +149,11 @@ public class EnvironmentInstanceResourceImplTest {
 
     /**
      * Test the creation of an environment based on a OVF file.
+     * 
      * @throws Exception
      */
     @Test
-    public void testCreateOvfEnviornmentInstance() throws Exception {
+    public void testCreateOvfEnvironmentInstance() throws Exception {
 
         // Given
         EnvironmentInstanceDto environmentInstanceDto = new EnvironmentInstanceDto();
@@ -160,16 +161,14 @@ public class EnvironmentInstanceResourceImplTest {
         environmentInstanceDto.setBlueprintName("BlueprintName");
         environmentInstanceDto.setEnvironmentDto(environment.toDto());
 
-        PaasManagerUser paasManagerUser = mock(PaasManagerUser.class);
-
         // When
-        when(systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM)).thenReturn("ss");
-        environmentInstanceResource.create(org, vdc, environmentInstanceDto, callback);
+
+        Task task = environmentInstanceResource.create(org, vdc, environmentInstanceDto, callback);
 
         // Then
         verify(environmentInstanceAsyncManager, times(1)).create(any(ClaudiaData.class),
                 any(EnvironmentInstance.class), any(Task.class), any(String.class));
-        verify(systemPropertiesProvider, times(1)).getProperty(SystemPropertiesProvider.CLOUD_SYSTEM);
 
+        assertNotNull(task);
     }
 }

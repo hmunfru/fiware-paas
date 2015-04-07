@@ -40,10 +40,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnectionException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -80,7 +80,7 @@ public class OpenStackAuthenticationTokenTest {
         Invocation.Builder builder = mock(Invocation.Builder.class);
 
         openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
-        when(client.target(keystoneUrl)).thenReturn(webTarget);
+        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
@@ -92,7 +92,7 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
 
         // then
-        verify(client).target(keystoneUrl);
+        verify(client).target(keystoneUrl + "tokens");
         verify(webTarget).request(MediaType.APPLICATION_JSON);
         verify(builder).accept(MediaType.APPLICATION_JSON);
         verify(response).getStatus();
@@ -119,7 +119,7 @@ public class OpenStackAuthenticationTokenTest {
 
         openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
 
-        when(client.target(keystoneUrl)).thenReturn(webTarget);
+        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);

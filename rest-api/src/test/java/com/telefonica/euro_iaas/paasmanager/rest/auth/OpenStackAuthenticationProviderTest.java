@@ -43,15 +43,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import org.junit.Before;
 import org.junit.Test;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 import org.openstack.docs.identity.api.v2.TenantForAuthenticateResponse;
 import org.openstack.docs.identity.api.v2.Token;
 import org.openstack.docs.identity.api.v2.UserForAuthenticateResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -100,9 +104,7 @@ public class OpenStackAuthenticationProviderTest {
         WebTarget webResource = mock(WebTarget.class);
         WebTarget webResource2 = mock(WebTarget.class);
         when(client.target("http://keystone.test")).thenReturn(webResource);
-        WebTarget webTarget = mock(WebTarget.class);
-        when(webResource.path("tokens")).thenReturn(webTarget);
-        when(webTarget.path(anyString())).thenReturn(webResource2);
+        when(webResource.path(anyString())).thenReturn(webResource2);
         Invocation.Builder builder = mock(Invocation.Builder.class);
         when(webResource2.request()).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_XML)).thenReturn(builder);
@@ -158,9 +160,7 @@ public class OpenStackAuthenticationProviderTest {
         WebTarget webResource = mock(WebTarget.class);
         WebTarget webResource2 = mock(WebTarget.class);
         when(client.target("http://keystone.test")).thenReturn(webResource);
-        WebTarget webTarget = mock(WebTarget.class);
-        when(webResource.path("tokens")).thenReturn(webTarget);
-        when(webTarget.path(anyString())).thenReturn(webResource2);
+        when(webResource.path(anyString())).thenReturn(webResource2);
         Invocation.Builder builder = mock(Invocation.Builder.class);
         when(webResource2.request()).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_XML)).thenReturn(builder);
@@ -208,6 +208,31 @@ public class OpenStackAuthenticationProviderTest {
 
         assertEquals("user tenantId", secondTimePaasManagerUser.getTenantId());
         assertEquals("user token", secondTimePaasManagerUser.getToken());
+    }
+
+    @Test
+    public void shouldAddCredentialsToClaudiaDataWhenAuthenticatedWithToken() {
+        // given
+
+        ClaudiaData claudiaData = new ClaudiaData("org", "vdc", "service");
+        SecurityContext context = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(context);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = mock(UsernamePasswordAuthenticationToken.class);
+        when(context.getAuthentication()).thenReturn(usernamePasswordAuthenticationToken);
+        when(usernamePasswordAuthenticationToken.getPrincipal()).thenReturn("token1");
+        when(usernamePasswordAuthenticationToken.getCredentials()).thenReturn("tenantId1");
+        // when
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
+
+        // then
+        assertNotNull(claudiaData);
+        assertEquals("org", claudiaData.getOrg());
+        assertEquals("vdc", claudiaData.getVdc());
+        assertEquals("service", claudiaData.getService());
+        assertEquals("token1", claudiaData.getUser().getToken());
+        assertEquals("vdc", claudiaData.getUser().getTenantId());
+        assertEquals("", claudiaData.getUser().getTenantName());
+
     }
 
 }
