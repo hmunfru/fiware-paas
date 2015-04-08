@@ -22,7 +22,7 @@
  * </p>
  */
 
-package com.telefonica.euro_iaas.paasmanager.rest.auth;
+package com.telefonica.euro_iaas.paasmanager.util.auth;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -44,7 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.rest.exception.AuthenticationConnectionException;
+import com.telefonica.euro_iaas.paasmanager.exception.AuthenticationConnectionException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 public class OpenStackAuthenticationTokenTest {

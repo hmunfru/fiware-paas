@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -44,11 +43,14 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
 
 /**
  * This class implements OpenStackRegion interface.<br>
@@ -58,8 +60,11 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
     private Client client;
 
-    private static Logger log = LoggerFactory.getLogger(OpenStackRegionImpl.class);
     private RegionCache regionCache;
+
+    private TokenCache tokenCache;
+
+    private OpenStackAuthenticationToken openStackAuthenticationToken;
 
     private HttpClientConnectionManager httpConnectionManager;
 
@@ -69,13 +74,19 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     private SystemPropertiesProvider systemPropertiesProvider;
 
     /**
-     * Default constructor. It creates a jersey client.
+     * Logger.
+     */
+    private static Logger log = LoggerFactory.getLogger(OpenStackRegionImpl.class);
+
+    /**
+     * Default constructor. Configure caches
      */
     public OpenStackRegionImpl() {
 
         client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
-
         regionCache = new RegionCache();
+
+        tokenCache = new TokenCache();
     }
 
     @Override
@@ -84,12 +95,12 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
         String url = regionCache.getUrl(regionName, type);
 
-        String tokenadmin = this.getTokenAdmin();
         if (url != null) {
             log.debug("Get url for sdc in region " + url);
             return url;
         } else {
-            String responseJSON = getJSONWithEndpoints(token, tokenadmin);
+            OpenStackAccess openStackAccess = this.getTokenAdmin();
+            String responseJSON = getJSONWithEndpoints(token, openStackAccess.getToken());
 
             String result = parseEndpoint(token, responseJSON, type, regionName);
             if (result == null) {
@@ -101,10 +112,21 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
     }
 
-    public String getTokenAdmin() throws OpenStackException {
+    private OpenStackAccess getTokenAdmin() throws OpenStackException {
 
-        String responseJSON = getEndPointsThroughTokenRequest();
-        return parseToken(responseJSON);
+        OpenStackAccess openStackAccess;
+
+        openStackAccess = tokenCache.getAdmin();
+
+        if (openStackAccess == null) {
+
+            if (openStackAuthenticationToken == null) {
+                openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+            }
+            openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
+            tokenCache.putAdmin(openStackAccess);
+        }
+        return openStackAccess;
 
     }
 
@@ -123,11 +145,10 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
     @Override
     public String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException {
-        String defaulRegion = this.getDefaultRegion(token);
-        log.info("Get url for puppet for default region " + defaulRegion);
         String url;
         try {
-            url = getEndPointByNameAndRegionName("puppetmaster", defaulRegion, token);
+            log.info("Get url for puppet for default region " + regionName);
+            url = getEndPointByNameAndRegionName("puppetmaster", regionName, token);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the Puppet Master endpoint";
             log.info(msn);
@@ -162,7 +183,7 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     public String getDefaultRegion(String token) throws OpenStackException {
-        log.debug("Get defautl region for token " + token);
+        log.debug("Get default region for token " + token);
 
         List<String> regions = null;
         try {
@@ -177,11 +198,13 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return regions.get(0);
     }
 
-    @Override
-    public List<String> getRegionNames(String token) throws OpenStackException {
+    /**
+     * Get a list with the name of all regions for token.
+     */
+    private List<String> getRegionNames(String token) throws OpenStackException {
 
-        String tokenAdmin = this.getTokenAdmin();
-        String responseJSON = getJSONWithEndpoints(token, tokenAdmin);
+        OpenStackAccess openStackAccess = this.getTokenAdmin();
+        String responseJSON = getJSONWithEndpoints(token, openStackAccess.getToken());
         return parseRegionName(responseJSON, "nova");
 
     }
@@ -190,9 +213,9 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens/" + token
                 + "/endpoints";
 
-        WebTarget webResource = client.target(url);
+        WebTarget webTarget = client.target(url);
         log.debug("url " + url);
-        Invocation.Builder builder = webResource.request(MediaType.APPLICATION_JSON);
+        Invocation.Builder builder = webTarget.request(MediaType.APPLICATION_JSON);
         builder.header("X-Auth-Token", tokenadmin);
 
         Response response = null;
@@ -208,7 +231,8 @@ public class OpenStackRegionImpl implements OpenStackRegion {
                 String message = "Failed : HTTP (url:" + url + ") error code : " + code + " body: " + responseJSON;
 
                 if (code == 501) {
-                    log.warn(message);
+                    log.warn("failed, probably is essex:" + message);
+
                     responseJSON = getEndPointsThroughTokenRequest();
                 } else {
                     log.error(message);
@@ -225,13 +249,22 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
     }
 
+    private String getEndPointsThroughTokenRequest() throws OpenStackException {
+
+        OpenStackAccess openStackAccess = this.getTokenAdmin();
+        JSONObject jsonObject = openStackAccess.getAccessJSON();
+
+        return jsonObject.toString();
+
+    }
+
     private String parseEndpoint(String token, String response, String type, String regionName)
             throws OpenStackException {
 
-        JSONObject jsonObject = JSONObject.fromObject(response);
-
         String url = null;
         Map<String, String> urlMap = new HashMap<String, String>();
+        JSONObject jsonObject = JSONObject.fromObject(response);
+
         if (jsonObject.containsKey("endpoints")) {
 
             JSONArray endpointsArray = jsonObject.getJSONArray("endpoints");
@@ -306,10 +339,9 @@ public class OpenStackRegionImpl implements OpenStackRegion {
      * @param name
      * @return
      */
-    private List<String> parseRegionName(String response, String name) {
+    public List<String> parseRegionName(String response, String name) {
 
         List<String> names = new ArrayList<String>(2);
-
         JSONObject jsonObject = JSONObject.fromObject(response);
 
         if (jsonObject.containsKey("endpoints")) {
@@ -365,68 +397,6 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return names;
     }
 
-    /**
-     * Parse region name, with compatibility with essex,grizzly.
-     * 
-     * @param response
-     * @return
-     */
-    private String parseToken(String response) {
-
-        String token = null;
-
-        JSONObject jsonObject = JSONObject.fromObject(response);
-        jsonObject = (JSONObject) jsonObject.get("access");
-
-        if (jsonObject.containsKey("token")) {
-
-            JSONObject tokenObject = (JSONObject) jsonObject.get("token");
-            token = (String) tokenObject.get("id");
-
-        }
-        return token;
-    }
-
-    public String getEndPointsThroughTokenRequest() throws OpenStackException {
-        String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
-        log.debug("actionUri: " + url);
-
-        Response response = null;
-
-        try {
-
-            WebTarget wr = client.target(url);
-
-            String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
-            String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
-            String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
-
-            String payload = "{\"auth\": {\"tenantName\": \"" + adminTenant + "\", \""
-                    + "passwordCredentials\":{\"username\": \"" + adminUser + "\"," + " \"password\": \"" + adminPass
-                    + "\"}}}";
-
-            Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
-
-            response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
-
-            int httpCode = response.getStatus();
-            String responseJSON = response.readEntity(String.class);
-            if (httpCode != 200) {
-                String message = "Error calling OpenStack for valid token. " + "Status " + httpCode + ": "
-                        + responseJSON;
-                log.warn(message);
-                throw new OpenStackException(message);
-            }
-
-            return responseJSON;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-
-    }
-
     public SystemPropertiesProvider getSystemPropertiesProvider() {
         return systemPropertiesProvider;
     }
@@ -468,6 +438,10 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
     public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
         this.httpConnectionManager = httpConnectionManager;
+    }
+
+    public RegionCache getRegionCache() {
+        return regionCache;
     }
 
 }

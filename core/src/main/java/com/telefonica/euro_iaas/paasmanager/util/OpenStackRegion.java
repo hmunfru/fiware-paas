@@ -24,8 +24,6 @@
 
 package com.telefonica.euro_iaas.paasmanager.util;
 
-import java.util.List;
-
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 /**
@@ -66,25 +64,14 @@ public interface OpenStackRegion {
     String getQuantumEndPoint(String regionName, String token) throws OpenStackException;
 
     /**
-     * Get a list with the name of all regions.
-     * 
-     * @param token
-     * @return
-     */
-    List<String> getRegionNames(String token) throws OpenStackException;
-    
-    
-    /**
-     * 
      * @param regionName
      * @param token
      * @return
      * @throws OpenStackException
      */
     String getSdcEndPoint(String regionName, String token) throws OpenStackException;
-    
+
     /**
-     * 
      * @param token
      * @return
      * @throws OpenStackException
@@ -92,14 +79,13 @@ public interface OpenStackRegion {
     String getDefaultRegion(String token) throws OpenStackException;
 
     /**
-     * 
      * @param token
      * @return
-     * @throws OpenStackException 
+     * @throws OpenStackException
      */
-	String getFederatedQuantumEndPoint(String token) throws OpenStackException;
+    String getFederatedQuantumEndPoint(String token) throws OpenStackException;
 
-	String getChefServerEndPoint(String region, String token) throws OpenStackException;
+    String getChefServerEndPoint(String region, String token) throws OpenStackException;
 
-    String getPuppetMasterEndPoint(String regionName,String token) throws OpenStackException;
+    String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException;
 }

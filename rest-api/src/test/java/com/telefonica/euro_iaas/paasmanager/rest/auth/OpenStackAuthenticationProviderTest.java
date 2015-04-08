@@ -43,6 +43,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;

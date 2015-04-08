@@ -31,6 +31,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 
 /**
@@ -90,11 +91,10 @@ public class TokenCache {
     /**
      * Put new admin token in cache.
      * 
-     * @param token
-     * @param tenantId
+     * @param openStackAccess
      */
-    public void putAdmin(String token, String tenantId) {
-        cache.put(new Element("admin", new String[] { token, tenantId }));
+    public void putAdmin(OpenStackAccess openStackAccess) {
+        cache.put(new Element("admin", openStackAccess));
     }
 
     /**
@@ -102,9 +102,9 @@ public class TokenCache {
      * 
      * @return
      */
-    public String[] getAdmin() {
+    public OpenStackAccess getAdmin() {
         if (cache.isKeyInCache("admin") && (cache.get("admin") != null)) {
-            return (String[]) cache.get("admin").getObjectValue();
+            return (OpenStackAccess) cache.get("admin").getObjectValue();
         } else {
             return null;
         }

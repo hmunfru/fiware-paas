@@ -54,6 +54,7 @@ import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
 
 /**
  * The Class OpenStackAuthenticationProvider.
@@ -204,21 +205,16 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     private OpenStackAccess generateOpenStackAuthenticationToken() {
         OpenStackAccess openStackAccess;
 
-        if (oSAuthToken == null) {
-            oSAuthToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
-        }
+        openStackAccess = tokenCache.getAdmin();
 
-        String adminCredentials[] = tokenCache.getAdmin();
-
-        if (adminCredentials == null) {
+        if (openStackAccess == null) {
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+            if (oSAuthToken == null) {
+                oSAuthToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+            }
 
             openStackAccess = oSAuthToken.getAdminCredentials(client);
-            tokenCache.putAdmin(openStackAccess.getToken(), openStackAccess.getTenantId());
-        } else {
-            openStackAccess = new OpenStackAccess();
-            openStackAccess.setToken(adminCredentials[0]);
-            openStackAccess.setTenantId(adminCredentials[1]);
+            tokenCache.putAdmin(openStackAccess);
         }
         return openStackAccess;
 

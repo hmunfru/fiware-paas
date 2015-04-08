@@ -22,7 +22,7 @@
  * </p>
  */
 
-package com.telefonica.euro_iaas.paasmanager.rest.exception;
+package com.telefonica.euro_iaas.paasmanager.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
