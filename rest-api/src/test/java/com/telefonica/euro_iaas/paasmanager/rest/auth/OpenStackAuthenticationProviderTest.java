@@ -43,7 +43,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.openstack.docs.identity.api.v2.AuthenticateResponse;
@@ -58,6 +57,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
 
 /**
  * Test class to check the OpenStackAuthenticationProvider.
@@ -229,7 +229,7 @@ public class OpenStackAuthenticationProviderTest {
         assertEquals("vdc", claudiaData.getVdc());
         assertEquals("service", claudiaData.getService());
         assertEquals("token1", claudiaData.getUser().getToken());
-        assertEquals("vdc", claudiaData.getUser().getTenantId());
+        assertEquals("tenantId1", claudiaData.getUser().getTenantId());
         assertEquals("", claudiaData.getUser().getTenantName());
 
     }

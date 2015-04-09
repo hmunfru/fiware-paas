@@ -315,7 +315,6 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
 
             }
         }
-        paasManagerUser.setTenantId(claudiaData.getVdc());
         claudiaData.setUser(paasManagerUser);
 
     }
