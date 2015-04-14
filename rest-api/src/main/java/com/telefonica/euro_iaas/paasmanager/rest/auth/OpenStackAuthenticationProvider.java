@@ -31,12 +31,11 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
 
 import net.sf.ehcache.Cache;
+import net.sf.json.JSONObject;
 
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.openstack.docs.identity.api.v2.AuthenticateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -144,13 +143,16 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
                 WebTarget webResource = getClient().target(oSAuthToken.getKeystoneURL());
                 WebTarget tokens = webResource.path(token);
                 Invocation.Builder builder = tokens.request();
-                response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", openStackAccess.getToken())
-                        .get();
+                response = builder.accept(MediaType.APPLICATION_JSON)
+                        .header("X-Auth-Token", openStackAccess.getToken()).get();
 
                 if (response.getStatus() == CODE_200) {
                     // Validate user's token
-                    AuthenticateResponse authenticateResponse = response.readEntity(AuthenticateResponse.class);
-                    PaasManagerUser userValidated = createPaasManagerUser(token, tenantId, authenticateResponse);
+
+                    JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
+                    jsonObject = (JSONObject) jsonObject.get("access");
+
+                    PaasManagerUser userValidated = createPaasManagerUser(token, tenantId, jsonObject);
                     log.info("generated new token for tenantId:" + tenantId + ": " + token);
                     tokenCache.put(token + "-" + tenantId, userValidated);
 
@@ -182,24 +184,36 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * 
      * @param token
      * @param tenantId
-     * @param authenticateResponse
+     * @param responseJSON
      * @return
      */
-    private PaasManagerUser createPaasManagerUser(String token, String tenantId,
-            AuthenticateResponse authenticateResponse) {
+    private PaasManagerUser createPaasManagerUser(String token, String tenantId, JSONObject responseJSON) {
 
-        if (!tenantId.equals(authenticateResponse.getToken().getTenant().getId())) {
-            throw new AuthenticationServiceException("Token " + authenticateResponse.getToken().getTenant().getId()
-                    + " not valid for the tenantId provided:" + tenantId);
+        if (responseJSON.containsKey("token")) {
+
+            JSONObject tokenObject = (JSONObject) responseJSON.get("token");
+            String responseTenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
+            String responseTenantName = (String) ((JSONObject) tokenObject.get("tenant")).get("name");
+            JSONObject userObject = (JSONObject) responseJSON.get("user");
+            String responseUserName = (String) (userObject.get("name"));
+
+            if (!tenantId.equals(responseTenantId)) {
+                throw new AuthenticationServiceException("Token " + token + " not valid for the tenantId provided:"
+                        + tenantId);
+            }
+
+            PaasManagerUser user = new PaasManagerUser(responseUserName, token);
+
+            user.setTenantId(tenantId);
+            user.setTenantName(responseTenantName);
+            user.setToken(token);
+            return user;
+
+        } else {
+            throw new AuthenticationServiceException("Invalid request with token:" + token + " and tenantId:"
+                    + tenantId);
         }
 
-        PaasManagerUser user = new PaasManagerUser(authenticateResponse.getUser().getOtherAttributes()
-                .get(new QName("username")), token);
-
-        user.setTenantId(tenantId);
-        user.setTenantName(authenticateResponse.getToken().getTenant().getName());
-        user.setToken(token);
-        return user;
     }
 
     private OpenStackAccess generateOpenStackAuthenticationToken() {
