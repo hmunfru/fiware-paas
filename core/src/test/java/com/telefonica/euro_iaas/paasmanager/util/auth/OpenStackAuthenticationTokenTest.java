@@ -133,4 +133,44 @@ public class OpenStackAuthenticationTokenTest {
         // then
 
     }
+
+    @Test
+    public void getCredentialsWithReturningCode201() throws AuthenticationConnectionException, IOException {
+
+        OpenStackAuthenticationToken openStackAuthenticationToken;
+
+        // Given
+
+        String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
+                + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
+                + "\"enabled\":\"true\",\"id\":\"00000000000000000000000000001348\",\"name\":\"tenantName\"}"
+                + "      }}}";
+
+        Client client = mock(Client.class);
+        WebTarget webTarget = mock(WebTarget.class);
+        Invocation.Builder builder = mock(Invocation.Builder.class);
+
+        openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
+        when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
+        when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
+        Response response = mock(Response.class);
+        when(builder.post(any(Entity.class))).thenReturn(response);
+        when(response.getStatus()).thenReturn(201);
+        when(response.readEntity(String.class)).thenReturn(payload);
+
+        // when
+        OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
+
+        // then
+        verify(client).target(keystoneUrl + "tokens");
+        verify(webTarget).request(MediaType.APPLICATION_JSON);
+        verify(builder).accept(MediaType.APPLICATION_JSON);
+        verify(response).getStatus();
+        verify(response).readEntity(String.class);
+        assertNotNull(openStackAccess);
+        assertEquals("0bd52c4b2fa09951aa057b4590c4aa6d", openStackAccess.getToken());
+        assertEquals("00000000000000000000000000001348", openStackAccess.getTenantId());
+
+    }
 }

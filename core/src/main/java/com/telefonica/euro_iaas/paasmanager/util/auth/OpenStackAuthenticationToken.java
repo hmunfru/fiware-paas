@@ -31,13 +31,13 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.telefonica.euro_iaas.paasmanager.exception.AuthenticationConnectionException;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.exception.AuthenticationConnectionException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -105,7 +105,8 @@ public class OpenStackAuthenticationToken {
 
             response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
-            if (response.getStatus() == 200) {
+            int status = response.getStatus();
+            if ((status == 201) || (status == 200)) {
 
                 JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
                 jsonObject = (JSONObject) jsonObject.get("access");
