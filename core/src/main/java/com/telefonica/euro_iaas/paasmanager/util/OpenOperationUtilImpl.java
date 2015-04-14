@@ -60,7 +60,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 
 /**
  * @author jesus.movilla
@@ -294,7 +294,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
 
             throw new RuntimeException("Tenant format unknown:\n " + tenantId);
         }
-        PaasManagerUser user2 = new PaasManagerUser(tenantId, token, user.getAuthorities());
+        PaasManagerUser user2 = new PaasManagerUser(tenantId, token);
         return user2;
     }
 

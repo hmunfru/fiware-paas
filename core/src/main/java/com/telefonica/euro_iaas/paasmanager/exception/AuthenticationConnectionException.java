@@ -22,18 +22,29 @@
  * </p>
  */
 
-package com.telefonica.euro_iaas.paasmanager.dao.keystone;
+package com.telefonica.euro_iaas.paasmanager.exception;
 
-import java.sql.Connection;
-
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
- * @author jesus.movilla
+ * Exception method of the Authentication process to keystone.
+ *
+ * @author fernandolopezaguilar
  */
-public interface TokenDao {
+@SuppressWarnings("serial")
+public class AuthenticationConnectionException extends WebApplicationException {
 
-    Token findLastTokenFromUser(Connection connection, String user) throws EntityNotFoundException, OpenStackException;
+    /**
+     * Constructor.
+     * @param message   The information of the error.
+     */
+    public AuthenticationConnectionException(final String message) {
+        super(Response.status(Status.SERVICE_UNAVAILABLE)
+                .type(MediaType.APPLICATION_XHTML_XML)
+                .entity(message).build());
+    }
+
 }
