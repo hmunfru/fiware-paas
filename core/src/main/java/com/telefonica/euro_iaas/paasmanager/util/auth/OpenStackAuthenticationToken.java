@@ -48,6 +48,16 @@ import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 public class OpenStackAuthenticationToken {
 
     /**
+     * HTTP 200 ok
+     */
+    public static final int CODE_200 = 200;
+
+    /**
+     * HTTP 201 ok
+     */
+    public static final int CODE_201 = 201;
+
+    /**
      * The url of the keystone service.
      */
     private String url;
@@ -106,7 +116,7 @@ public class OpenStackAuthenticationToken {
             response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
             int status = response.getStatus();
-            if ((status == 201) || (status == 200)) {
+            if ((status == CODE_200) || (status == CODE_201)) {
 
                 JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
                 jsonObject = (JSONObject) jsonObject.get("access");
