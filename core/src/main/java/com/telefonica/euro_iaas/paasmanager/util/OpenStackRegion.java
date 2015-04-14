@@ -24,6 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.util;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 /**
@@ -88,4 +89,10 @@ public interface OpenStackRegion {
     String getChefServerEndPoint(String region, String token) throws OpenStackException;
 
     String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException;
+
+    /**
+     * @return
+     * @throws OpenStackException
+     */
+    OpenStackAccess getTokenAdmin() throws OpenStackException;
 }
