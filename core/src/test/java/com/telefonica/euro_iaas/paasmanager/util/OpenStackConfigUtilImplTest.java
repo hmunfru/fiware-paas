@@ -44,14 +44,14 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 public class OpenStackConfigUtilImplTest {
 
     private OpenStackConfigUtilImplTestable openStackUtil;
     private CloseableHttpClient closeableHttpClientMock;
-    private CloseableHttpResponse httpResponse;
     private PaasManagerUser paasManagerUser;
     private OpenOperationUtil openOperationUtil;
 
@@ -102,8 +102,7 @@ public class OpenStackConfigUtilImplTest {
 
         HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
         openStackUtil.setHttpConnectionManager(httpClientConnectionManager);
-
-        httpResponse = mock(CloseableHttpResponse.class);
+        CloseableHttpResponse httpResponse = mock(CloseableHttpResponse.class);
 
         openOperationUtil = mock(OpenOperationUtil.class);
         closeableHttpClientMock = mock(CloseableHttpClient.class);
@@ -141,9 +140,12 @@ public class OpenStackConfigUtilImplTest {
         // given
         String region = "RegionOne";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
 
         String net = openStackUtil.getPublicAdminNetwork(paasManagerUser, region);
 
@@ -157,9 +159,12 @@ public class OpenStackConfigUtilImplTest {
         // given
         String region = "RegionOne2";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
 
         String net = openStackUtil.getPublicFloatingPool(paasManagerUser, region);
 
@@ -174,9 +179,13 @@ public class OpenStackConfigUtilImplTest {
         // given
         String region = "RegionOne3";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
+
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
+        // when
 
         String router = openStackUtil.getPublicRouter(paasManagerUser, region, "080b5f2a-668f-45e0-be23-361c3a7d11d0");
 
@@ -194,10 +203,12 @@ public class OpenStackConfigUtilImplTest {
     public void testBugFindRouterNetworkNull() throws OpenStackException {
         // given
         String region = "RegionOne4";
-
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
+        // when
 
         try {
             openStackUtil.getPublicRouter(paasManagerUser, region, null);
@@ -232,9 +243,12 @@ public class OpenStackConfigUtilImplTest {
 
         String region = "RegionOne5";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
 
         String net = openStackUtil.getPublicAdminNetwork(paasManagerUser, region);
 

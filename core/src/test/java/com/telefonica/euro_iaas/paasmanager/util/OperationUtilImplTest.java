@@ -25,28 +25,23 @@
 package com.telefonica.euro_iaas.paasmanager.util;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 public class OperationUtilImplTest {
 
@@ -107,54 +102,6 @@ public class OperationUtilImplTest {
 
         when(openStackRegion.getNovaEndPoint(anyString(), anyString())).thenReturn("http://localhost/v2.0");
 
-    }
-
-    @Test
-    public void getAdminUser() throws OpenStackException, IOException {
-
-        // when
-
-        String content = " <?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
-                + "<access xmlns=\"http://docs.openstack.org/identity/api/v2.0\">\n"
-                + "<token expires=\"2013-11-06T12:02:42Z\" id=\"e563937547fd447985db4a9567528393\">\n"
-                + "<tenant enabled=\"true\" name=\"admin\" id=\"6571e3422ad84f7d828ce2f30373b3d4\">\n"
-                + "<description>Default tenant</description>   \n" + "</tenant>   \n" + "</token>   \n"
-                + "</access> \n";
-        HttpEntity entity = mock(HttpEntity.class);
-        Header header = mock(Header.class);
-
-        // when
-
-        PaasManagerUser user = new PaasManagerUser("user", "aa");
-        user.setToken("1234567891234567989");
-        user.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
-
-        when(closeableHttpClientMock.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(statusLine.getStatusCode()).thenReturn(204);
-        when(statusLine.getReasonPhrase()).thenReturn("ok");
-
-        when(httpResponse.getEntity()).thenReturn(entity);
-        when(httpResponse.getHeaders(any(String.class))).thenReturn(new Header[] { header });
-        when(header.getValue()).thenReturn("value");
-        when(entity.getContent()).thenReturn(new ByteArrayInputStream(content.getBytes()));
-        when(statusLine.getStatusCode()).thenReturn(200);
-        when(statusLine.getReasonPhrase()).thenReturn("ok");
-
-        PaasManagerUser response = openOperationUtil.getAdminUser(user);
-
-        // then
-        assertNotNull(response);
-
-    }
-
-    @Test
-    public void shouldCreateKeystonePostRequest() throws OpenStackException, IOException {
-
-        HttpPost response = openOperationUtil.createKeystonePostRequest();
-
-        // then
-        assertNotNull(response);
     }
 
     @Test

@@ -118,8 +118,8 @@ public class OpenStackAuthenticationToken {
             int status = response.getStatus();
             if ((status == CODE_200) || (status == CODE_201)) {
 
-                JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
-                jsonObject = (JSONObject) jsonObject.get("access");
+                JSONObject jsonObjectResponse = JSONObject.fromObject(response.readEntity(String.class));
+                JSONObject jsonObject = (JSONObject) jsonObjectResponse.get("access");
                 openStackAccess.setAccessJSON(jsonObject);
 
                 if (jsonObject.containsKey("token")) {
@@ -127,10 +127,14 @@ public class OpenStackAuthenticationToken {
                     JSONObject tokenObject = (JSONObject) jsonObject.get("token");
                     String token = (String) tokenObject.get("id");
                     String tenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
+                    JSONObject userObject = (JSONObject) jsonObject.get("user");
+
+                    String tenantName = (String) userObject.get("tenantName");
 
                     openStackAccess.setToken(token);
                     openStackAccess.setTenantId(tenantId);
-                    log.info("generated new token for tenantId:" + tenantId);
+                    openStackAccess.setTenantName(tenantName);
+                    log.info("generated new token for tenantId:" + tenantId + " with tenantName: " + tenantName);
 
                 }
             } else {

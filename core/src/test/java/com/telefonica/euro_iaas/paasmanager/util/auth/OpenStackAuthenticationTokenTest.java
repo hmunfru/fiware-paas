@@ -70,10 +70,16 @@ public class OpenStackAuthenticationTokenTest {
 
         // Given
 
-        String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
-                + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
-                + "\"enabled\":\"true\",\"id\":\"00000000000000000000000000001348\",\"name\":\"tenantName\"}"
-                + "      }}}";
+        String responseJSON = "{\"access\": {\"token\": {\n"
+                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
+                + "                \"id\": \"00000000000000000000000000001348\",\n"
+                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
+                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
+                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
+                + "            \"roles\": [\n" + "                {\n"
+                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
+                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
+                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
@@ -86,7 +92,7 @@ public class OpenStackAuthenticationTokenTest {
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(200);
-        when(response.readEntity(String.class)).thenReturn(payload);
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
 
         // when
         OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
@@ -108,10 +114,16 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-        String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
-                + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
-                + "\"enabled\":\"true\",\"id\":\"00000000000000000000000000001348\",\"name\":\"tenantName\"}"
-                + "      }}}";
+        String responseJSON = "{\"access\": {\"token\": {\n"
+                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
+                + "                \"id\": \"00000000000000000000000000001348\",\n"
+                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
+                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
+                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
+                + "            \"roles\": [\n" + "                {\n"
+                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
+                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
+                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
@@ -125,7 +137,7 @@ public class OpenStackAuthenticationTokenTest {
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(400);
-        when(response.readEntity(String.class)).thenReturn(payload);
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
 
         // when
         openStackAuthenticationToken.getAdminCredentials(client);
@@ -140,11 +152,16 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-
-        String payload = "{ \"access\":{\"token\":{\"expires\":\"2015-07-09T15:16:07Z\","
-                + "\"id\":\"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\":{\"description\":\"Tenant from IDM\","
-                + "\"enabled\":\"true\",\"id\":\"00000000000000000000000000001348\",\"name\":\"tenantName\"}"
-                + "      }}}";
+        String responseJSON = "{\"access\": {\"token\": {\n"
+                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
+                + "                \"id\": \"00000000000000000000000000001348\",\n"
+                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
+                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
+                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
+                + "            \"roles\": [\n" + "                {\n"
+                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
+                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
+                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
@@ -157,7 +174,7 @@ public class OpenStackAuthenticationTokenTest {
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(201);
-        when(response.readEntity(String.class)).thenReturn(payload);
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
 
         // when
         OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);

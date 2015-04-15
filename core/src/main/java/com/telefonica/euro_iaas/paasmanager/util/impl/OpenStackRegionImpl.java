@@ -112,7 +112,7 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
     }
 
-    private OpenStackAccess getTokenAdmin() throws OpenStackException {
+    public OpenStackAccess getTokenAdmin() throws OpenStackException {
 
         OpenStackAccess openStackAccess;
 
