@@ -36,11 +36,10 @@ public interface SDCUtil {
     /**
      * check the status of the productInstance install task
      * 
-     * @param token
      * @throws ProductInstallatorException
      */
 
-    String getSdcUtil(String token) throws OpenStackException;
+    String getSdcUtil() throws OpenStackException;
 
     public void checkTaskStatus(Task task, String token, String vdc) throws ProductInstallatorException;
 

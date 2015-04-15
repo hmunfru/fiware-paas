@@ -30,17 +30,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -50,7 +46,6 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -153,9 +148,6 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
     }
 
-
-
-
     /**
      * Returns a request for a NOVA DELETE petition.
      * 
@@ -173,7 +165,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
         log.debug("novaUrl" + novaUrl);
         request = new HttpDelete(novaUrl + vdc + "/" + resource);
 
@@ -200,7 +192,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
         request = new HttpGet(novaUrl + vdc + "/" + resource);
 
         // request.setHeader(OpenStackConstants.CONTENT_TYPE,
@@ -233,7 +225,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
 
         request = new HttpPost(novaUrl + vdc + "/" + resource);
 
@@ -276,7 +268,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
 
         String quantumUrl = null;
-        quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpDelete(quantumUrl + resource);
 
         // request.setHeader(OpenStackConstants.CONTENT_TYPE, OpenStackConstants.APPLICATION_JSON);
@@ -304,7 +296,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         } catch (OpenStackException ex) {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
         log.debug("quantumUrl for region " + region + " " + quantumUrl);
         request = new HttpGet(quantumUrl + resource);
 
@@ -335,7 +327,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpPost(quantumUrl + resource);
 
         try {
@@ -379,7 +371,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpPut(quantumUrl + resource);
 
         try {
@@ -572,7 +564,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
 
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getFederatedQuantumEndPoint(token);
+        String quantumUrl = openStackRegion.getFederatedQuantumEndPoint();
         request = new HttpPost(quantumUrl + resource);
 
         try {

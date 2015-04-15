@@ -31,10 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -90,8 +86,7 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getEndPointByNameAndRegionName(String type, String regionName, String token)
-            throws OpenStackException {
+    public String getEndPointByNameAndRegionName(String type, String regionName) throws OpenStackException {
 
         String url = regionCache.getUrl(regionName, type);
 
@@ -100,9 +95,8 @@ public class OpenStackRegionImpl implements OpenStackRegion {
             return url;
         } else {
             OpenStackAccess openStackAccess = this.getTokenAdmin();
-            String responseJSON = getJSONWithEndpoints(token, openStackAccess.getToken());
 
-            String result = parseEndpoint(token, responseJSON, type, regionName);
+            String result = parseEndpoint(openStackAccess.getAccessJSON(), type, regionName);
             if (result == null) {
                 throw new OpenStackException("region not found");
             }
@@ -131,10 +125,10 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getNovaEndPoint(String regionName, String token) throws OpenStackException {
+    public String getNovaEndPoint(String regionName) throws OpenStackException {
 
-        String url = getEndPointByNameAndRegionName("compute", regionName, token);
-        log.debug("getNovaEndPoint " + regionName + " " + token + " " + url);
+        String url = getEndPointByNameAndRegionName("compute", regionName);
+        log.debug("getNovaEndPoint " + regionName + " " + url);
 
         Integer index = url.lastIndexOf("/");
         url = url.substring(0, index + 1);
@@ -144,11 +138,11 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException {
+    public String getPuppetMasterEndPoint(String regionName) throws OpenStackException {
         String url;
         try {
             log.info("Get url for puppet for default region " + regionName);
-            url = getEndPointByNameAndRegionName("puppetmaster", regionName, token);
+            url = getEndPointByNameAndRegionName("puppetmaster", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the Puppet Master endpoint";
             log.info(msn);
@@ -159,20 +153,20 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getQuantumEndPoint(String regionName, String token) throws OpenStackException {
-        String url = getEndPointByNameAndRegionName("network", regionName, token);
+    public String getQuantumEndPoint(String regionName) throws OpenStackException {
+        String url = getEndPointByNameAndRegionName("network", regionName);
         Integer index = url.lastIndexOf("/v");
         if (index == -1) {
-            url = url + "v2.0/";
+            url = url + "v3/";
         }
         return url;
     }
 
-    public String getSdcEndPoint(String regionName, String token) throws OpenStackException {
+    public String getSdcEndPoint(String regionName) throws OpenStackException {
         log.debug("Get url for sdc in region " + regionName);
         String url;
         try {
-            url = getEndPointByNameAndRegionName("sdc", regionName, token);
+            url = getEndPointByNameAndRegionName("sdc", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the SDC endpoint";
             log.error(msn);
@@ -182,12 +176,12 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return url;
     }
 
-    public String getDefaultRegion(String token) throws OpenStackException {
-        log.debug("Get default region for token " + token);
+    public String getDefaultRegion() throws OpenStackException {
+        log.debug("Get default region");
 
-        List<String> regions = null;
+        List<String> regions;
         try {
-            regions = getRegionNames(token);
+            regions = getRegionNames();
             log.debug("regions " + regions + " " + regions.size());
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the SDC endpoint";
@@ -201,199 +195,104 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     /**
      * Get a list with the name of all regions for token.
      */
-    private List<String> getRegionNames(String token) throws OpenStackException {
+    private List<String> getRegionNames() throws OpenStackException {
 
         OpenStackAccess openStackAccess = this.getTokenAdmin();
-        String responseJSON = getJSONWithEndpoints(token, openStackAccess.getToken());
-        return parseRegionName(responseJSON, "nova");
+        return parseRegionName(openStackAccess.getAccessJSON(), "nova");
 
     }
 
-    private String getJSONWithEndpoints(String token, String tokenadmin) throws OpenStackException {
-        String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens/" + token
-                + "/endpoints";
-
-        WebTarget webTarget = client.target(url);
-        log.debug("url " + url);
-        Invocation.Builder builder = webTarget.request(MediaType.APPLICATION_JSON);
-        builder.header("X-Auth-Token", tokenadmin);
-
-        Response response = null;
-
-        try {
-            response = builder.get();
-
-            int code = response.getStatus();
-            log.debug("code " + code);
-
-            String responseJSON = response.readEntity(String.class);
-            if (code != 200) {
-                String message = "Failed : HTTP (url:" + url + ") error code : " + code + " body: " + responseJSON;
-
-                if (code == 501) {
-                    log.warn("failed, probably is essex:" + message);
-
-                    responseJSON = getEndPointsThroughTokenRequest();
-                } else {
-                    log.error(message);
-                    throw new OpenStackException(message);
-                }
-
-            }
-            return responseJSON;
-
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-    }
-
-    private String getEndPointsThroughTokenRequest() throws OpenStackException {
-
-        OpenStackAccess openStackAccess = this.getTokenAdmin();
-        JSONObject jsonObject = openStackAccess.getAccessJSON();
-
-        return jsonObject.toString();
-
-    }
-
-    private String parseEndpoint(String token, String response, String type, String regionName)
-            throws OpenStackException {
+    private String parseEndpoint(JSONObject jsonObject, String type, String regionName) throws OpenStackException {
 
         String url = null;
         Map<String, String> urlMap = new HashMap<String, String>();
-        JSONObject jsonObject = JSONObject.fromObject(response);
 
-        if (jsonObject.containsKey("endpoints")) {
+        JSONObject tokenJSON = jsonObject.getJSONObject("token");
 
-            JSONArray endpointsArray = jsonObject.getJSONArray("endpoints");
+        if (tokenJSON.containsKey("catalog")) {
+            JSONArray servicesArray = tokenJSON.getJSONArray("catalog");
 
             boolean notFound = true;
-            Iterator it = endpointsArray.iterator();
-            JSONObject endpointJson = null;
+
+            Iterator it = servicesArray.iterator();
+            JSONObject serviceJSON;
             while (notFound && it.hasNext()) {
 
-                endpointJson = JSONObject.fromObject(it.next());
-                String name1 = endpointJson.get("type").toString();
-                String regionName1 = endpointJson.get("region").toString();
+                serviceJSON = JSONObject.fromObject(it.next());
+                String name1 = serviceJSON.get("type").toString();
 
                 if (type.equals(name1)) {
-                    url = endpointJson.get("publicURL").toString();
-                    urlMap.put(regionName1, url);
-                    if ((regionName != null) && (regionName.equals(regionName1))) {
-                        notFound = false;
+                    JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
+                    Iterator it2 = endpointsArray.iterator();
+
+                    while (notFound && it2.hasNext()) {
+                        JSONObject endpointJson = JSONObject.fromObject(it2.next());
+
+                        String regionName1 = endpointJson.get("region").toString();
+                        String interfaceValue = endpointJson.get("interface").toString();
+
+                        if ("public".equals(interfaceValue)) {
+                            url = endpointJson.get("url").toString();
+                            if (regionName.equals(regionName1)) {
+                                notFound = false;
+                            }
+                            urlMap.put(regionName1, url);
+                        }
+
                     }
+
                 }
             }
             if (!notFound) {
                 return url;
             }
-            // return default regionName
-
-        } else {
-            if (jsonObject.containsKey("access")) {
-                JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
-
-                boolean notFound = true;
-                Iterator it = servicesArray.iterator();
-                JSONObject serviceJSON;
-                while (notFound && it.hasNext()) {
-
-                    serviceJSON = JSONObject.fromObject(it.next());
-                    String name1 = serviceJSON.get("type").toString();
-
-                    if (type.equals(name1)) {
-                        JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
-                        Iterator it2 = endpointsArray.iterator();
-
-                        while (notFound && it2.hasNext()) {
-                            JSONObject endpointJson = JSONObject.fromObject(it2.next());
-
-                            String regionName1 = endpointJson.get("region").toString();
-                            url = endpointJson.get("publicURL").toString();
-                            if (regionName.equals(regionName1)) {
-                                notFound = false;
-                            }
-                            urlMap.put(regionName1, url);
-
-                        }
-
-                    }
-                }
-                if (!notFound) {
-                    return url;
-                }
-
-            }
-
         }
-        ;
-        return urlMap.get(this.getDefaultRegion(token));
+        return urlMap.get(this.getDefaultRegion());
     }
 
     /**
      * Parse region name, with compatibility with essex,grizzly.
      * 
-     * @param response
+     * @param jsonObject
      * @param name
      * @return
      */
-    public List<String> parseRegionName(String response, String name) {
+    public List<String> parseRegionName(JSONObject jsonObject, String name) {
 
         List<String> names = new ArrayList<String>(2);
-        JSONObject jsonObject = JSONObject.fromObject(response);
 
-        if (jsonObject.containsKey("endpoints")) {
+        JSONObject tokenJSON = jsonObject.getJSONObject("token");
 
-            JSONArray endpointsArray = jsonObject.getJSONArray("endpoints");
+        if (tokenJSON.containsKey("catalog")) {
+            JSONArray servicesArray = tokenJSON.getJSONArray("catalog");
 
-            Iterator it = endpointsArray.iterator();
-            JSONObject endpointJson;
-            while (it.hasNext()) {
+            boolean notFound = true;
+            Iterator it = servicesArray.iterator();
+            JSONObject serviceJSON;
+            while (notFound && it.hasNext()) {
 
-                endpointJson = JSONObject.fromObject(it.next());
-                String name1 = endpointJson.get("name").toString();
-                String regionName1 = endpointJson.get("region").toString();
+                serviceJSON = JSONObject.fromObject(it.next());
+                String name1 = serviceJSON.get("name").toString();
 
                 if (name.equals(name1)) {
-                    if (!names.contains(regionName1)) {
-                        names.add(regionName1);
-                    }
-                }
-            }
-        } else {
-            if (jsonObject.containsKey("access")) {
+                    JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
 
-                JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
+                    Iterator it2 = endpointsArray.iterator();
+                    while (it2.hasNext()) {
+                        JSONObject endpointJson = JSONObject.fromObject(it2.next());
 
-                boolean notFound = true;
-                Iterator it = servicesArray.iterator();
-                JSONObject serviceJSON;
-                while (notFound && it.hasNext()) {
-
-                    serviceJSON = JSONObject.fromObject(it.next());
-                    String name1 = serviceJSON.get("name").toString();
-
-                    if (name.equals(name1)) {
-                        JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
-
-                        Iterator it2 = endpointsArray.iterator();
-                        while (it2.hasNext()) {
-                            JSONObject endpointJson = JSONObject.fromObject(it2.next());
-
-                            String regionName1 = endpointJson.get("region").toString();
-                            if (!names.contains(regionName1)) {
-                                names.add(regionName1);
-                            }
-
+                        String regionName1 = endpointJson.get("region").toString();
+                        if (!names.contains(regionName1)) {
+                            names.add(regionName1);
                         }
-                        notFound = false;
 
                     }
+                    notFound = false;
+
                 }
             }
         }
+
         return names;
     }
 
@@ -413,15 +312,15 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         this.client = client;
     }
 
-    public String getFederatedQuantumEndPoint(String token) throws OpenStackException {
-        String url = getEndPointByNameAndRegionName("federatednetwork", getDefaultRegion(token), token);
+    public String getFederatedQuantumEndPoint() throws OpenStackException {
+        String url = getEndPointByNameAndRegionName("federatednetwork", getDefaultRegion());
         return url;
     }
 
-    public String getChefServerEndPoint(String regionName, String token) throws OpenStackException {
+    public String getChefServerEndPoint(String regionName) throws OpenStackException {
         String url;
         try {
-            url = getEndPointByNameAndRegionName("chef-server", regionName, token);
+            url = getEndPointByNameAndRegionName("chef-server", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the chef-server endpoint";
             log.error(msn);

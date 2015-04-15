@@ -100,7 +100,7 @@ public class OperationUtilImplTest {
         statusLine = mock(StatusLine.class);
         closeableHttpClientMock = mock(CloseableHttpClient.class);
 
-        when(openStackRegion.getNovaEndPoint(anyString(), anyString())).thenReturn("http://localhost/v2.0");
+        when(openStackRegion.getNovaEndPoint(anyString())).thenReturn("http://localhost/v2.0");
 
     }
 
