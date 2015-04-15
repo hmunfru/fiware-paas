@@ -157,7 +157,7 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         String url = getEndPointByNameAndRegionName("network", regionName);
         Integer index = url.lastIndexOf("/v");
         if (index == -1) {
-            url = url + "v3/";
+            url = url + "v2.0/";
         }
         return url;
     }

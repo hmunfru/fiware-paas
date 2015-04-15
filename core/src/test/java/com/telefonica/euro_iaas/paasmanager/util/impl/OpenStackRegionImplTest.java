@@ -115,7 +115,7 @@ public class OpenStackRegionImplTest {
         String resultURL = openStackRegion.getQuantumEndPoint("Spain");
         // then
         assertNotNull(resultURL);
-        assertEquals("http://dev-havana-neutron:9696/v3/", resultURL);
+        assertEquals("http://dev-havana-neutron:9696/v2.0/", resultURL);
     }
 
     @Test
@@ -202,14 +202,14 @@ public class OpenStackRegionImplTest {
         tokenCache.putAdmin(openStackAccess);
 
         RegionCache regionCache = new RegionCache();
-        regionCache.putUrl("Spain", "federatednetwork", "http://130.206.80.58:8774/v3/12321312312312321");
+        regionCache.putUrl("Spain", "federatednetwork", "http://130.206.80.58:8774/v2.0/12321312312312321");
 
         // when
 
         String resultURL = openStackRegion.getFederatedQuantumEndPoint();
         // then
         assertNotNull(resultURL);
-        assertEquals("http://130.206.80.58:8774/v3/12321312312312321", resultURL);
+        assertEquals("http://130.206.80.58:8774/v2.0/12321312312312321", resultURL);
     }
 
     @Test
