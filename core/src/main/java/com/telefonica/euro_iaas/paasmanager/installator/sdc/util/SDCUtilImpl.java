@@ -51,7 +51,7 @@ public class SDCUtilImpl implements SDCUtil {
         String msgerror = null;
         String sdcServerUrl;
         try {
-            sdcServerUrl = getSdcUtil(token);
+            sdcServerUrl = getSdcUtil();
         } catch (OpenStackException e1) {
             msgerror = "Error to obtain the SDC endpoint or the default region: " + e1.getMessage();
             log.error(msgerror);
@@ -95,9 +95,9 @@ public class SDCUtilImpl implements SDCUtil {
         }
     }
 
-    public String getSdcUtil(String token) throws OpenStackException {
-        String regionName = openStackRegion.getDefaultRegion(token);
-        return openStackRegion.getSdcEndPoint(regionName, token);
+    public String getSdcUtil() throws OpenStackException {
+        String regionName = openStackRegion.getDefaultRegion();
+        return openStackRegion.getSdcEndPoint(regionName);
     }
 
     /**

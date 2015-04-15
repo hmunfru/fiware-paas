@@ -61,8 +61,8 @@ public class SDCUtilImplTest {
         com.telefonica.euro_iaas.sdc.model.Task task = new Task();
         task.setStatus(TaskStates.SUCCESS);
         when(taskService.load(anyString(), anyString(), anyString())).thenReturn(task);
-        when(openStackRegion.getDefaultRegion(anyString())).thenReturn("region");
-        when(openStackRegion.getSdcEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getDefaultRegion()).thenReturn("region");
+        when(openStackRegion.getSdcEndPoint(anyString())).thenReturn("http");
 
         when(sDCClient.getTaskService(anyString(), anyString())).thenReturn(taskService);
 
@@ -81,15 +81,15 @@ public class SDCUtilImplTest {
         err.setMessage("error");
         task.setError(err);
         when(taskService.load(anyString(), anyString(), anyString())).thenReturn(task);
-        when(openStackRegion.getDefaultRegion(anyString())).thenReturn("region");
-        when(openStackRegion.getSdcEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getDefaultRegion()).thenReturn("region");
+        when(openStackRegion.getSdcEndPoint(anyString())).thenReturn("http");
 
         when(sDCClient.getTaskService(anyString(), anyString())).thenReturn(taskService);
 
         sdcUtilImpl.checkTaskStatus(task, "token", "vdc");
 
         verify(sDCClient).getTaskService(anyString(), anyString());
-        verify(openStackRegion).getSdcEndPoint(anyString(), anyString());
+        verify(openStackRegion).getSdcEndPoint(anyString());
 
     }
 
@@ -100,15 +100,15 @@ public class SDCUtilImplTest {
         task.setStatus(TaskStates.ERROR);
 
         when(taskService.load(anyString(), anyString(), anyString())).thenReturn(task);
-        when(openStackRegion.getDefaultRegion(anyString())).thenReturn("region");
-        when(openStackRegion.getSdcEndPoint(anyString(), anyString())).thenThrow(new OpenStackException("men"));
+        when(openStackRegion.getDefaultRegion()).thenReturn("region");
+        when(openStackRegion.getSdcEndPoint(anyString())).thenThrow(new OpenStackException("men"));
 
         when(sDCClient.getTaskService(anyString(), anyString())).thenReturn(taskService);
 
         sdcUtilImpl.checkTaskStatus(task, "token", "vdc");
 
         verify(sDCClient).getTaskService(anyString(), anyString());
-        verify(openStackRegion).getSdcEndPoint(anyString(), anyString());
+        verify(openStackRegion).getSdcEndPoint(anyString());
 
     }
 

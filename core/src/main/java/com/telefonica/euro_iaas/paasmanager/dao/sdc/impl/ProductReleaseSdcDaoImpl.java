@@ -98,7 +98,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
         ProductRelease p = null;
 
         try {
-            String url = sDCUtil.getSdcUtil(data.getUser().getToken());
+            String url = sDCUtil.getSdcUtil();
             log.info("Loading from SDC in url: " + url);
 
             com.telefonica.euro_iaas.sdc.client.services.ProductReleaseService pIService = sDCClient
@@ -132,7 +132,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
         Response response = null;
 
         try {
-            String url = sDCUtil.getSdcUtil(token) + "/catalog/product";
+            String url = sDCUtil.getSdcUtil() + "/catalog/product";
             log.debug("url: " + url);
 
             Invocation.Builder builder = createWebResource(url, token, tenant);
