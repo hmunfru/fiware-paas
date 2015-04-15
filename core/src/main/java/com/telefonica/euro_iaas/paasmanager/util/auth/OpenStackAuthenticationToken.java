@@ -83,7 +83,7 @@ public class OpenStackAuthenticationToken {
      * The default constructor of the class OpenStackAuthenticationToken.
      */
     public OpenStackAuthenticationToken(SystemPropertiesProvider systemPropertiesProvider) {
-        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
+        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "auth/tokens";
 
         user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
 
@@ -108,8 +108,9 @@ public class OpenStackAuthenticationToken {
 
             WebTarget wr = client.target(url);
 
-            String payload = "{\"auth\": {\"tenantName\": \"" + tenant + "\", \""
-                    + "passwordCredentials\":{\"username\": \"" + user + "\"," + " \"password\": \"" + pass + "\"}}}";
+            String payload = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],"
+                    + "\"password\":{\"user\":{\"domain\":{\"id\":\"default\"}," + "\"name\":\"" + user
+                    + "\",\"password\":\"" + pass + "\"}}}}}";
 
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
 
@@ -119,19 +120,16 @@ public class OpenStackAuthenticationToken {
             if ((status == CODE_200) || (status == CODE_201)) {
 
                 JSONObject jsonObjectResponse = JSONObject.fromObject(response.readEntity(String.class));
-                JSONObject jsonObject = (JSONObject) jsonObjectResponse.get("access");
-                openStackAccess.setAccessJSON(jsonObject);
 
-                if (jsonObject.containsKey("token")) {
+                if (jsonObjectResponse.containsKey("token")) {
+                    String xSubjectToken = response.getHeaderString("X-Subject-Token");
+                    openStackAccess.setAccessJSON(jsonObjectResponse);
 
-                    JSONObject tokenObject = (JSONObject) jsonObject.get("token");
-                    String token = (String) tokenObject.get("id");
-                    String tenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
-                    JSONObject userObject = (JSONObject) jsonObject.get("user");
+                    JSONObject tokenObject = (JSONObject) jsonObjectResponse.get("token");
+                    String tenantId = (String) ((JSONObject) tokenObject.get("project")).get("id");
+                    String tenantName = (String) ((JSONObject) tokenObject.get("project")).get("name");
 
-                    String tenantName = (String) userObject.get("tenantName");
-
-                    openStackAccess.setToken(token);
+                    openStackAccess.setToken(xSubjectToken);
                     openStackAccess.setTenantId(tenantId);
                     openStackAccess.setTenantName(tenantName);
                     log.info("generated new token for tenantId:" + tenantId + " with tenantName: " + tenantName);

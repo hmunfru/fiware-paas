@@ -70,42 +70,51 @@ public class OpenStackAuthenticationTokenTest {
 
         // Given
 
-        String responseJSON = "{\"access\": {\"token\": {\n"
-                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
-                + "                \"id\": \"00000000000000000000000000001348\",\n"
-                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
-                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
-                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
-                + "            \"roles\": [\n" + "                {\n"
-                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
-                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
-                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
+        String responseJSON = "{\n" + "    \"token\": {\n" + "        \"methods\": [\n" + "            \"password\"\n"
+                + "        ],\n" + "        \"roles\": [\n" + "            {\n"
+                + "                \"id\": \"bb780354f545410b9cc144809e845148\",\n"
+                + "                \"name\": \"admin\"\n" + "            }\n" + "        ],\n"
+                + "        \"expires_at\": \"2015-04-16T05:46:46.510754Z\",\n" + "        \"project\": {\n"
+                + "            \"domain\": {\n" + "                \"id\": \"default\",\n"
+                + "                \"name\": \"Default\"\n" + "            },\n"
+                + "            \"id\": \"tenantId1\",\n" + "            \"name\": \"tenant name\"\n" + "        },\n"
+                + "        \"extras\": {},\n" + "        \"user\": {\n" + "            \"domain\": {\n"
+                + "                \"id\": \"default\",\n" + "                \"name\": \"Default\"\n"
+                + "            },\n" + "            \"id\": \"e12249b99b3e4b9394dd85703b04e851\",\n"
+                + "            \"name\": \"admin\"\n" + "        },\n" + "        \"audit_ids\": [\n"
+                + "            \"hbiTO5lCTfm5ScW7acVVYg\"\n" + "        ],\n"
+                + "        \"issued_at\": \"2015-04-15T09:46:46.510825Z\"\n" + "    }\n" + "}";
+
+        String xSubjectToken = "fffef88341aa4df39514c251a0ff9ff4";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
         Invocation.Builder builder = mock(Invocation.Builder.class);
 
         openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
-        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
+        when(client.target(keystoneUrl + "auth/tokens")).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(200);
+        when(response.getHeaderString("X-Subject-Token")).thenReturn(xSubjectToken);
         when(response.readEntity(String.class)).thenReturn(responseJSON);
 
         // when
         OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
 
         // then
-        verify(client).target(keystoneUrl + "tokens");
+        verify(client).target(keystoneUrl + "auth/tokens");
         verify(webTarget).request(MediaType.APPLICATION_JSON);
         verify(builder).accept(MediaType.APPLICATION_JSON);
         verify(response).getStatus();
         verify(response).readEntity(String.class);
+        verify(response).getHeaderString("X-Subject-Token");
         assertNotNull(openStackAccess);
-        assertEquals("0bd52c4b2fa09951aa057b4590c4aa6d", openStackAccess.getToken());
-        assertEquals("00000000000000000000000000001348", openStackAccess.getTenantId());
+        assertEquals("fffef88341aa4df39514c251a0ff9ff4", openStackAccess.getToken());
+        assertEquals("tenantId1", openStackAccess.getTenantId());
+        assertEquals("tenant name", openStackAccess.getTenantName());
 
     }
 
@@ -114,16 +123,6 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-        String responseJSON = "{\"access\": {\"token\": {\n"
-                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
-                + "                \"id\": \"00000000000000000000000000001348\",\n"
-                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
-                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
-                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
-                + "            \"roles\": [\n" + "                {\n"
-                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
-                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
-                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
@@ -131,13 +130,12 @@ public class OpenStackAuthenticationTokenTest {
 
         openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
 
-        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
+        when(client.target(keystoneUrl + "auth/tokens")).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(400);
-        when(response.readEntity(String.class)).thenReturn(responseJSON);
 
         // when
         openStackAuthenticationToken.getAdminCredentials(client);
@@ -152,42 +150,49 @@ public class OpenStackAuthenticationTokenTest {
         OpenStackAuthenticationToken openStackAuthenticationToken;
 
         // Given
-        String responseJSON = "{\"access\": {\"token\": {\n"
-                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"0bd52c4b2fa09951aa057b4590c4aa6d\",\"tenant\": {\n"
-                + "                \"id\": \"00000000000000000000000000001348\",\n"
-                + "                \"name\": \"tenant name\"\n" + "            }\n" + "        },\n"
-                + "        \"user\": {\n" + "            \"name\": \"username1\",\n"
-                + "            \"tenantName\": \"tenant name\",\n" + "            \"id\": \"aalonsog@dit.upm.es\",\n"
-                + "            \"roles\": [\n" + "                {\n"
-                + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
-                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
-                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
+        String responseJSON = "{\n" + "    \"token\": {\n" + "        \"methods\": [\n" + "            \"password\"\n"
+                + "        ],\n" + "        \"roles\": [\n" + "            {\n"
+                + "                \"id\": \"bb780354f545410b9cc144809e845148\",\n"
+                + "                \"name\": \"admin\"\n" + "            }\n" + "        ],\n"
+                + "        \"expires_at\": \"2015-04-16T05:46:46.510754Z\",\n" + "        \"project\": {\n"
+                + "            \"domain\": {\n" + "                \"id\": \"default\",\n"
+                + "                \"name\": \"Default\"\n" + "            },\n"
+                + "            \"id\": \"tenantId1\",\n" + "            \"name\": \"tenant name\"\n" + "        },\n"
+                + "        \"extras\": {},\n" + "        \"user\": {\n" + "            \"domain\": {\n"
+                + "                \"id\": \"default\",\n" + "                \"name\": \"Default\"\n"
+                + "            },\n" + "            \"id\": \"e12249b99b3e4b9394dd85703b04e851\",\n"
+                + "            \"name\": \"admin\"\n" + "        },\n" + "        \"audit_ids\": [\n"
+                + "            \"hbiTO5lCTfm5ScW7acVVYg\"\n" + "        ],\n"
+                + "        \"issued_at\": \"2015-04-15T09:46:46.510825Z\"\n" + "    }\n" + "}";
+        String xSubjectToken = "fffef88341aa4df39514c251a0ff9ff4";
 
         Client client = mock(Client.class);
         WebTarget webTarget = mock(WebTarget.class);
         Invocation.Builder builder = mock(Invocation.Builder.class);
 
         openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
-        when(client.target(keystoneUrl + "tokens")).thenReturn(webTarget);
+        when(client.target(keystoneUrl + "auth/tokens")).thenReturn(webTarget);
         when(webTarget.request(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         Response response = mock(Response.class);
         when(builder.post(any(Entity.class))).thenReturn(response);
         when(response.getStatus()).thenReturn(201);
         when(response.readEntity(String.class)).thenReturn(responseJSON);
+        when(response.getHeaderString("X-Subject-Token")).thenReturn(xSubjectToken);
 
         // when
         OpenStackAccess openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
 
         // then
-        verify(client).target(keystoneUrl + "tokens");
+        verify(client).target(keystoneUrl + "auth/tokens");
         verify(webTarget).request(MediaType.APPLICATION_JSON);
         verify(builder).accept(MediaType.APPLICATION_JSON);
         verify(response).getStatus();
         verify(response).readEntity(String.class);
         assertNotNull(openStackAccess);
-        assertEquals("0bd52c4b2fa09951aa057b4590c4aa6d", openStackAccess.getToken());
-        assertEquals("00000000000000000000000000001348", openStackAccess.getTenantId());
+        assertEquals("fffef88341aa4df39514c251a0ff9ff4", openStackAccess.getToken());
+        assertEquals("tenantId1", openStackAccess.getTenantId());
+        assertEquals("tenant name", openStackAccess.getTenantName());
 
     }
 }

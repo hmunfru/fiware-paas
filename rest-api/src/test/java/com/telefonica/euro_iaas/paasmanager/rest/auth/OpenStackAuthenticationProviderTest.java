@@ -27,7 +27,6 @@ package com.telefonica.euro_iaas.paasmanager.rest.auth;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,15 +82,14 @@ public class OpenStackAuthenticationProviderTest {
 
         // Given
 
-        String responseJSON = "{\"access\": {\"token\": {\n"
-                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"user token\",\"tenant\": {\n"
-                + "                \"id\": \"user tenantId\",\n" + "                \"name\": \"tenant name\"\n"
-                + "            }\n" + "        },\n" + "        \"user\": {\n"
-                + "            \"name\": \"username1\",\n" + "            \"tenantName\": \"tenant name\",\n"
-                + "            \"id\": \"aalonsog@dit.upm.es\",\n" + "            \"roles\": [\n"
-                + "                {\n" + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
-                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
-                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
+        String responseJSON = "{\"token\":{\"methods\":[\"password\"],"
+                + "\"roles\":[{\"id\":\"13abab31bc194317a009b25909f390a6\",\"name\":\"owner\"}],"
+                + "\"expires_at\":\"2015-04-16T06:49:07.794235Z\",\"project\":{\"domain\":{\"id\":\"default\","
+                + "\"name\":\"Default\"},\"id\":\"user tenantId\",\"name\":\"jesuspg2\"},"
+                + "\"extras\":{},\"user\":{\"domain\":{\"id\":\"default\",\"name\":\"Default\"},"
+                + "\"id\":\"a7e01921db0049f69daa76490402714a\",\"name\":\"jesus.perezgonzalez@telefonica.com\"},"
+                + "\"audit_ids\":[\"0u8bgE6AStObXnzfI9nu6A\"],\"issued_at\":\"2015-04-15T10:49:07.794329Z\"}}";
+
         OpenStackAuthenticationProvider openStackAuthenticationProvider = new OpenStackAuthenticationProvider();
         openStackAuthenticationProvider.setSystemPropertiesProvider(systemPropertiesProvider);
         openStackAuthenticationToken = mock(OpenStackAuthenticationToken.class);
@@ -105,13 +103,12 @@ public class OpenStackAuthenticationProviderTest {
         when(openStackAuthenticationToken.getKeystoneURL()).thenReturn(keystoneURL);
         openStackAuthenticationProvider.setClient(client);
         WebTarget webResource = mock(WebTarget.class);
-        WebTarget webResource2 = mock(WebTarget.class);
         when(client.target("http://keystone.test")).thenReturn(webResource);
-        when(webResource.path(anyString())).thenReturn(webResource2);
         Invocation.Builder builder = mock(Invocation.Builder.class);
-        when(webResource2.request()).thenReturn(builder);
+        when(webResource.request()).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.header("X-Auth-Token", "token1")).thenReturn(builder);
+        when(builder.header("X-Subject-Token", "user token")).thenReturn(builder);
         Response response = mock(Response.class);
         when(builder.get()).thenReturn(response);
         when(response.getStatus()).thenReturn(200);
@@ -138,15 +135,13 @@ public class OpenStackAuthenticationProviderTest {
     public void shouldCreateNewTokenAfterResetCache() throws InterruptedException {
         // Given
 
-        String responseJSON = "{\"access\": {\"token\": {\n"
-                + "            \"expires\": \"2015-04-14T10:58:54.578527Z\",\"id\": \"user token\",\"tenant\": {\n"
-                + "                \"id\": \"user tenantId\",\n" + "                \"name\": \"tenant name\"\n"
-                + "            }\n" + "        },\n" + "        \"user\": {\n"
-                + "            \"name\": \"username1\",\n" + "            \"tenantName\": \"tenant name\",\n"
-                + "            \"id\": \"aalonsog@dit.upm.es\",\n" + "            \"roles\": [\n"
-                + "                {\n" + "                    \"id\": \"13abab31bc194317a009b25909f390a6\",\n"
-                + "                    \"name\": \"owner\"\n" + "                }\n" + "            ],\n"
-                + "            \"tenantId\": \"tenantId1\"\n" + "        }\n" + "    }\n" + "}";
+        String responseJSON = "{\"token\":{\"methods\":[\"password\"],"
+                + "\"roles\":[{\"id\":\"13abab31bc194317a009b25909f390a6\",\"name\":\"owner\"}],"
+                + "\"expires_at\":\"2015-04-16T06:49:07.794235Z\",\"project\":{\"domain\":{\"id\":\"default\","
+                + "\"name\":\"Default\"},\"id\":\"user tenantId\",\"name\":\"jesuspg2\"},"
+                + "\"extras\":{},\"user\":{\"domain\":{\"id\":\"default\",\"name\":\"Default\"},"
+                + "\"id\":\"a7e01921db0049f69daa76490402714a\",\"name\":\"jesus.perezgonzalez@telefonica.com\"},"
+                + "\"audit_ids\":[\"0u8bgE6AStObXnzfI9nu6A\"],\"issued_at\":\"2015-04-15T10:49:07.794329Z\"}}";
 
         OpenStackAuthenticationProvider openStackAuthenticationProvider = new OpenStackAuthenticationProvider();
         openStackAuthenticationProvider.setSystemPropertiesProvider(systemPropertiesProvider);
@@ -161,13 +156,13 @@ public class OpenStackAuthenticationProviderTest {
         Client client = mock(Client.class);
         openStackAuthenticationProvider.setClient(client);
         WebTarget webResource = mock(WebTarget.class);
-        WebTarget webResource2 = mock(WebTarget.class);
         when(client.target("http://keystone.test")).thenReturn(webResource);
-        when(webResource.path(anyString())).thenReturn(webResource2);
         Invocation.Builder builder = mock(Invocation.Builder.class);
-        when(webResource2.request()).thenReturn(builder);
+        when(webResource.request()).thenReturn(builder);
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.header("X-Auth-Token", "token1")).thenReturn(builder);
+        when(builder.header("X-Subject-Token", "user token")).thenReturn(builder);
+
         Response response = mock(Response.class);
         when(builder.get()).thenReturn(response);
         when(response.getStatus()).thenReturn(200);

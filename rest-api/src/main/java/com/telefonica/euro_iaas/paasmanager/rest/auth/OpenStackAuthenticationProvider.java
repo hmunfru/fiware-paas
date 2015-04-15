@@ -141,16 +141,15 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
             if (paasManagerUser == null) {
 
                 WebTarget webResource = getClient().target(oSAuthToken.getKeystoneURL());
-                WebTarget tokens = webResource.path(token);
-                Invocation.Builder builder = tokens.request();
+                Invocation.Builder builder = webResource.request();
                 response = builder.accept(MediaType.APPLICATION_JSON)
-                        .header("X-Auth-Token", openStackAccess.getToken()).get();
+                        .header("X-Auth-Token", openStackAccess.getToken()).header("X-Subject-Token", token).get();
 
                 if (response.getStatus() == CODE_200) {
                     // Validate user's token
 
                     JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
-                    jsonObject = (JSONObject) jsonObject.get("access");
+                    jsonObject = (JSONObject) jsonObject.get("token");
 
                     PaasManagerUser userValidated = createPaasManagerUser(token, tenantId, jsonObject);
                     log.info("generated new token for tenantId:" + tenantId + ": " + token);
@@ -189,30 +188,20 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     private PaasManagerUser createPaasManagerUser(String token, String tenantId, JSONObject responseJSON) {
 
-        if (responseJSON.containsKey("token")) {
+        String responseTenantId = (String) ((JSONObject) responseJSON.get("project")).get("id");
+        String responseTenantName = (String) ((JSONObject) responseJSON.get("project")).get("name");
+        JSONObject userObject = (JSONObject) responseJSON.get("user");
+        String responseUserName = (String) (userObject.get("name"));
 
-            JSONObject tokenObject = (JSONObject) responseJSON.get("token");
-            String responseTenantId = (String) ((JSONObject) tokenObject.get("tenant")).get("id");
-            String responseTenantName = (String) ((JSONObject) tokenObject.get("tenant")).get("name");
-            JSONObject userObject = (JSONObject) responseJSON.get("user");
-            String responseUserName = (String) (userObject.get("name"));
-
-            if (!tenantId.equals(responseTenantId)) {
-                throw new AuthenticationServiceException("Token " + token + " not valid for the tenantId provided:"
-                        + tenantId);
-            }
-
-            PaasManagerUser user = new PaasManagerUser(responseUserName, token);
-
-            user.setTenantId(tenantId);
-            user.setTenantName(responseTenantName);
-            user.setToken(token);
-            return user;
-
-        } else {
-            throw new AuthenticationServiceException("Invalid request with token:" + token + " and tenantId:"
+        if (!tenantId.equals(responseTenantId)) {
+            throw new AuthenticationServiceException("Token " + token + " not valid for the tenantId provided:"
                     + tenantId);
         }
+
+        PaasManagerUser user = new PaasManagerUser(responseUserName, token);
+        user.setTenantId(tenantId);
+        user.setTenantName(responseTenantName);
+        return user;
 
     }
 
