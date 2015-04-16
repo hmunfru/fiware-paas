@@ -23,14 +23,21 @@
  */
 package com.telefonica.euro_iaas.paasmanager.util.auth;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 /**
  * OpenStackKeystoneV2
@@ -54,6 +61,7 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
      * @param jsonObjectResponse
      */
     public void parseResponse(OpenStackAccess openStackAccess, Response response, JSONObject jsonObjectResponse) {
+        openStackAccess.setOpenStackKeystone(this);
         if (jsonObjectResponse.containsKey("access")) {
             openStackAccess.setAccessJSON(jsonObjectResponse);
 
@@ -65,6 +73,7 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
             openStackAccess.setToken(token);
             openStackAccess.setTenantId(tenantId);
             openStackAccess.setTenantName(tenantName);
+            openStackAccess.setApi(VERSION);
             log.info("generated new token for tenantId:" + tenantId + " with tenantName: " + tenantName);
 
         }
@@ -104,5 +113,83 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
             return baseUrl + "/tokens";
 
         }
+    }
+
+    public String parseEndpoint(JSONObject jsonObject, String type, String regionName) throws OpenStackException {
+        String url = null;
+        Map<String, String> urlMap = new HashMap<String, String>();
+        if (jsonObject.containsKey("access")) {
+            JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
+
+            boolean notFound = true;
+            Iterator it = servicesArray.iterator();
+            JSONObject serviceJSON;
+            while (notFound && it.hasNext()) {
+
+                serviceJSON = JSONObject.fromObject(it.next());
+                String name1 = serviceJSON.get("type").toString();
+
+                if (type.equals(name1)) {
+                    JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
+                    Iterator it2 = endpointsArray.iterator();
+
+                    while (notFound && it2.hasNext()) {
+                        JSONObject endpointJson = JSONObject.fromObject(it2.next());
+
+                        String regionName1 = endpointJson.get("region").toString();
+                        url = endpointJson.get("publicURL").toString();
+                        if (regionName.equals(regionName1)) {
+                            notFound = false;
+                        }
+                        urlMap.put(regionName1, url);
+
+                    }
+
+                }
+            }
+            if (!notFound) {
+                return url;
+            }
+
+        }
+
+        String defaultRegion = parseRegionNames(jsonObject, "nova").get(0);
+        return urlMap.get(defaultRegion);
+    }
+
+    public List<String> parseRegionNames(JSONObject jsonObject, String name) {
+
+        List<String> names = new ArrayList<String>(2);
+        if (jsonObject.containsKey("access")) {
+
+            JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
+
+            boolean notFound = true;
+            Iterator it = servicesArray.iterator();
+            JSONObject serviceJSON;
+            while (notFound && it.hasNext()) {
+
+                serviceJSON = JSONObject.fromObject(it.next());
+                String name1 = serviceJSON.get("name").toString();
+
+                if (name.equals(name1)) {
+                    JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
+
+                    Iterator it2 = endpointsArray.iterator();
+                    while (it2.hasNext()) {
+                        JSONObject endpointJson = JSONObject.fromObject(it2.next());
+
+                        String regionName1 = endpointJson.get("region").toString();
+                        if (!names.contains(regionName1)) {
+                            names.add(regionName1);
+                        }
+
+                    }
+                    notFound = false;
+
+                }
+            }
+        }
+        return names;
     }
 }

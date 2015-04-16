@@ -23,11 +23,12 @@
  */
 package com.telefonica.euro_iaas.paasmanager.util.auth;
 
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 import net.sf.json.JSONObject;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
 public interface OpenStackKeystone {
 
@@ -56,4 +57,21 @@ public interface OpenStackKeystone {
      * @param jsonObjectResponse
      */
     void parseResponse(OpenStackAccess openStackAccess, Response response, JSONObject jsonObjectResponse);
+
+    /**
+     * @param jsonObject
+     * @param type
+     * @param regionName
+     * @return
+     * @throws OpenStackException
+     */
+    String parseEndpoint(JSONObject jsonObject, String type, String regionName) throws OpenStackException;
+
+    /**
+     *
+     * @param jsonObject
+     * @param name
+     * @return
+     */
+    List<String> parseRegionNames(JSONObject jsonObject, String name);
 }

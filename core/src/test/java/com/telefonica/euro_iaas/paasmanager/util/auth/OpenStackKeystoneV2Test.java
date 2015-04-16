@@ -33,8 +33,6 @@ import net.sf.json.JSONObject;
 
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
-
 public class OpenStackKeystoneV2Test {
 
     @Test

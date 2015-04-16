@@ -43,7 +43,6 @@ import javax.ws.rs.core.Response;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.exception.AuthenticationConnectionException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 

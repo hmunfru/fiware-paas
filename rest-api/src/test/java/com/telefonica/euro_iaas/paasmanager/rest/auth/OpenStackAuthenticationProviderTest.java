@@ -46,10 +46,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV2;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV3;
 
 /**
  * Test class to check the OpenStackAuthenticationProvider.
@@ -98,6 +100,7 @@ public class OpenStackAuthenticationProviderTest {
         OpenStackAccess openStackAccess = new OpenStackAccess();
         openStackAccess.setToken("token1");
         openStackAccess.setTenantId("tenantId1");
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV3());
 
         when(openStackAuthenticationToken.getAdminCredentials(any(Client.class))).thenReturn(openStackAccess);
         Client client = mock(Client.class);
@@ -110,6 +113,62 @@ public class OpenStackAuthenticationProviderTest {
         when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
         when(builder.header("X-Auth-Token", "token1")).thenReturn(builder);
         when(builder.header("X-Subject-Token", "user token")).thenReturn(builder);
+        Response response = mock(Response.class);
+        when(builder.get()).thenReturn(response);
+        when(response.getStatus()).thenReturn(200);
+
+        // mock response
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
+
+        openStackAuthenticationProvider.getTokenCache().removeAll();
+
+        UsernamePasswordAuthenticationToken authentication = mock(UsernamePasswordAuthenticationToken.class);
+        when(authentication.getCredentials()).thenReturn("user tenantId");
+
+        // When
+        UserDetails userDetails = openStackAuthenticationProvider.retrieveUser("user token", authentication);
+
+        // Then
+        verify(response).readEntity(String.class);
+        assertNotNull(userDetails);
+        assertEquals("user token", userDetails.getPassword());
+
+    }
+
+    @Test
+    public void shouldCreatesNewTokenForAdminAndUserWithAPIv3() {
+
+        // Given
+
+        String responseJSON = "{\"access\": {\"token\": {\"issued_at\": \"2015-04-16T14:47:17.573966\", "
+                + "\"expires\": \"2015-04-17T10:47:17Z\", \"id\": \"user token\", "
+                + "\"tenant\": {\"description\": \"Cloud admins\", \"enabled\": true, "
+                + "\"id\": \"user tenantId\", \"name\": \"tenantName\"}, "
+                + "\"audit_ids\": [\"z4fSnIPsQ2eu3ylzoXRfvA\"]}, \"user\": {\"username\": \"admin\", "
+                + "\"roles_links\": [], \"id\": \"e12249b99b3e4b9394dd85703b04e851\", "
+                + "\"roles\": [{\"name\": \"admin\"}], \"name\": \"admin\"}, \"metadata\": {\"is_admin\": 0, "
+                + "\"roles\": [\"bb780354f545410b9cc144809e845148\"]}}}";
+
+        OpenStackAuthenticationProvider openStackAuthenticationProvider = new OpenStackAuthenticationProvider();
+        openStackAuthenticationProvider.setSystemPropertiesProvider(systemPropertiesProvider);
+        openStackAuthenticationToken = mock(OpenStackAuthenticationToken.class);
+        openStackAuthenticationProvider.setoSAuthToken(openStackAuthenticationToken);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("token1");
+        openStackAccess.setTenantId("tenantId1");
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV2());
+
+        when(openStackAuthenticationToken.getAdminCredentials(any(Client.class))).thenReturn(openStackAccess);
+        Client client = mock(Client.class);
+        when(openStackAuthenticationToken.getKeystoneURL()).thenReturn(keystoneURL);
+        openStackAuthenticationProvider.setClient(client);
+        WebTarget webResource = mock(WebTarget.class);
+        when(client.target("http://keystone.test")).thenReturn(webResource);
+        when(webResource.path("user token")).thenReturn(webResource);
+        Invocation.Builder builder = mock(Invocation.Builder.class);
+        when(webResource.request()).thenReturn(builder);
+        when(builder.accept(MediaType.APPLICATION_JSON)).thenReturn(builder);
+        when(builder.header("X-Auth-Token", "token1")).thenReturn(builder);
         Response response = mock(Response.class);
         when(builder.get()).thenReturn(response);
         when(response.getStatus()).thenReturn(200);
@@ -152,6 +211,8 @@ public class OpenStackAuthenticationProviderTest {
         OpenStackAccess openStackAccess = new OpenStackAccess();
         openStackAccess.setToken("token1");
         openStackAccess.setTenantId("tenantId1");
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV3());
+
         when(openStackAuthenticationToken.getAdminCredentials(any(Client.class))).thenReturn(openStackAccess);
         when(openStackAuthenticationToken.getKeystoneURL()).thenReturn(keystoneURL);
         Client client = mock(Client.class);

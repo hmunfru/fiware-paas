@@ -31,8 +31,8 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
 
 /**
  * Create and manage the cache to the response of OpenStack for request the admin token. Based on ehcache open source.

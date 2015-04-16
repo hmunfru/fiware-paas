@@ -48,11 +48,12 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV3;
 
 public class OpenStackRegionImplTest {
 
@@ -77,7 +78,7 @@ public class OpenStackRegionImplTest {
     }
 
     @Test
-    public void testShouldGetEndPointsForNovaAndARegionName() throws OpenStackException {
+    public void testShouldGetEndPointsForNovaAndARegionNameWithAPIV3() throws OpenStackException {
         // given
         OpenStackRegionImpl openStackRegion = new OpenStackRegionImpl();
         openStackRegion.setSystemPropertiesProvider(systemPropertiesProvider);
@@ -87,6 +88,8 @@ public class OpenStackRegionImplTest {
         openStackAccess.setToken("tokenAdminCached");
         openStackAccess.setTenantId("00000001");
         openStackAccess.setAccessJSON(serviceCatalogJSON);
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV3());
+
         tokenCache.putAdmin(openStackAccess);
 
         // when
@@ -98,7 +101,7 @@ public class OpenStackRegionImplTest {
     }
 
     @Test
-    public void testShouldGetEndPointsForQuantumAndARegionName() throws OpenStackException {
+    public void testShouldGetEndPointsForQuantumAndARegionNameWithAPIV3() throws OpenStackException {
         // given
         OpenStackRegionImpl openStackRegion = new OpenStackRegionImpl();
         openStackRegion.setSystemPropertiesProvider(systemPropertiesProvider);
@@ -109,6 +112,7 @@ public class OpenStackRegionImplTest {
         openStackAccess.setToken("tokenAdminCached");
         openStackAccess.setTenantId("00000001");
         openStackAccess.setAccessJSON(serviceCatalogJSON);
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV3());
         tokenCache.putAdmin(openStackAccess);
 
         // when
@@ -137,7 +141,7 @@ public class OpenStackRegionImplTest {
     }
 
     @Test
-    public void testShouldGetDefaultRegionWithAdminTokenInCache() throws OpenStackException {
+    public void testShouldGetDefaultRegionWithAdminTokenInCacheWithAPIV3() throws OpenStackException {
         // given
         OpenStackRegionImpl openStackRegion = new OpenStackRegionImpl();
         openStackRegion.setSystemPropertiesProvider(systemPropertiesProvider);
@@ -149,6 +153,8 @@ public class OpenStackRegionImplTest {
         openStackAccess.setToken("tokenAdminCached");
         openStackAccess.setTenantId("00000001");
         openStackAccess.setAccessJSON(serviceCatalogJSON);
+        openStackAccess.setOpenStackKeystone(new OpenStackKeystoneV3());
+
         tokenCache.putAdmin(openStackAccess);
 
         // when

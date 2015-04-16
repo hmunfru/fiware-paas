@@ -21,7 +21,7 @@
  * For those usages not covered by the Apache version 2.0 License please contact with opensource@tid.es
  * </p>
  */
-package com.telefonica.euro_iaas.paasmanager.bean;
+package com.telefonica.euro_iaas.paasmanager.util.auth;
 
 import net.sf.json.JSONObject;
 
@@ -34,6 +34,10 @@ public class OpenStackAccess {
     private String tenantName;
 
     private JSONObject accessJSON;
+
+    private String api;
+
+    private OpenStackKeystone openStackKeystone;
 
     public String getToken() {
         return token;
@@ -65,5 +69,21 @@ public class OpenStackAccess {
 
     public void setAccessJSON(JSONObject accessJSON) {
         this.accessJSON = accessJSON;
+    }
+
+    public String getApi() {
+        return api;
+    }
+
+    public void setApi(String api) {
+        this.api = api;
+    }
+
+    public OpenStackKeystone getOpenStackKeystone() {
+        return openStackKeystone;
+    }
+
+    public void setOpenStackKeystone(OpenStackKeystone openStackKeystone) {
+        this.openStackKeystone = openStackKeystone;
     }
 }
