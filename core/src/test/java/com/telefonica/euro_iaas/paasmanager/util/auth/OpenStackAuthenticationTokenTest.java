@@ -50,7 +50,7 @@ import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 public class OpenStackAuthenticationTokenTest {
 
     private SystemPropertiesProvider systemPropertiesProvider;
-    private final String keystoneUrl = "http://keystone";
+    private final String keystoneUrl = "http://keystone/v3/";
 
     @Before
     public void setUp() {

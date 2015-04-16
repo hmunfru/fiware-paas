@@ -75,6 +75,11 @@ public class OpenStackAuthenticationToken {
     private String pass;
 
     /**
+     * instance of version v2 or v3
+     */
+    private OpenStackKeystone openStackKeystone;
+
+    /**
      * The log.
      */
     private static Logger log = LoggerFactory.getLogger(OpenStackAuthenticationToken.class);
@@ -83,13 +88,21 @@ public class OpenStackAuthenticationToken {
      * The default constructor of the class OpenStackAuthenticationToken.
      */
     public OpenStackAuthenticationToken(SystemPropertiesProvider systemPropertiesProvider) {
-        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "auth/tokens";
+        url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
 
         user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
 
         pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
 
         tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+
+        boolean containsV3 = url.indexOf(OpenStackKeystoneV3.VERSION) != -1;
+        if (containsV3) {
+            openStackKeystone = new OpenStackKeystoneV3();
+        } else {
+            openStackKeystone = new OpenStackKeystoneV2();
+
+        }
     }
 
     /**
@@ -101,16 +114,15 @@ public class OpenStackAuthenticationToken {
 
         OpenStackAccess openStackAccess = new OpenStackAccess();
 
+        log.info("using keystone version: " + openStackKeystone.getVersion());
         log.info("generate new valid token for admin");
 
         Response response = null;
         try {
 
-            WebTarget wr = client.target(url);
+            WebTarget wr = client.target(openStackKeystone.getKeystoneURL(url));
 
-            String payload = "{\"auth\":{\"identity\":{\"methods\":[\"password\"],"
-                    + "\"password\":{\"user\":{\"domain\":{\"id\":\"default\"}," + "\"name\":\"" + user
-                    + "\",\"password\":\"" + pass + "\"}}}}}";
+            String payload = openStackKeystone.getPayload(user, pass, tenant);
 
             Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
 
@@ -121,20 +133,7 @@ public class OpenStackAuthenticationToken {
 
                 JSONObject jsonObjectResponse = JSONObject.fromObject(response.readEntity(String.class));
 
-                if (jsonObjectResponse.containsKey("token")) {
-                    String xSubjectToken = response.getHeaderString("X-Subject-Token");
-                    openStackAccess.setAccessJSON(jsonObjectResponse);
-
-                    JSONObject tokenObject = (JSONObject) jsonObjectResponse.get("token");
-                    String tenantId = (String) ((JSONObject) tokenObject.get("project")).get("id");
-                    String tenantName = (String) ((JSONObject) tokenObject.get("project")).get("name");
-
-                    openStackAccess.setToken(xSubjectToken);
-                    openStackAccess.setTenantId(tenantId);
-                    openStackAccess.setTenantName(tenantName);
-                    log.info("generated new token for tenantId:" + tenantId + " with tenantName: " + tenantName);
-
-                }
+                openStackKeystone.parseResponse(openStackAccess, response, jsonObjectResponse);
             } else {
                 String exceptionMessage = "Failed : HTTP error code : (" + url + ")" + response.getStatus()
                         + " message: " + response;
@@ -160,6 +159,7 @@ public class OpenStackAuthenticationToken {
      * @return
      */
     public String getKeystoneURL() {
-        return this.url;
+        return openStackKeystone.getKeystoneURL(url);
     }
+
 }
