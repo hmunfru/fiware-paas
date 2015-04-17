@@ -36,6 +36,8 @@ import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 
@@ -215,5 +217,31 @@ public class OpenStackKeystoneV3 implements OpenStackKeystone {
         }
 
         return names;
+    }
+
+    public String[] checkToken(String token, String tenantId, Response response) {
+        // Validate user's token
+        if (response.getStatus() == 200) {
+            JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
+            jsonObject = (JSONObject) jsonObject.get("token");
+            String responseTenantId = (String) ((JSONObject) jsonObject.get("project")).get("id");
+            String responseTenantName = (String) ((JSONObject) jsonObject.get("project")).get("name");
+            JSONObject userObject = (JSONObject) jsonObject.get("user");
+            String responseUserName = (String) (userObject.get("name"));
+
+            if (!tenantId.equals(responseTenantId)) {
+                throw new AuthenticationServiceException("Token " + token + " not valid for the tenantId provided:"
+                        + tenantId);
+            }
+            return new String[] { responseUserName, responseTenantName };
+        } else {
+            log.warn("response status:" + response.getStatus());
+
+            if (response.getStatus() == 401) {
+                throw new BadCredentialsException("Invalid token");
+            }
+
+            throw new AuthenticationServiceException("Invalid token");
+        }
     }
 }
