@@ -33,6 +33,8 @@ import javax.ws.rs.core.Response;
 import net.sf.json.JSONObject;
 
 import org.junit.Test;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 public class OpenStackKeystoneV3Test {
 
@@ -117,5 +119,69 @@ public class OpenStackKeystoneV3Test {
         assertEquals("tenantId1", openStackAccess.getTenantId());
         assertEquals("tenantName1", openStackAccess.getTenantName());
         assertNotNull(openStackAccess.getAccessJSON());
+    }
+
+    @Test
+    public void shouldCheckTokenWithValidToken() {
+        // given
+        String responseJSON = "{\"token\":{\"methods\":[\"password\"],"
+                + "\"roles\":[{\"id\":\"13abab31bc194317a009b25909f390a6\",\"name\":\"owner\"}],"
+                + "\"expires_at\":\"2015-04-16T06:49:07.794235Z\",\"project\":{\"domain\":{\"id\":\"default\","
+                + "\"name\":\"Default\"},\"id\":\"tenantId1\",\"name\":\"tenant name1\"},"
+                + "\"extras\":{},\"user\":{\"domain\":{\"id\":\"default\",\"name\":\"Default\"},"
+                + "\"id\":\"a7e01921db0049f69daa76490402714a\",\"name\":\"username1\"},"
+                + "\"audit_ids\":[\"0u8bgE6AStObXnzfI9nu6A\"],\"issued_at\":\"2015-04-15T10:49:07.794329Z\"}}";
+
+        OpenStackKeystone openStackKeystone = new OpenStackKeystoneV3();
+
+        Response response = mock(Response.class);
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
+        when(response.getHeaderString("X-Subject-Token")).thenReturn("token1");
+        when(response.getStatus()).thenReturn(200);
+        // when
+        String result[] = openStackKeystone.checkToken("token1", "tenantId1", response);
+        // then
+        assertNotNull(result);
+        assertEquals("username1", result[0]);
+        assertEquals("tenant name1", result[1]);
+
+    }
+
+    @Test(expected = BadCredentialsException.class)
+    public void shouldCheckTokenWithInValidToken() {
+        // given
+
+        OpenStackKeystone openStackKeystone = new OpenStackKeystoneV3();
+
+        Response response = mock(Response.class);
+        when(response.getHeaderString("X-Subject-Token")).thenReturn("token1");
+        when(response.getStatus()).thenReturn(401);
+        // when
+        openStackKeystone.checkToken("token1", "tenantId1", response);
+        // then
+
+    }
+
+    @Test(expected = AuthenticationServiceException.class)
+    public void shouldCheckTokenWithInvalidTenantId() {
+        // given
+        String responseJSON = "{\"token\":{\"methods\":[\"password\"],"
+                + "\"roles\":[{\"id\":\"13abab31bc194317a009b25909f390a6\",\"name\":\"owner\"}],"
+                + "\"expires_at\":\"2015-04-16T06:49:07.794235Z\",\"project\":{\"domain\":{\"id\":\"default\","
+                + "\"name\":\"Default\"},\"id\":\"tenantId2\",\"name\":\"tenant name1\"},"
+                + "\"extras\":{},\"user\":{\"domain\":{\"id\":\"default\",\"name\":\"Default\"},"
+                + "\"id\":\"a7e01921db0049f69daa76490402714a\",\"name\":\"username1\"},"
+                + "\"audit_ids\":[\"0u8bgE6AStObXnzfI9nu6A\"],\"issued_at\":\"2015-04-15T10:49:07.794329Z\"}}";
+
+        OpenStackKeystone openStackKeystone = new OpenStackKeystoneV3();
+
+        Response response = mock(Response.class);
+        when(response.readEntity(String.class)).thenReturn(responseJSON);
+        when(response.getHeaderString("X-Subject-Token")).thenReturn("token1");
+        when(response.getStatus()).thenReturn(200);
+        // when
+        openStackKeystone.checkToken("token1", "tenantId1", response);
+        // then
+
     }
 }

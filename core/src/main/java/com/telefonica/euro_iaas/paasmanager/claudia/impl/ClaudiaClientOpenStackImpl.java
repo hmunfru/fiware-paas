@@ -182,35 +182,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         return string + suffix;
     }
 
-    /**
-     * Decodes an base64-encoded UTF-8/ASCII string to it's Base64 value. Gives anomalous result for string with any
-     * other encoding. Output is similar to output of this command on Linux: printf "<string>" | base64 -d
-     * 
-     * @param string
-     * @return Base64 Decoding of parameter string
-     */
-    public static String decode(String string) {
-        String binary_string = "";
-        for (char c : string.toCharArray()) {
-            if (c == '=')
-                break;
-            String char_to_binary = Integer.toBinaryString(radixBase64.indexOf(c));
-            while (char_to_binary.length() < 6)
-                char_to_binary = "0" + char_to_binary;
-            binary_string += char_to_binary;
-        }
-        if (string.endsWith("=="))
-            binary_string = binary_string.substring(0, binary_string.length() - 4);
-        else if (string.endsWith("="))
-            binary_string = binary_string.substring(0, binary_string.length() - 2);
-        string = "";
-        for (int i = 0; i < binary_string.length(); i += 8) {
-            String eight_binary_digits = binary_string.substring(i, i + 8);
-            string += (char) Integer.parseInt(eight_binary_digits, 2);
-        }
-        return string;
-    }
-
     public String getUserData(ClaudiaData claudiaData, TierInstance tierInstance) {
         log.debug("Creating user data");
         String file = null;

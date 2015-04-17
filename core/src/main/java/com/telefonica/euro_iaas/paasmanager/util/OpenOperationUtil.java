@@ -65,64 +65,7 @@ public interface OpenOperationUtil {
      * name of the resource Images.
      */
     String RESOURCE_IMAGES = "images/";
-    /**
-     * name of the resource Flavors.
-     */
-    String RESOURCE_FLAVORS = "flavors/";
-    /**
-     * name of the resource Networks.
-     */
-    String RESOURCE_NETWORKS = "networks";
 
-    /**
-     * name of the resource Networks.
-     */
-    String RESOURCE_PORTS = "ports";
-    /**
-     * name of the resource Subnets.
-     */
-    String RESOURCE_SUBNETS = "subnets";
-    /**
-     * name of the resource Subnets.
-     */
-    String RESOURCE_ROUTERS = "routers";
-    /**
-     * name of the resource Servers.
-     */
-    String RESOURCE_SERVERS = "servers";
-    /**
-     * path for a detailed resource .
-     */
-    String RESOURCE_DETAIL = "detail";
-    /**
-     * path for actions.
-     */
-    String RESOURCE_ACTION = "action";
-    /**
-     * path for add interfaces to routers.
-     */
-    String RESOURCE_ADD_INTERFACE = "add_router_interface";
-    /**
-     * path for remove interfaces to routers.
-     */
-    String RESOURCE_REMOVE_INTERFACE = "remove_router_interface";
-
-    /**
-     * path for floatingIPS.
-     */
-    String RESOURCE_FLOATINGIP = "os-floating-ips";
-    /**
-     * name of OpenStack constant name: org.openstack.compute.storage.root. Amount of root Disk.
-     */
-    String OPENSTACK_COMPUTE_STORAGE_ROOT = "org.openstack.compute.storage.root";
-    /**
-     * name of OpenStack constant name: org.openstack.compute.storage.root. Amount of root Disk.
-     */
-    String OPENSTACK_COMPUTE_STORAGE_EPHEMERAL = "org.openstack.compute.storage.ephemeral";
-    /**
-     * name of OpenStack constant name: org.openstack.compute.swap. Amount of swap.
-     */
-    String OPENSTACK_COMPUTE_SWAP = "org.openstack.compute.swap";
     /**
      * path for a detailed resource.
      */
@@ -205,6 +148,14 @@ public interface OpenOperationUtil {
      */
     String executeNovaRequest(HttpUriRequest request) throws OpenStackException;
 
+    /**
+     * @param resourceNetwoksFederated
+     * @param payload
+     * @param applicationJson
+     * @param token
+     * @return
+     * @throws OpenStackException
+     */
     HttpUriRequest createJoinQuantumPostRequestRequest(String resourceNetwoksFederated, String payload,
             String applicationJson, String token) throws OpenStackException;
 

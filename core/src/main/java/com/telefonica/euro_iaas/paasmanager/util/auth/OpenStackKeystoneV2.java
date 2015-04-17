@@ -117,6 +117,13 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
         }
     }
 
+    /**
+     * @param jsonObject
+     * @param type
+     * @param regionName
+     * @return
+     * @throws OpenStackException
+     */
     public String parseEndpoint(JSONObject jsonObject, String type, String regionName) throws OpenStackException {
         String url = null;
         Map<String, String> urlMap = new HashMap<String, String>();
@@ -159,7 +166,12 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
         return urlMap.get(defaultRegion);
     }
 
-    public List<String> parseRegionNames(JSONObject jsonObject, String name) {
+    /**
+     * @param jsonObject
+     * @param serviceName
+     * @return
+     */
+    public List<String> parseRegionNames(JSONObject jsonObject, String serviceName) {
 
         List<String> names = new ArrayList<String>(2);
         if (jsonObject.containsKey("access")) {
@@ -174,7 +186,7 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
                 serviceJSON = JSONObject.fromObject(it.next());
                 String name1 = serviceJSON.get("name").toString();
 
-                if (name.equals(name1)) {
+                if (serviceName.equals(name1)) {
                     JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
 
                     Iterator it2 = endpointsArray.iterator();
@@ -197,7 +209,7 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
 
     @Override
     public String[] checkToken(String token, String tenantId, Response response) {
-        if (response.getStatus() == 200) {
+        if (response.getStatus() == CODE_200) {
             JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
             jsonObject = (JSONObject) jsonObject.get("access");
             JSONObject tokenJSONObject = (JSONObject) jsonObject.get("token");
@@ -217,7 +229,7 @@ public class OpenStackKeystoneV2 implements OpenStackKeystone {
         } else {
             log.warn("response status:" + response.getStatus());
 
-            if (response.getStatus() == 401) {
+            if (response.getStatus() == CODE_401) {
                 throw new BadCredentialsException("Invalid token");
             }
 

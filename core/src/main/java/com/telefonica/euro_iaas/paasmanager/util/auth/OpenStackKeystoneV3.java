@@ -219,9 +219,15 @@ public class OpenStackKeystoneV3 implements OpenStackKeystone {
         return names;
     }
 
+    /**
+     * @param token
+     * @param tenantId
+     * @param response
+     * @return
+     */
     public String[] checkToken(String token, String tenantId, Response response) {
         // Validate user's token
-        if (response.getStatus() == 200) {
+        if (response.getStatus() == CODE_200) {
             JSONObject jsonObject = JSONObject.fromObject(response.readEntity(String.class));
             jsonObject = (JSONObject) jsonObject.get("token");
             String responseTenantId = (String) ((JSONObject) jsonObject.get("project")).get("id");
@@ -235,9 +241,9 @@ public class OpenStackKeystoneV3 implements OpenStackKeystone {
             }
             return new String[] { responseUserName, responseTenantName };
         } else {
-            log.warn("response status:" + response.getStatus());
+            log.warn("response status:" + response.getStatus() + " body: " + response.readEntity(String.class));
 
-            if (response.getStatus() == 401) {
+            if (response.getStatus() == CODE_401) {
                 throw new BadCredentialsException("Invalid token");
             }
 

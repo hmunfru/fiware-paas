@@ -34,6 +34,16 @@ import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 public interface OpenStackKeystone {
 
     /**
+     * HTTP CODE
+     */
+    final static int CODE_200 = 200;
+
+    /**
+     * HTTP CODE
+     */
+    final static int CODE_401 = 401;
+
+    /**
      * @return
      */
     String getVersion();
@@ -70,10 +80,16 @@ public interface OpenStackKeystone {
 
     /**
      * @param jsonObject
-     * @param name
+     * @param serviceName
      * @return
      */
-    List<String> parseRegionNames(JSONObject jsonObject, String name);
+    List<String> parseRegionNames(JSONObject jsonObject, String serviceName);
 
+    /**
+     * @param token
+     * @param tenantId
+     * @param response
+     * @return array with strings: {username,tenantName}
+     */
     String[] checkToken(String token, String tenantId, Response response);
 }
