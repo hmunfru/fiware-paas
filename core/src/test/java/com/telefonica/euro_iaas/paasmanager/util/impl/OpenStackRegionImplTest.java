@@ -48,12 +48,12 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.util.RegionCache;
+import com.telefonica.fiware.commons.util.TokenCache;
 
 public class OpenStackRegionImplTest {
 

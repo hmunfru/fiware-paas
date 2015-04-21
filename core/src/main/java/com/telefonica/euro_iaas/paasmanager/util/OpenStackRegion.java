@@ -24,8 +24,8 @@
 
 package com.telefonica.euro_iaas.paasmanager.util;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 
 /**
  * Utilities for manage OpenStack regions.

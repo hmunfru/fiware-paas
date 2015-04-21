@@ -24,7 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.validation;
 
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.ApplicationInstanceNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidApplicationReleaseException;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationReleaseDto;

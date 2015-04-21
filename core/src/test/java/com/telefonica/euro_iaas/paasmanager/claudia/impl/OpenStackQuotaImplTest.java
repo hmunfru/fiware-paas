@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Limits;
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;

@@ -32,14 +32,14 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
-import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.RegionCache;
+import com.telefonica.fiware.commons.util.TokenCache;
 
 /**
  * This class implements OpenStackRegion interface.<br>
@@ -109,7 +109,14 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         if (openStackAccess == null) {
 
             if (openStackAuthenticationToken == null) {
-                openStackAuthenticationToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+                String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+
+                String user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+
+                String pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+
+                String tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+                openStackAuthenticationToken = new OpenStackAuthenticationToken(url, user, pass, tenant);
             }
             openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
             tokenCache.putAdmin(openStackAccess);

@@ -39,8 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.dao.TierDao;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.manager.impl.TierManagerImpl;
@@ -52,8 +51,9 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Rule;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
-import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 
 /**
  * @author jesus.movilla
@@ -453,8 +453,7 @@ public class TierManagerImplTest {
         Tier tier = new Tier("name", new Integer(1), new Integer(1), new Integer(1), productReleases, "flavour",
                 "image", "icono", "keypair", "floatingip", "payload");
         when(tierDao.loadTierWithNetworks(any(String.class), any(String.class), any(String.class))).thenThrow(
-                new com.telefonica.euro_iaas.commons.dao.EntityNotFoundException(Tier.class, "error", tier)
-                                                                                                             );
+                new com.telefonica.fiware.commons.dao.EntityNotFoundException(Tier.class, "error", tier));
 
         tierManager.delete(data, tier);
     }

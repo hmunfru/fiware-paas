@@ -34,8 +34,8 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtil;

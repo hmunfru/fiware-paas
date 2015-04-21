@@ -48,10 +48,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV2;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackKeystoneV2;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackKeystoneV3;
 
 /**
  * Test class to check the OpenStackAuthenticationProvider.

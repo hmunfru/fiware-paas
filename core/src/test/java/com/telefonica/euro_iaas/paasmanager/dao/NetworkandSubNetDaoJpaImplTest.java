@@ -38,11 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetwork;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 
 /**
  * @author jesus.movilla
@@ -80,10 +80,10 @@ public class NetworkandSubNetDaoJpaImplTest {
         assertEquals(networkOut.getSubNets().size(), 0);
 
     }
-    
-    @Test(expected=com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
+
+    @Test(expected = com.telefonica.fiware.commons.dao.EntityNotFoundException.class)
     public void testNetworkLoadError() throws Exception {
-        networkDao.load("other",VDC, REGION);
+        networkDao.load("other", VDC, REGION);
     }
 
     @Test
@@ -138,10 +138,10 @@ public class NetworkandSubNetDaoJpaImplTest {
         }
 
     }
-    
-    @Test(expected=com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
+
+    @Test(expected = com.telefonica.fiware.commons.dao.EntityNotFoundException.class)
     public void testSubNetworkLoadError2() throws Exception {
-    	subNetworkDao.load("other", VDC, REGION);
+        subNetworkDao.load("other", VDC, REGION);
     }
 
     @Test

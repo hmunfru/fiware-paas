@@ -24,7 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.validation;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.AlreadyExistEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentInstanceException;

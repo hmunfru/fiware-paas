@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtilImpl;

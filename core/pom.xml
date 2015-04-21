@@ -97,8 +97,8 @@
         </dependency>
         <!-- Persistence -->
         <dependency>
-            <groupId>com.telefonica.euro_iaas</groupId>
-            <artifactId>commons-dao</artifactId>
+            <groupId>com.telefonica.fiware</groupId>
+            <artifactId>commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.telefonica.euro_iaas</groupId>

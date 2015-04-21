@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.AttributeDao;
 import com.telefonica.euro_iaas.paasmanager.dao.MetadataDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;

@@ -33,10 +33,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.NetworkClient;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;

@@ -34,7 +34,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.QuotaClient;
 import com.telefonica.euro_iaas.paasmanager.exception.AlreadyExistEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;

@@ -48,12 +48,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
-import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.paasmanager.util.TokenCache;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAuthenticationToken;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.TokenCache;
 
 /**
  * The Class OpenStackAuthenticationProvider.
@@ -135,7 +135,7 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         log.debug("Keystone URL : " + oSAuthToken.getKeystoneURL());
         log.debug("adminToken : " + openStackAccess.getToken());
 
-        PaasManagerUser paasManagerUser = tokenCache.getPaasManagerUser(token, tenantId);
+        PaasManagerUser paasManagerUser = (PaasManagerUser) tokenCache.getPaasManagerUser(token, tenantId);
         Response response = null;
         try {
             if (paasManagerUser == null) {
@@ -191,7 +191,15 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         if (openStackAccess == null) {
             Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
             if (oSAuthToken == null) {
-                oSAuthToken = new OpenStackAuthenticationToken(systemPropertiesProvider);
+
+                String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+
+                String user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+
+                String pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+
+                String tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+                oSAuthToken = new OpenStackAuthenticationToken(url, user, pass, tenant);
             }
 
             openStackAccess = oSAuthToken.getAdminCredentials(client);

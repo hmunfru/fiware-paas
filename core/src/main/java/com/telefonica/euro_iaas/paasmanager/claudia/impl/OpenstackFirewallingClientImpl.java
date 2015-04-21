@@ -43,14 +43,14 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.FirewallingClient;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.Rule;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
 
 /**
  * @author henar munoz

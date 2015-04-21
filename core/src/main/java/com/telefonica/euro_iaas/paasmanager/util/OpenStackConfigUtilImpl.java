@@ -33,10 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
-import com.telefonica.euro_iaas.paasmanager.util.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.util.RegionCache;
 
 /**
  * @author jesus.movilla

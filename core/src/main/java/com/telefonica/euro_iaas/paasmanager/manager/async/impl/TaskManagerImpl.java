@@ -30,8 +30,8 @@ import static com.telefonica.euro_iaas.paasmanager.util.Configuration.TASK_PATH;
 import java.text.MessageFormat;
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.TaskDao;
 import com.telefonica.euro_iaas.paasmanager.exception.PaasManagerServerRuntimeException;
 import com.telefonica.euro_iaas.paasmanager.manager.async.TaskManager;
