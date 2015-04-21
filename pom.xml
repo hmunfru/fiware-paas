@@ -476,6 +476,16 @@
                                                 ${project.build.directory}/paas-manager-server-dist/webapps/paasmanager.xml
                                             </location>
                                         </source>
+                                        <source>
+                                            <location>
+                                                ${project.build.directory}/paas-manager-server-dist/resources/db-initial.sql
+                                            </location>
+                                        </source>
+                                        <source>
+                                            <location>
+                                                ${project.build.directory}/paas-manager-server-dist/resources/db-changelog.sql
+                                            </location>
+                                        </source>
                                     </sources>
                                 </mapping>
                             </mappings>
