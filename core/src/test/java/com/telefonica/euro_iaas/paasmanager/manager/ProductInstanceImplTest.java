@@ -49,7 +49,7 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductInstance;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 
 /**

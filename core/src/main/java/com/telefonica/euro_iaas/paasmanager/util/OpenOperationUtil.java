@@ -26,51 +26,17 @@ package com.telefonica.euro_iaas.paasmanager.util;
 
 // import org.openstack.docs.compute.api.v1.Server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.logging.Level;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
-import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 
 /**
  * @author jesus.movilla
  */
 public interface OpenOperationUtil {
-    
+
     /**
      * pool name in nova *
      */
@@ -107,7 +73,7 @@ public interface OpenOperationUtil {
      * name of the resource Networks.
      */
     String RESOURCE_NETWORKS = "networks";
-    
+
     /**
      * name of the resource Networks.
      */
@@ -163,20 +129,6 @@ public interface OpenOperationUtil {
 
     String ERROR_AUTHENTICATION_HEADERS = "Authentication Token, Tenant ID and User must be initialized...";
 
-
-    PaasManagerUser getAdminUser(PaasManagerUser user) throws OpenStackException; 
-    /**
-     * It obtains the request for invoking Openstack keystone with admin credentials.
-     * 
-     * @return
-     * @throws OpenStackException
-     */
-    HttpPost createKeystonePostRequest() throws OpenStackException; 
-
-    ArrayList<Object> executePostRequest(HttpPost postRequest) throws OpenStackException ; 
-
-   
-
     /**
      * Returns a request for a NOVA DELETE petition.
      * 
@@ -185,12 +137,14 @@ public interface OpenOperationUtil {
      * @return HttpUriRequest the request
      */
     HttpUriRequest createNovaDeleteRequest(String resource, String region, String token, String vdc)
-            throws OpenStackException; 
+            throws OpenStackException;
+
     /**
      * Returns a request for a NOVA GET petition.
      */
     HttpUriRequest createNovaGetRequest(String resource, String accept, String region, String token, String vdc)
-            throws OpenStackException ; 
+            throws OpenStackException;
+
     /**
      * Returns a request for a NOVA POST petition.
      * 
@@ -198,8 +152,9 @@ public interface OpenOperationUtil {
      *            the target resource
      * @return HttpUriRequest the request
      */
-    HttpPost createNovaPostRequest(String resource, String payload, String content, String accept,
-            String region, String token, String vdc) throws OpenStackException; 
+    HttpPost createNovaPostRequest(String resource, String payload, String content, String accept, String region,
+            String token, String vdc) throws OpenStackException;
+
     /**
      * Returns a request for a QUANTUM DELETE petition.
      * 
@@ -208,7 +163,7 @@ public interface OpenOperationUtil {
      * @return HttpUriRequest the request
      */
     HttpUriRequest createQuantumDeleteRequest(String resource, String region, String vdc, String token)
-            throws OpenStackException; 
+            throws OpenStackException;
 
     /**
      * Returns a request for a Quantum GET petition.
@@ -217,8 +172,9 @@ public interface OpenOperationUtil {
      *            the target resource
      * @return HttpUriRequest the request
      */
-    HttpUriRequest createQuantumGetRequest(String resource, String accept, String region, String token,
-            String vdc) throws OpenStackException; 
+    HttpUriRequest createQuantumGetRequest(String resource, String accept, String region, String token, String vdc)
+            throws OpenStackException;
+
     /**
      * Returns a request for a Quantum POST petition.
      * 
@@ -226,8 +182,9 @@ public interface OpenOperationUtil {
      *            the target resource
      * @return HttpUriRequest the request
      */
-    HttpPost createQuantumPostRequest(String resource, String payload, String content, String region,
-            String token, String vdc) throws OpenStackException; 
+    HttpPost createQuantumPostRequest(String resource, String payload, String content, String region, String token,
+            String vdc) throws OpenStackException;
+
     /**
      * Returns a request for a Quantum POST petition.
      * 
@@ -235,8 +192,8 @@ public interface OpenOperationUtil {
      *            the target resource
      * @return HttpUriRequest the request
      */
-    HttpPut createQuantumPutRequest(String resource, String payload, String content, String region,
-            String token, String vdc) throws OpenStackException ;    
+    HttpPut createQuantumPutRequest(String resource, String payload, String content, String region, String token,
+            String vdc) throws OpenStackException;
 
     /**
      * Method to execute a request and get the response from NOVA.
@@ -246,9 +203,9 @@ public interface OpenOperationUtil {
      * @return HttpUriRequest the response from server
      * @throws OpenStackException
      */
-    String executeNovaRequest(HttpUriRequest request) throws OpenStackException ;
-	HttpUriRequest createJoinQuantumPostRequestRequest(
-			String resourceNetwoksFederated, String payload,
-			String applicationJson, String token) throws OpenStackException;
+    String executeNovaRequest(HttpUriRequest request) throws OpenStackException;
+
+    HttpUriRequest createJoinQuantumPostRequestRequest(String resourceNetwoksFederated, String payload,
+            String applicationJson, String token) throws OpenStackException;
 
 }

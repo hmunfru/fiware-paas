@@ -36,13 +36,14 @@ import org.springframework.stereotype.Component;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.manager.ProductReleaseManager;
 import com.telefonica.euro_iaas.paasmanager.manager.TierManager;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.ProductReleaseDto;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
@@ -65,20 +66,25 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
     /**
      * Delete a product release resource.
-     * @param org   The organization id
-     * @param vdc   The vdc id.
-     * @param envName   The name of th environment.
-     * @param tierName  The name of the tier.
-     * @param productReleaseName    The name of the product to be deleted.
-     * @throws APIException Any exception launched during the deleting process.
+     * 
+     * @param org
+     *            The organization id
+     * @param vdc
+     *            The vdc id.
+     * @param envName
+     *            The name of th environment.
+     * @param tierName
+     *            The name of the tier.
+     * @param productReleaseName
+     *            The name of the product to be deleted.
+     * @throws APIException
+     *             Any exception launched during the deleting process.
      */
     public void delete(String org, String vdc, String envName, String tierName, String productReleaseName)
-        throws APIException {
+            throws APIException {
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, envName);
 
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            claudiaData.setUser(getCredentials());
-        }
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         try {
 
@@ -96,21 +102,24 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
     /**
      * Insert a new product release resource.
-     * @param org   The organization id
-     * @param vdc   The vdc id.
-     * @param environmentName   The environment name.
-     * @param tierName  The name of the tier.
-     * @param productReleaseDto The information of the new product release resource.
+     * 
+     * @param org
+     *            The organization id
+     * @param vdc
+     *            The vdc id.
+     * @param environmentName
+     *            The environment name.
+     * @param tierName
+     *            The name of the tier.
+     * @param productReleaseDto
+     *            The information of the new product release resource.
      */
     public void insert(String org, String vdc, String environmentName, String tierName,
             ProductReleaseDto productReleaseDto) {
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
         ProductRelease productRelease = null;
-
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            claudiaData.setUser(getCredentials());
-        }
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         try {
             productRelease = productReleaseManager.load(
@@ -124,7 +133,7 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
             Tier tier = tierManager.load(tierName, vdc, environmentName);
             tier.addProductRelease(productRelease);
-            //tierManager.addSecurityGroupToProductRelease(claudiaData, tier, productRelease);
+            // tierManager.addSecurityGroupToProductRelease(claudiaData, tier, productRelease);
             tierManager.update(tier);
 
         } catch (InvalidEntityException e) {
@@ -139,22 +148,27 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
     /**
      * Find a specific product release resource.
-     * @param org   The organization id
-     * @param vdc   The vdc id.
-     * @param environment   The environment id.
-     * @param tier  The tier id.
-     * @param name  The name of the product release resource.
-     * @return  The detail of the product release resource.
-     * @throws APIException Any exception launched during the process.
+     * 
+     * @param org
+     *            The organization id
+     * @param vdc
+     *            The vdc id.
+     * @param environment
+     *            The environment id.
+     * @param tier
+     *            The tier id.
+     * @param name
+     *            The name of the product release resource.
+     * @return The detail of the product release resource.
+     * @throws APIException
+     *             Any exception launched during the process.
      */
     public ProductReleaseDto load(String org, String vdc, String environment, String tier, String name)
-        throws APIException {
+            throws APIException {
         try {
             ClaudiaData claudiaData = new ClaudiaData(org, vdc, environment);
 
-            if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-                claudiaData.setUser(getCredentials());
-            }
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
             ProductRelease productRelease = productReleaseManager.load(name, claudiaData);
 
             return convertToDto(productRelease);
@@ -189,7 +203,8 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
     /**
      * Get user credentials.
-     * @return  Credential.
+     * 
+     * @return Credential.
      */
     public PaasManagerUser getCredentials() {
         if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
@@ -201,13 +216,20 @@ public class ProductReleaseResourceImpl implements ProductReleaseResource {
 
     /**
      * Find all product release resource associated to a tier.
-     * @param page  The page of data to show.
-     * @param pageSize  The size of data to be returned.
-     * @param orderBy   The order by parameter.
-     * @param orderType The type of order of data o returned.
-     * @param environment   Environment which contains the tier.
-     * @param tier  Tier which contains the product to be listed.
-     * @return  The complete list of product release resource.
+     * 
+     * @param page
+     *            The page of data to show.
+     * @param pageSize
+     *            The size of data to be returned.
+     * @param orderBy
+     *            The order by parameter.
+     * @param orderType
+     *            The type of order of data o returned.
+     * @param environment
+     *            Environment which contains the tier.
+     * @param tier
+     *            Tier which contains the product to be listed.
+     * @return The complete list of product release resource.
      */
     public List<ProductReleaseDto> findAll(Integer page, Integer pageSize, String orderBy, String orderType,
             String environment, String tier) {

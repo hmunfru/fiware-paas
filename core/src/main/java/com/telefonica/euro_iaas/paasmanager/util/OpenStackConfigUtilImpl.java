@@ -32,10 +32,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 
 /**
  * @author jesus.movilla
@@ -84,15 +85,14 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             return networkId;
         }
 
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
-        log.debug("tenatn id" + adminUser.getTenantId() + " tenant name " + adminUser.getTenantName() + " user name"
-                + adminUser.getUserName());
+        log.debug("tenantId" + openStackAccess.getTenantId() + " tenant name " + openStackAccess.getTenantName());
         HttpUriRequest request;
         try {
 
             request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS, APPLICATION_JSON, region,
-                    adminUser.getToken(), adminUser.getTenantId());
+                    openStackAccess.getToken(), openStackAccess.getTenantId());
         } catch (OpenStackException e) {
             log.warn("It is not possible to obtain the quantum endpoint for obtaining the public network net");
             return null;
@@ -109,7 +109,7 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             for (int i = 0; i < jsonNetworks.length(); i++) {
 
                 JSONObject jsonNet = jsonNetworks.getJSONObject(i);
-                NetworkInstance net = isPublicNetwork(jsonNet, adminUser.getUserName(), region);
+                NetworkInstance net = isPublicNetwork(jsonNet, openStackAccess.getTenantId(), region);
 
                 if (net != null) {
                     log.debug("net " + net.getNetworkName() + " " + net.getIdNetwork());
@@ -140,12 +140,12 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             return networkId;
         }
 
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
         HttpUriRequest request;
 
         try {
             request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS, APPLICATION_JSON, region,
-                    adminUser.getToken(), adminUser.getTenantId());
+                    openStackAccess.getToken(), openStackAccess.getTenantId());
         } catch (OpenStackException e) {
             log.warn("Error to obtain the quantum request url ");
             return "net8300";
@@ -161,7 +161,7 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             for (int i = 0; i < jsonNetworks.length(); i++) {
 
                 JSONObject jsonNet = jsonNetworks.getJSONObject(i);
-                NetworkInstance net = isPublicNetwork(jsonNet, adminUser.getUserName(), region);
+                NetworkInstance net = isPublicNetwork(jsonNet, openStackAccess.getTenantId(), region);
                 if (net != null) {
 
                     regionCache.putUrl(region, type, net.getNetworkName());
@@ -202,16 +202,15 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
 
         // String publicNetworkId = this.getPublicAdminNetwork(user, region).getIdNetwork();
 
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
-
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
         HttpUriRequest request = openOperationUtil.createQuantumGetRequest(RESOURCE_ROUTERS, APPLICATION_JSON, region,
-                adminUser.getToken(), adminUser.getTenantId());
+                openStackAccess.getToken(), openStackAccess.getTenantId());
 
         String response = null;
 
         try {
             response = openOperationUtil.executeNovaRequest(request);
-            routerId = getPublicRouterId(response, adminUser.getUserName(), publicNetworkId);
+            routerId = getPublicRouterId(response, openStackAccess.getTenantId(), publicNetworkId);
             if (routerId == null) {
                 String errorMessage = "It is not possible to find a public router for network " + publicNetworkId
                         + ": ";

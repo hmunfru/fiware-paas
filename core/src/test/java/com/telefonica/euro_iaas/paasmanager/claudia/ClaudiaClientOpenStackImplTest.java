@@ -33,12 +33,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.claudia.impl.ClaudiaClientOpenStackImpl;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
@@ -49,7 +47,7 @@ import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
@@ -127,7 +125,7 @@ public class ClaudiaClientOpenStackImplTest {
                 + "# Useful for troubleshooting cloud-init issues\n"
                 + "output: {all: '| tee -a /var/log/cloud-init-output.log'}\n";
 
-        PaasManagerUser user = new PaasManagerUser("username", "myToken", new HashSet<GrantedAuthority>());
+        PaasManagerUser user = new PaasManagerUser("username", "myToken");
         user.setTenantName("FIWARE");
         claudiaData = new ClaudiaData("vdc", "org", "service");
         claudiaData.setUser(user);

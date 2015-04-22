@@ -26,23 +26,19 @@ package com.telefonica.euro_iaas.paasmanager.claudia.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Limits;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 
 public class OpenStackQuotaImplTest {
@@ -54,8 +50,7 @@ public class OpenStackQuotaImplTest {
         OpenStackQuotaClientImpl openStackQuotaImpl = new OpenStackQuotaClientImpl();
 
         ClaudiaData claudiaData = new ClaudiaData("org", "tenantId", "service");
-        List<? extends GrantedAuthority> authorities = new ArrayList();
-        PaasManagerUser user = new PaasManagerUser("user", "pass", authorities);
+        PaasManagerUser user = new PaasManagerUser("user", "pass");
         user.setToken("token");
         claudiaData.setUser(user);
         OpenStackUtil openStackUtil = mock(OpenStackUtil.class);

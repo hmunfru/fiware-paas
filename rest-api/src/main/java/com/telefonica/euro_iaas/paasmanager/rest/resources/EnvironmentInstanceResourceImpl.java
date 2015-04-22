@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
@@ -54,8 +53,8 @@ import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentInstanceDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentInstancePDto;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.EnvironmentInstanceSearchCriteria;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.EnvironmentInstanceResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -90,23 +89,7 @@ public class EnvironmentInstanceResourceImpl implements EnvironmentInstanceResou
     private static Logger log = LoggerFactory.getLogger(EnvironmentInstanceResourceImpl.class);
 
     /**
-     * Add PaasManagerUser to claudiaData.
-     * 
-     * @param claudiaData
-     */
-    public void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-
-            claudiaData.setUser(getCredentials());
-            claudiaData.getUser().setTenantId(claudiaData.getVdc());
-        }
-
-    }
-
-    /**
-     * @throws AlreadyExistsEntityException
-     * @throws InvalidEntityException
-     * @throws EntityNotFoundException
+     * @throws APIException
      */
     public Task create(String org, String vdc, EnvironmentInstanceDto environmentInstanceDto, String callback)
             throws APIException {
@@ -117,7 +100,7 @@ public class EnvironmentInstanceResourceImpl implements EnvironmentInstanceResou
         Task task = null;
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentInstanceDto.getBlueprintName());
-        addCredentialsToClaudiaData(claudiaData);
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
         try {
             validator.validateCreate(environmentInstanceDto, systemPropertiesProvider, claudiaData);
 
@@ -239,9 +222,7 @@ public class EnvironmentInstanceResourceImpl implements EnvironmentInstanceResou
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, name);
 
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            claudiaData.setUser(getCredentials());
-        }
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         Task task = createTask(MessageFormat.format("Destroying EnvironmentInstance {0} ", name), vdc, name);
         environmentInstanceAsyncManager.destroy(claudiaData, environmentInstance, task, callback);
@@ -291,17 +272,4 @@ public class EnvironmentInstanceResourceImpl implements EnvironmentInstanceResou
         this.taskManager = taskManager;
     }
 
-    /**
-     * Get the credentials associated to an user.
-     * 
-     * @return
-     */
-    public PaasManagerUser getCredentials() {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            return (PaasManagerUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } else {
-            return null;
-        }
-
-    }
 }
