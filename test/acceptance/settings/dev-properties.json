@@ -1,22 +1,23 @@
 {
     "environment": {
-        "name": "fiware-lab",
+        "name": "dev-havana",
         "logs_path": "logs",
         "test_files": "testreport/additional_output_files"
     },
     "paas": {
-        "keystone_url": "http://cloud.lab.fi-ware.org:4731/v2.0",
-        "sdc_url": "http://saggita.lab.fi-ware.org:8080/sdc/rest",
-        "paasmanager_url": "http://pegasus.lab.fi-ware.org:8080/paasmanager/rest",
-        "glance_url": "http://glance.lab.fi-ware.org:9292/v1",
-        "nova_url": "http://cloud.lab.fi-ware.org:8774/v2/******tenant*******",
-        "vdc": "*******vdc******",
-        "tenant": "******tenant*******",
-        "user": "******user*******",
-        "password": "*******pass******",
-        "tenant_alt": "******tenant-alt*******",
-        "user_alt": "******tenant-alt-user*******",
-        "password_alt": "******tenant-alt-password*******",
+        "keystone_url": "http://130.206.80.57:4731/v2.0",
+        "sdc_url": "https://130.206.81.126:8443/sdc/rest",
+        "paasmanager_url": "https://130.206.81.64:8443/paasmanager/rest",
+        "glance_url": "",
+        "nova_url": "http://130.206.80.58:8774/v2/******",
+        "vdc": "******",
+        "tenant": "******",
+        "user": "******",
+        "password": "******",
+        "tenant_alt": "******",
+        "vdc_alt": "******",
+        "user_alt": "******",
+        "password_alt": "******",
         "tier_image": "6e2519b8-1b36-4669-b6fe-ed2e77815b9f",
         "tier_num_min": "1",
         "tier_num_max": "1",
@@ -24,6 +25,6 @@
         "tier_flavour": "2",
         "tier_keypair": "default",
         "tier_floatingip": "false",
-        "tier_region": "Spain"
+        "tier_region": "Trento"
     }
 }
