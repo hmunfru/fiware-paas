@@ -65,21 +65,21 @@
         </dependency>
 
         <!-- Claudia TCloud-schemas needed or RECManager -->
-        <dependency>
-            <groupId>com.telefonica.claudia</groupId>
-            <artifactId>ovf-generated-schemas</artifactId>
-            <version>0.3.33</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.telefonica.claudia</groupId>
-            <artifactId>ovf-utils</artifactId>
-            <version>0.3.33</version>
-            <scope>compile</scope>
-            <type>ejb</type>
-        </dependency>
-        <!-- -->
+        <!--  <dependency>
+              <groupId>com.telefonica.claudia</groupId>
+              <artifactId>ovf-generated-schemas</artifactId>
+              <version>0.3.33</version>
+              <scope>compile</scope>
+              <type>jar</type>
+          </dependency>
+          <dependency>
+              <groupId>com.telefonica.claudia</groupId>
+              <artifactId>ovf-utils</artifactId>
+              <version>0.3.33</version>
+              <scope>compile</scope>
+              <type>ejb</type>
+          </dependency>
+         -->
         <dependency>
             <groupId>com.telefonica.iot</groupId>
             <artifactId>sdc-client</artifactId>
@@ -97,7 +97,7 @@
         </dependency>
         <!-- Persistence -->
         <dependency>
-            <groupId>com.telefonica.fiware</groupId>
+            <groupId>com.telefonica.iot</groupId>
             <artifactId>commons</artifactId>
         </dependency>
         <dependency>
