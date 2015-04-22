@@ -218,7 +218,6 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="openOperationUtil" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.util.OpenOperationUtilImpl">
         <property name="openStackRegion" ref="openStackRegion"/>
-        <property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>
         <property name="httpConnectionManager" ref="httpConnectionManager"/>
     </bean>
 

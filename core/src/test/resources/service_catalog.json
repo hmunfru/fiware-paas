@@ -1,0 +1,669 @@
+{
+    "token": {
+        "methods": [
+            "password"
+        ],
+        "roles": [
+            {
+                "id": "13abab31bc194317a009b25909f390a6",
+                "name": "owner"
+            }
+        ],
+        "expires_at": "2015-04-16T07:50:47.439389Z",
+        "project": {
+            "domain": {
+                "id": "default",
+                "name": "Default"
+            },
+            "id": "2189cc3267484eae87726728ce783610",
+            "name": "jesuspg2"
+        },
+        "catalog": [
+            {
+                "endpoints": [
+                    {
+                        "region_id": "RegionOne",
+                        "url": "http://172.15.10.206:4731/v3",
+                        "region": "RegionOne",
+                        "interface": "admin",
+                        "id": "0af612b78ea74b87be772caad7d9400f"
+                    },
+                    {
+                        "region_id": "RegionOne",
+                        "url": "http://172.15.10.206:4730/v3",
+                        "region": "RegionOne",
+                        "interface": "public",
+                        "id": "2906f080533a4269a4080a837a66be4e"
+                    },
+                    {
+                        "region_id": "RegionOne",
+                        "url": "http://172.15.10.206:4730/v3",
+                        "region": "RegionOne",
+                        "interface": "internal",
+                        "id": "5919cd3bfb5a45a9a73b08c876cc2692"
+                    }
+                ],
+                "type": "identity",
+                "id": "08017239fd004280884a55c1954bba7b",
+                "name": "keystone"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "056795988aaa473abfb0129df8422418"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "2b10a924ef124d1b90ab63547c6fb09e"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "628f5bea1f7649d68892932ae3ce9213"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "6bdd14dd6f92409793e3e1d2544f455e"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "c18fb8e7ead94f95adf6d512e2cd6a9a"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8776/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "fae1fcef39954721ba92047e009a9312"
+                    }
+                ],
+                "type": "volume",
+                "id": "0b4ec4c8603d47909a1dee914c64ebfc",
+                "name": "cinder"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "085293ff40fa45289c81c944395510a9"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "9ba552ac0a714c9d8f32455bf3dbe44d"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "9f24e9b2403e43cab7aa784fadfc271b"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "cd8f2770f44745cc8252822338c8dc29"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "dcdfe5b082a4430d81e5e0f9e1b9e692"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "e9145f94db9042848b787eba70d07af3"
+                    }
+                ],
+                "type": "sdc",
+                "id": "1fda6f7f17604c9d9128b7a7e9cbfcef",
+                "name": "sdc"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "46bb468422c54165be6443c1aea130e1"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "70df249ab62649819b7caf20074ff18d"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "82404a2e3f6b49f8a9826a916df55752"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "85db2c8ab659448bb456994a78b96f99"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "a67be750eae744db92e4fcc0e34eb091"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8774/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "ba12c46fc7a448e0b34ac774b67bc277"
+                    }
+                ],
+                "type": "compute",
+                "id": "207b5174a2694e988e220ef163d21bc8",
+                "name": "nova"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "0081fa749f944b24ac76f89ce8082eef"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "8df18fd2d1cd4c02980f7f232d553acb"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "a705844de83543b685a9ed6be3bb7af6"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "bf2a8d53b05e4d0bba309a392444992d"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "c2546996a9c74d55832ff95cefc5659f"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "ca94e7c5f20748ce85478c91084653e6"
+                    }
+                ],
+                "type": "paas",
+                "id": "26182f0dd5f741dda4bdc7ec35ace9ec",
+                "name": "paasmanager"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "05e8858e4d2a41f1849c2c3b5b5b6856"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "42b4a99795264ab5ba71f2e03b35b9fb"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "87ae1658207945f98ab2e913c69a39f1"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "af722b486daa4ba683c2da00b79cc7b9"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "d135c1b3e290490cb1d1010026f0271b"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "ec4c128d7419494b80abb92876a94007"
+                    }
+                ],
+                "type": "chef-server",
+                "id": "2bfb163b629846fb9a117c0765bbf642",
+                "name": "chef-server"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9696/",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "03b03ea81921456c82095b24d5d24a9a"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-neutron:9696/",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "0618d925fc2342839f8b49fd70cac3a3"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-neutron:9696/",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "550af574c9eb4041b893219c24d27584"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9696/",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "dfe5eb6c3d664cd9ab42fc8dab727f0e"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9696/",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "f0ba98baeed041b08c990953de45011b"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-neutron:9696/",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "f45d6b11d7bb428fb13e19391a8d17bc"
+                    }
+                ],
+                "type": "network",
+                "id": "66d81e932856420db8781ee37e24022a",
+                "name": "neutron"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "240c5d1cfb304c47adf24c9cd3b39cca"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "69c08fe3b7d4451ea47cabac380e2d36"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "a1de0605399c498086784cf99985c7a4"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "adb3d236980446fc9f3b0ef1b7cf305b"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "c7d0777174d8491fa662d7769c23f93a"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "f329f53199e64c3b9d5c97d9286dc713"
+                    }
+                ],
+                "type": "puppetmaster",
+                "id": "69c8110a6497455fbaf417ac0ef4e5eb",
+                "name": "puppetmaster"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8000/v1",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "48e4e62883e04b57b7eefd5dd11ad60a"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8000/v1",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "788d0c60ca3a483995b3d95c59942c52"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8000/v1",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "96261d11287648229311cdb368aad69d"
+                    }
+                ],
+                "type": "cloudformation",
+                "id": "6d7010506e634c438c74891114ef2d1a",
+                "name": "heat-cfn"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "6539ea42362646dca2fe9dc107b06bc3"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "6928df0cd8aa4dcea6916495960829c3"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "abc703cab11942e98dabe95c3faf7d97"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "b4f4daa81ae44934b5ffdba01b42c4cd"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "cf696b882c964216b9a8c93f883ac80a"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "fbc55a9338bf4c1bad77fd74cb306a84"
+                    }
+                ],
+                "type": "puppetwrapper",
+                "id": "946cd0e3c1d547029c9fce5ba0d021b0",
+                "name": "puppetwrapper"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "33fae00924eb45f7b8317cca9a4cd321"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "46bbc770aee0400fb834efb11f1f2789"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-cinder:8776/v2/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "b206772996bb4ed08fc29565eab38f49"
+                    }
+                ],
+                "type": "volumev2",
+                "id": "cc2e2d13078a4ff6adaed9b30092b075",
+                "name": "cinderv2"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Trento",
+                        "url": "http://10.95.61.205:8082",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "11b0fc82738c4de3bdfcfbb05f8e13b8"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://localhost:8082",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "4521e14f21584e4bb4e53428b3fde13f"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://10.95.61.205:8082",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "92d032a57b154219b69da406efc4502c"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://10.95.61.205:8082",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "ca3abb6d911b43fa9700256e5bb0fc56"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://10.95.61.205:8082",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "ce1359cd2a844666ac8d4d6892c92fb2"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://localhost:8082",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "d2bfc9528c0f4170be44920ed2aad704"
+                    }
+                ],
+                "type": "application_catalog",
+                "id": "d35c28839fb74a149b8b95eff3a12af9",
+                "name": "application_catalog"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8080/v1",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "58bb5fb0f15a438b80125de9d8570438"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8080/v1/AUTH_2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "83534ddce59446e09fe4df0e87cdfa21"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-controller:8080/v1/AUTH_2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "a82f1e219ddc4a97af32eb93f5903a35"
+                    }
+                ],
+                "type": "object-store",
+                "id": "df4546ca1a2a491091ab3941d5e337af",
+                "name": "swift"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-glance:9292/v1",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "088e74f308f14767b3eca426e6bf8d61"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9292/v1",
+                        "region": "Trento",
+                        "interface": "admin",
+                        "id": "1fb4101aff3740fa80cb055f7b9e74c2"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9292/v1",
+                        "region": "Trento",
+                        "interface": "public",
+                        "id": "226bc832b6cd475d89bcf22f76bbad22"
+                    },
+                    {
+                        "region_id": "Trento",
+                        "url": "http://130.206.80.58:9292/v1",
+                        "region": "Trento",
+                        "interface": "internal",
+                        "id": "b56c011aee134d23bb232a839c43402d"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-glance:9292/v1",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "c0d92840e1a040d49bd1ca14fa670afb"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-glance:9292/v1",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "c44f1650d3304749857694981709ea39"
+                    }
+                ],
+                "type": "image",
+                "id": "f294dcf35cdf4ce0b14a278359cb2ab1",
+                "name": "glance"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8004/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "admin",
+                        "id": "b9ebd863cd9740c0badfd741b4ef98a9"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8004/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "internal",
+                        "id": "d6092658aada4233acccf22c18aea2c7"
+                    },
+                    {
+                        "region_id": "Spain",
+                        "url": "http://dev-havana-heat:8004/v1/2189cc3267484eae87726728ce783610",
+                        "region": "Spain",
+                        "interface": "public",
+                        "id": "e60fa933445d4c0b818da616d5418d83"
+                    }
+                ],
+                "type": "orchestration",
+                "id": "f7f453703e724756a8052fbc4b2176ac",
+                "name": "heat"
+            }
+        ],
+        "extras": {
+
+        },
+        "user": {
+            "domain": {
+                "id": "default",
+                "name": "Default"
+            },
+            "id": "a7e01921db0049f69daa76490402714a",
+            "name": "jesus.perezgonzalez@telefonica.com"
+        },
+        "audit_ids": [
+            "_pkz5NUESaWns0aTtDsZ_A"
+        ],
+        "issued_at": "2015-04-15T11:50:47.439442Z"
+    }
+}

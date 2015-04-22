@@ -24,8 +24,8 @@
 
 package com.telefonica.euro_iaas.paasmanager.util;
 
-import com.telefonica.euro_iaas.paasmanager.bean.OpenStackAccess;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 
 /**
  * Utilities for manage OpenStack regions.
@@ -38,57 +38,61 @@ public interface OpenStackRegion {
      * @param name
      *            e.g. nova, quantum, glance, etc...
      * @param regionName
-     * @param token
      * @return the http url with de endpoint.
      * @throws OpenStackException
      */
-    String getEndPointByNameAndRegionName(String name, String regionName, String token) throws OpenStackException;
+    String getEndPointByNameAndRegionName(String name, String regionName) throws OpenStackException;
 
     /**
      * Get endpoint for nova services.
      * 
      * @param regionName
-     * @param token
      * @return
      * @throws OpenStackException
      */
-    String getNovaEndPoint(String regionName, String token) throws OpenStackException;
+    String getNovaEndPoint(String regionName) throws OpenStackException;
 
     /**
      * Get the endpoint for networks services.
      * 
      * @param regionName
-     * @param token
      * @return
      * @throws OpenStackException
      */
-    String getQuantumEndPoint(String regionName, String token) throws OpenStackException;
+    String getQuantumEndPoint(String regionName) throws OpenStackException;
 
     /**
      * @param regionName
-     * @param token
      * @return
      * @throws OpenStackException
      */
-    String getSdcEndPoint(String regionName, String token) throws OpenStackException;
+    String getSdcEndPoint(String regionName) throws OpenStackException;
 
     /**
-     * @param token
      * @return
      * @throws OpenStackException
      */
-    String getDefaultRegion(String token) throws OpenStackException;
+    String getDefaultRegion() throws OpenStackException;
 
     /**
-     * @param token
      * @return
      * @throws OpenStackException
      */
-    String getFederatedQuantumEndPoint(String token) throws OpenStackException;
+    String getFederatedQuantumEndPoint() throws OpenStackException;
 
-    String getChefServerEndPoint(String region, String token) throws OpenStackException;
+    /**
+     * @param region
+     * @return
+     * @throws OpenStackException
+     */
+    String getChefServerEndPoint(String region) throws OpenStackException;
 
-    String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException;
+    /**
+     * @param regionName
+     * @return
+     * @throws OpenStackException
+     */
+    String getPuppetMasterEndPoint(String regionName) throws OpenStackException;
 
     /**
      * @return
