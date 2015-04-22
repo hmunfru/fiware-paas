@@ -45,6 +45,14 @@
                 <include>*.sh</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/migrations/src/main/resources</directory>
+            <outputDirectory>/resources</outputDirectory>
+            <includes>
+                <include>db-initial.sql</include>
+                <include>db-changelog.sql</include>
+            </includes>
+        </fileSet>
 
 
         <!-- create emtpy directories -->
