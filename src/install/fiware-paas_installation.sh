@@ -2,6 +2,9 @@
 
 
 echo "Checking Linux Distribution before installing PaasManager"
+
+yum install -y  redhat-lsb
+
 linux_distro=` lsb_release -a | grep ID | awk -F " " '{print $3}'`
 
 echo "$linux_distro"
