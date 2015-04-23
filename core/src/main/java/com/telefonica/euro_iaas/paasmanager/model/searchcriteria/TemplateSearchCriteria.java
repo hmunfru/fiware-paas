@@ -24,7 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.model.searchcriteria;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractSearchCriteria;
+import com.telefonica.fiware.commons.dao.AbstractSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 

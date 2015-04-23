@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>paas-manager-core</artifactId>
     <packaging>jar</packaging>
@@ -64,21 +65,21 @@
         </dependency>
 
         <!-- Claudia TCloud-schemas needed or RECManager -->
-        <dependency>
-            <groupId>com.telefonica.claudia</groupId>
-            <artifactId>ovf-generated-schemas</artifactId>
-            <version>0.3.33</version>
-            <scope>compile</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.telefonica.claudia</groupId>
-            <artifactId>ovf-utils</artifactId>
-            <version>0.3.33</version>
-            <scope>compile</scope>
-            <type>ejb</type>
-        </dependency>
-        <!-- -->
+        <!--  <dependency>
+              <groupId>com.telefonica.claudia</groupId>
+              <artifactId>ovf-generated-schemas</artifactId>
+              <version>0.3.33</version>
+              <scope>compile</scope>
+              <type>jar</type>
+          </dependency>
+          <dependency>
+              <groupId>com.telefonica.claudia</groupId>
+              <artifactId>ovf-utils</artifactId>
+              <version>0.3.33</version>
+              <scope>compile</scope>
+              <type>ejb</type>
+          </dependency>
+         -->
         <dependency>
             <groupId>com.telefonica.iot</groupId>
             <artifactId>sdc-client</artifactId>
@@ -96,8 +97,8 @@
         </dependency>
         <!-- Persistence -->
         <dependency>
-            <groupId>com.telefonica.euro_iaas</groupId>
-            <artifactId>commons-dao</artifactId>
+            <groupId>com.telefonica.iot</groupId>
+            <artifactId>commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.telefonica.euro_iaas</groupId>
@@ -269,6 +270,12 @@
 
 
         <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -339,10 +346,6 @@
                     <artifactId>tools</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.telefonica.euro_iaas</groupId>
-            <artifactId>openstack-tcloud-schemas</artifactId>
         </dependency>
 
         <dependency>

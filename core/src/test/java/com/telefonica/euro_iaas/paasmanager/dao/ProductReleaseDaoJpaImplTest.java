@@ -37,10 +37,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 
 /**
  * @author jesus.movilla
@@ -73,20 +73,19 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getVersion(), "2");
 
     }
-    
-    @Test(expected=com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
-    public void testProductReleasesNotAttributesError() throws EntityNotFoundException  {
+
+    @Test(expected = com.telefonica.fiware.commons.dao.EntityNotFoundException.class)
+    public void testProductReleasesNotAttributesError() throws EntityNotFoundException {
 
         productReleaseDao.load("otro-2");
     }
-    
-    @Test(expected=com.telefonica.euro_iaas.commons.dao.EntityNotFoundException.class)
-    public void testProductReleasesNotAttributesError2() throws EntityNotFoundException  {
 
-        productReleaseDao.load("otro","3","tier");
+    @Test(expected = com.telefonica.fiware.commons.dao.EntityNotFoundException.class)
+    public void testProductReleasesNotAttributesError2() throws EntityNotFoundException {
+
+        productReleaseDao.load("otro", "3", "tier");
     }
-    
-    
+
     @Test
     public void testProductReleasesNotAttributesLoadAll() throws Exception {
 
@@ -107,7 +106,7 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getVersion(), "2");
 
     }
-    
+
     @Test
     public void testProductReleasesNotAttributesLoadAllError() throws Exception {
 
@@ -149,7 +148,7 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getAttributes().size(), 1);
 
     }
-    
+
     @Test
     public void testProductReleasesWithAttributesLoadAll() throws Exception {
 
@@ -180,8 +179,6 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getAttributes().size(), 1);
 
     }
-    
- 
 
     @Test
     public void testProductReleasesWithMetadata() throws Exception {
@@ -272,7 +269,7 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getMetadatas().size(), 0);
 
     }
-    
+
     @Test
     public void testProductReleasesWithEmptyAttributesLoadAll() throws Exception {
 
@@ -286,7 +283,7 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productproduct.getMetadatas().size(), 0);
         assertEquals(productproduct.getAttributes().size(), 0);
 
-        ProductRelease productRelease = productReleaseDao.load("product4", "0.1", "tiername" );
+        ProductRelease productRelease = productReleaseDao.load("product4", "0.1", "tiername");
         assertNotNull(productRelease);
         assertEquals(productRelease.getProduct(), "product4");
         assertEquals(productRelease.getVersion(), "0.1");
@@ -315,7 +312,7 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productproduct.getMetadatas().size(), 1);
         assertEquals(productproduct.getAttributes().size(), 1);
 
-        ProductRelease productRelease = productReleaseDao.load("product2","0.1", "tierName");
+        ProductRelease productRelease = productReleaseDao.load("product2", "0.1", "tierName");
         assertNotNull(productRelease);
         assertEquals(productRelease.getProduct(), "product2");
         assertEquals(productRelease.getVersion(), "0.1");
@@ -324,13 +321,12 @@ public class ProductReleaseDaoJpaImplTest {
         assertEquals(productRelease.getMetadatas().size(), 1);
 
     }
-    
+
     @Test
     public void testLoadProductRealseCreateProductReleaseTierNameWithMetadataAndAttributes() throws Exception {
 
         Metadata metproduct = new Metadata("product", "product", "product");
         Attribute attribute = new Attribute("product", "product", "product");
-   
 
         ProductRelease productproduct = new ProductRelease("product2", "0.1");
         productproduct.addMetadata(metproduct);

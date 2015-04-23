@@ -1,9 +1,0 @@
-<ovfenvelope:Envelope
-        xmlns:ovfenvelope="http://schemas.dmtf.org/ovf/envelope/1"
-        >
-    <ovfenvelope:References/>
-    <ovfenvelope:AnnotationSection ovfenvelope:required="true">
-        <ovfenvelope:Info ovfenvelope:msgid="org.fourcaast.application.id">appValue</ovfenvelope:Info>
-        <ovfenvelope:Annotation></ovfenvelope:Annotation>
-    </ovfenvelope:AnnotationSection>
-</ovfenvelope:Envelope>

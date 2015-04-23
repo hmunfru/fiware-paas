@@ -43,14 +43,14 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.FirewallingClient;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.Rule;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.paasmanager.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
 
 /**
  * @author henar munoz
@@ -84,7 +84,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
      */
     public String deployRule(String region, String token, String vdc, Rule rule) throws InfrastructureException {
         log.debug("Creating security rule " + rule.getFromPort());
-        String novaUrl = getNovaEndPoint(region, token);
+        String novaUrl = getNovaEndPoint(region);
         String url = novaUrl + vdc + "/os-security-group-rules";
         log.debug("actionUri: " + url);
 
@@ -144,10 +144,10 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
         }
     }
 
-    private String getNovaEndPoint(String region, String token) throws InfrastructureException {
+    private String getNovaEndPoint(String region) throws InfrastructureException {
         String novaUrl;
         try {
-            novaUrl = openStackRegion.getNovaEndPoint(region, token);
+            novaUrl = openStackRegion.getNovaEndPoint(region);
         } catch (OpenStackException e) {
             log.warn("Can not obtain nova url " + e);
             throw new InfrastructureException("Can not obtain nova url " + e);
@@ -162,7 +162,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
             throws InfrastructureException {
 
         log.debug("Creating security group " + securityGroup.getName());
-        String url = getNovaEndPoint(region, token) + vdc + "/os-security-groups";
+        String url = getNovaEndPoint(region) + vdc + "/os-security-groups";
         log.debug("actionUri: " + url);
 
         String payload = securityGroup.toJSON();
@@ -227,7 +227,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
     public void destroyRule(String region, String token, String vdc, Rule rule) throws InfrastructureException {
 
         log.debug("Destroy security rule " + rule.getFromPort());
-        String url = getNovaEndPoint(region, token) + vdc + "/os-security-group-rules/" + rule.getIdRule();
+        String url = getNovaEndPoint(region) + vdc + "/os-security-group-rules/" + rule.getIdRule();
         log.debug("actionUri: " + url);
 
         Response response = null;
@@ -284,7 +284,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
             throws InfrastructureException {
 
         log.debug("Destroy security group " + securityGroup.getName());
-        String url = getNovaEndPoint(region, token) + vdc + "/os-security-groups/" + securityGroup.getIdSecurityGroup();
+        String url = getNovaEndPoint(region) + vdc + "/os-security-groups/" + securityGroup.getIdSecurityGroup();
         log.debug("actionUri: " + url);
 
         Response response = null;
@@ -370,7 +370,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
             throws InfrastructureException {
 
         String url = null;
-        url = getNovaEndPoint(region, token) + vdc + "/os-security-groups";
+        url = getNovaEndPoint(region) + vdc + "/os-security-groups";
         log.debug("actionUri: " + url);
         Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
 
@@ -410,7 +410,7 @@ public class OpenstackFirewallingClientImpl implements FirewallingClient {
 
         log.debug("Loading security group " + securityGroupId);
         String url = null;
-        url = getNovaEndPoint(region, token) + vdc + "/os-security-groups/" + securityGroupId;
+        url = getNovaEndPoint(region) + vdc + "/os-security-groups/" + securityGroupId;
 
         log.debug("actionUri: " + url);
 

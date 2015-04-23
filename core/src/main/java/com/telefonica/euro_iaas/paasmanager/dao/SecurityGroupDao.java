@@ -24,9 +24,9 @@
 
 package com.telefonica.euro_iaas.paasmanager.dao;
 
-import com.telefonica.euro_iaas.commons.dao.BaseDAO;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.BaseDAO;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 
 /**

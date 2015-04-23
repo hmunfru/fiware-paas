@@ -27,7 +27,7 @@ package com.telefonica.euro_iaas.paasmanager.model.searchcriteria;
 import java.util.Date;
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractSearchCriteria;
+import com.telefonica.fiware.commons.dao.AbstractSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 
 public class TaskSearchCriteria extends AbstractSearchCriteria {

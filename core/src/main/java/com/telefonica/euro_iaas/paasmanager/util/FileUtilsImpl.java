@@ -25,15 +25,12 @@
 package com.telefonica.euro_iaas.paasmanager.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 
 import com.telefonica.euro_iaas.paasmanager.exception.FileUtilsException;
 
@@ -51,30 +48,14 @@ public class FileUtilsImpl implements FileUtils {
 
         try {
             while ((actualString = reader.readLine()) != null) {
-                ruleFile.append("      "+ actualString + "\n");
+                ruleFile.append("      " + actualString + "\n");
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             throw new FileUtilsException("Error in reading the file " + path);
         }
 
-
         return ruleFile.toString();
-    }
-
-    public void generationFile(String filename, String text) throws FileUtilsException {
-        if (text == null)
-            throw new FileUtilsException("No data to write in the file ");
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(filename));
-            out.write(text);
-            out.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            throw new FileUtilsException("Error in generating the file " + filename);
-        }
-
     }
 
     public String readFile(String fileName) throws FileUtilsException {
@@ -88,7 +69,6 @@ public class FileUtilsImpl implements FileUtils {
 
             InputStream targetStream = new FileInputStream(initialFile);
             reader = new BufferedReader(new InputStreamReader(targetStream));
-
 
             String actualString;
             while ((actualString = reader.readLine()) != null) {

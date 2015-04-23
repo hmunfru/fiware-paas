@@ -27,8 +27,8 @@ package com.telefonica.euro_iaas.paasmanager.rest.validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.ApplicationInstanceNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidApplicationReleaseException;
 import com.telefonica.euro_iaas.paasmanager.manager.ApplicationInstanceManager;

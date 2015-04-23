@@ -28,7 +28,7 @@ from tools.tier import Tier
 from tools.keystone_request import KeystoneRequest, get_token_value
 from tools.utils import raw_httplib_request_to_python_dic
 from tools.constants import NAME, DESCRIPTION, PRODUCTS, NETWORKS, PAAS,\
-    TIER_IMAGE, KEYSTONE_URL, TENANT_ALT, USER_ALT, PASSWORD_ALT
+    TIER_IMAGE, KEYSTONE_URL, TENANT_ALT, USER_ALT, PASSWORD_ALT, VDC_ALT
 
 dataset_utils = DatasetUtils()
 
@@ -119,4 +119,4 @@ def a_token_requested_by_other_user(step):
                                        world.config[PAAS][USER_ALT], world.config[PAAS][PASSWORD_ALT])
     token = get_token_value(raw_httplib_request_to_python_dic(keystone_request.get_token()))
     world.headers.update({'X-Auth-Token': token})
-    world.headers.update({'Tenant-Id': world.config[PAAS][TENANT_ALT]})
+    world.headers.update({'Tenant-Id': world.config[PAAS][VDC_ALT]})

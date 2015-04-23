@@ -29,7 +29,7 @@ import static com.telefonica.euro_iaas.paasmanager.util.Configuration.SDC_SERVER
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.ProductInstallatorException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.sdc.model.Task;
@@ -51,7 +51,7 @@ public class SDCUtilImpl implements SDCUtil {
         String msgerror = null;
         String sdcServerUrl;
         try {
-            sdcServerUrl = getSdcUtil(token);
+            sdcServerUrl = getSdcUtil();
         } catch (OpenStackException e1) {
             msgerror = "Error to obtain the SDC endpoint or the default region: " + e1.getMessage();
             log.error(msgerror);
@@ -95,9 +95,9 @@ public class SDCUtilImpl implements SDCUtil {
         }
     }
 
-    public String getSdcUtil(String token) throws OpenStackException {
-        String regionName = openStackRegion.getDefaultRegion(token);
-        return openStackRegion.getSdcEndPoint(regionName, token);
+    public String getSdcUtil() throws OpenStackException {
+        String regionName = openStackRegion.getDefaultRegion();
+        return openStackRegion.getSdcEndPoint(regionName);
     }
 
     /**
