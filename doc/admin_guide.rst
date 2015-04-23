@@ -18,8 +18,49 @@ please refer to the postgres official site.
 
 Paas Manager should be installed in a host with 2Gb RAM.
 
-Installation  (for CentOS)
-==========================
+Installation from script
+========================
+
+The installation of fiware-paas can be done in the easiest way by executing the script
+
+.. code ::
+
+     scripts/bootstrap/centos.sh
+
+that is in the github repository of the project.
+
+In order to perform the installation via script, git should be installed (yum install git). 
+Just clone the github repository:
+
+.. code ::
+
+     git clone -b develop https://github.com/telefonicaid/fiware-paas
+
+and go to the folder
+
+.. code ::
+
+     cd fiware-paas/scripts/bootstrap
+
+give the corresponding permissions to the script centos.sh and execute under root user
+
+.. code ::
+
+     ./centos.sh
+     
+The script will ask you the following data:
+- The database name for the fiware-paas
+- the keytone url to connect fiware-paas for the uthentication process
+- the admin keystone user for the autentication process
+- the admin password for the autentication process
+
+Once the script is finished, you will have fiware-paas installed under /opt/fiware-paas/ . Please go to the Sanity Check
+section in order to test the installation. This script does not insert the fiware-paas data into the keystone, so this
+action has to be done manually. In order to complete the instalation please refer to Configuring the PaasManager
+in the kesytone section.
+
+Manual Installation
+===================
 
 Requirements: Install PostgreSQL
 --------------------------------
