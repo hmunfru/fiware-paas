@@ -50,6 +50,7 @@ give the corresponding permissions to the script centos.sh and execute under roo
      
 The script will ask you the following data:
 - The database name for the fiware-paas
+- The postgres password of the database
 - the keytone url to connect fiware-paas for the uthentication process
 - the admin keystone user for the autentication process
 - the admin password for the autentication process

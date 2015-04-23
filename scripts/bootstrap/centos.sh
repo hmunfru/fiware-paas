@@ -38,8 +38,11 @@ yum install -y fiware-paas
 echo "Configuring Postgres"
 
 db_name=
+postgres_user_passwd=
 echo -n "Enter PaasManager Database name [paasmanager] > "
 read db_name
+echo -n "Enter password for postgres user [postgres] > "
+read postgres_user_passwd
 
 echo "PaasManager Database name:$db_name"
 
@@ -47,7 +50,7 @@ sudo -u postgres sh << EOF1
 dbname="postgres"
 username="postgres"
 psql $dbname $username << EOF
-alter user postgres with password 'postgres';
+alter user postgres with password '$postgres_user_passwd';
 create database $db_name;
 grant all privileges on database paasmanager to postgres;
 \q
@@ -79,7 +82,7 @@ echo "Configuring Paas Manager"
 echo "Modifying paasmanager.xml"
 paasmanager_xml_file="/opt/fiware-paas/webapps/paasmanager.xml"
 sed -i "s/>user</>postgres</g" $paasmanager_xml_file
-sed -i "s/>paas</>postgres</g" $paasmanager_xml_file
+sed -i "s/>paas</>$postgres_user_passwd</g" $paasmanager_xml_file
 sed -i "s/>name</>$db_name</g" $paasmanager_xml_file
 sed -i "s/>host</>localhost</g" $paasmanager_xml_file
 
