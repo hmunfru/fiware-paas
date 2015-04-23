@@ -47,12 +47,11 @@ read postgres_user_passwd
 echo "PaasManager Database name:$db_name"
 
 sudo -u postgres sh << EOF1
-dbname="postgres"
 username="postgres"
 psql $dbname $username << EOF
 alter user postgres with password '$postgres_user_passwd';
 create database $db_name;
-grant all privileges on database paasmanager to postgres;
+grant all privileges on database $db_name to postgres;
 \q
 EOF
 EOF1
