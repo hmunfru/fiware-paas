@@ -34,7 +34,7 @@ Just clone the github repository:
 
 .. code ::
 
-     git clone -b develop https://github.com/telefonicaid/fiware-paas
+     git clone https://github.com/telefonicaid/fiware-paas
 
 and go to the folder
 
@@ -42,7 +42,7 @@ and go to the folder
 
      cd fiware-paas/scripts/bootstrap
 
-give the corresponding permissions to the script centos.sh and execute under root user
+Assign the corresponding permissions to the script centos.sh and execute under root user
 
 .. code ::
 
@@ -57,7 +57,7 @@ The script will ask you the following data:
 
 Once the script is finished, you will have fiware-paas installed under /opt/fiware-paas/ . Please go to the Sanity Check
 section in order to test the installation. This script does not insert the fiware-paas data into the keystone, so this
-action has to be done manually. In order to complete the instalation please refer to Configuring the PaasManager
+action has to be done manually. In order to complete the installation please refer to Configuring the PaasManager
 in the kesytone section.
 
 Manual Installation
