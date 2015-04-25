@@ -18,8 +18,50 @@ please refer to the postgres official site.
 
 Paas Manager should be installed in a host with 2Gb RAM.
 
-Installation  (for CentOS)
-==========================
+Installation from script
+========================
+
+The installation of fiware-paas can be done in the easiest way by executing the script
+
+.. code ::
+
+     scripts/bootstrap/centos.sh
+
+that is in the github repository of the project.
+
+In order to perform the installation via script, git should be installed (yum install git). 
+Just clone the github repository:
+
+.. code ::
+
+     git clone https://github.com/telefonicaid/fiware-paas
+
+and go to the folder
+
+.. code ::
+
+     cd fiware-paas/scripts/bootstrap
+
+Assign the corresponding permissions to the script centos.sh and execute under root user
+
+.. code ::
+
+     ./centos.sh
+     
+The script will ask you the following data:
+- The database name for the fiware-paas
+- The postgres password of the database
+- the keytone url to connect fiware-paas for the uthentication process
+- the admin keystone user for the autentication process
+- the admin password for the autentication process
+
+Once the script is finished, you will have fiware-paas installed under /opt/fiware-paas/ . Please go to the Sanity Check
+section in order to test the installation. This script does not insert the fiware-paas data into the keystone, so this
+action has to be done manually. In order to complete the installation please refer to Configuring the PaasManager
+in the kesytone section.
+
+Manual Installation
+===================
 
 Requirements: Install PostgreSQL
 --------------------------------
@@ -393,7 +435,7 @@ The request to test it in the testbed should be
      curl -v -k -H 'Access-Control-Request-Method: GET' -H 'Content-Type: application xml' 
 	 -H 'Accept: application/xml' -H 'X-Auth-Token: 5d035c3a29be41e0b7007383bdbbec57' 
 	 -H 'Tenant-Id: 60b4125450fc4a109f50357894ba2e28' 
-	 -X GET 'http://{PaaSManagerIP}:{port}/paasmanager/rest/catalog/org/FIWARE/environment'
+	 -X GET 'https://{PaaSManagerIP}:8443/paasmanager/rest/catalog/org/FIWARE/environment'
 
 the option -k should be included in the case you have not changed the security configuration of Paas Manager.
 
