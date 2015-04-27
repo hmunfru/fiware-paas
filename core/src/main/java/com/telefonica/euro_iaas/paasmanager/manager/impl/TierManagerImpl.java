@@ -32,9 +32,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.TierDao;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkManager;
@@ -49,6 +46,9 @@ import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TierSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 
 /**
  * It is the manager for the Tier.
@@ -166,7 +166,7 @@ public class TierManagerImpl implements TierManager {
 
             String mens = "It is not possible to delete the tier " + tier.getName() + " since it is not exist";
             log.error(mens);
-            throw new com.telefonica.euro_iaas.commons.dao.EntityNotFoundException(Tier.class, mens, tier);
+            throw new com.telefonica.fiware.commons.dao.EntityNotFoundException(Tier.class, mens, tier);
         }
 
         log.info("Deleting the networks " + tier.getNetworks());

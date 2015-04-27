@@ -24,6 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.util.impl;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
@@ -58,6 +59,7 @@ public class SDCClientConfigImpl extends SdcClientConfigImp implements SdcClient
         clientConfig.connectorProvider(provider);
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 60000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 60000);
+        HttpsURLConnection.setDefaultSSLSocketFactory(getStx().getSocketFactory());
 
     }
 

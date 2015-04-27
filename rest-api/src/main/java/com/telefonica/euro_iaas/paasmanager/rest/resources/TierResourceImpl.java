@@ -35,10 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentManager;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkManager;
@@ -46,9 +45,9 @@ import com.telefonica.euro_iaas.paasmanager.manager.TierManager;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.TierDto;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TierSearchCriteria;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.TierResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -93,9 +92,7 @@ public class TierResourceImpl implements TierResource {
         try {
             tierResourceValidator.validateDelete(vdc, envName, tierName);
 
-            if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-                claudiaData.setUser(getCredentials());
-            }
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
             Tier tier = tierManager.load(tierName, vdc, envName);
 
@@ -114,7 +111,7 @@ public class TierResourceImpl implements TierResource {
 
     /**
      * Retrieve all Tiers available created in the system.
-     *
+     * 
      * @param page
      *            for pagination is 0 based number(<i>nullable</i>)
      * @param pageSize
@@ -166,17 +163,6 @@ public class TierResourceImpl implements TierResource {
     }
 
     /**
-     * Get the user credentials.
-     */
-    private PaasManagerUser getCredentials() {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            return (PaasManagerUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Add the selected Environment in to the SDC's catalog. If the Environment already exists, then add the new
      * Release.
      */
@@ -184,17 +170,14 @@ public class TierResourceImpl implements TierResource {
 
         log.info("Insert tier " + tierDto.getName() + " from env " + environmentName);
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
-        claudiaData.setUser(getCredentials());
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         try {
             tierResourceValidator.validateCreate(claudiaData, tierDto, vdc, environmentName);
         } catch (Exception ex) {
             throw new APIException(ex);
         }
-
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            claudiaData.setUser(getCredentials());
-        }
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
         log.info("From tier dto " + tierDto + "  product " + tierDto.getProductReleaseDtos() + " nets "
                 + tierDto.getNetworksDto());
         Tier tier = tierDto.fromDto(vdc, environmentName);
@@ -257,7 +240,7 @@ public class TierResourceImpl implements TierResource {
      * Update the Tier in DB.
      */
     public void update(String org, String vdc, String environmentName, String tierName, TierDto tierDto)
-        throws APIException {
+            throws APIException {
         log.info("Update tier " + tierName + " from env " + environmentName);
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
 
@@ -265,9 +248,7 @@ public class TierResourceImpl implements TierResource {
             tierResourceValidator.validateUpdate(vdc, environmentName, tierName, tierDto);
             log.info("Validated tier " + tierDto.getName() + " from env " + environmentName);
 
-            if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-                claudiaData.setUser(getCredentials());
-            }
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
             Tier newtier = tierDto.fromDto(vdc, environmentName);
 

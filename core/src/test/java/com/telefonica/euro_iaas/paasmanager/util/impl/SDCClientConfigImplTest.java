@@ -21,19 +21,30 @@
  * For those usages not covered by the Apache version 2.0 License please contact with opensource@tid.es
  * </p>
  */
+package com.telefonica.euro_iaas.paasmanager.util.impl;
 
-package com.telefonica.euro_iaas.paasmanager.dao.keystone;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
-import java.sql.Connection;
+import javax.ws.rs.client.Client;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.junit.Test;
 
-/**
- * @author jesus.movilla
- */
-public interface TokenDao {
+public class SDCClientConfigImplTest {
 
-    Token findLastTokenFromUser(Connection connection, String user) throws EntityNotFoundException, OpenStackException;
+    @Test
+    public void shouldCreateAClient() {
+        // given
+
+        HttpClientConnectionManager httpConnectionManager = mock(HttpClientConnectionManager.class);
+        SDCClientConfigImpl sdcClientConfigImpl = new SDCClientConfigImpl(httpConnectionManager);
+
+        // when
+        Client client = sdcClientConfigImpl.getClient();
+
+        // then
+        assertNotNull(client);
+    }
+
 }

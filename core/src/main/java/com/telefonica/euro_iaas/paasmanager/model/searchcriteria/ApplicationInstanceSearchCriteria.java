@@ -26,7 +26,7 @@ package com.telefonica.euro_iaas.paasmanager.model.searchcriteria;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractSearchCriteria;
+import com.telefonica.fiware.commons.dao.AbstractSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.model.ApplicationRelease;
 import com.telefonica.euro_iaas.paasmanager.model.InstallableInstance.Status;
 

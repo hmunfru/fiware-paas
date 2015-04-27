@@ -24,20 +24,27 @@
 
 package com.telefonica.euro_iaas.paasmanager.exception;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 /**
- * @author jesus.movilla
+ * Exception method of the Authentication process to keystone.
+ *
+ * @author fernandolopezaguilar
  */
-public class OpenStackException extends Exception {
+@SuppressWarnings("serial")
+public class AuthenticationConnectionException extends WebApplicationException {
 
-    public OpenStackException(String msg) {
-        super(msg);
+    /**
+     * Constructor.
+     * @param message   The information of the error.
+     */
+    public AuthenticationConnectionException(final String message) {
+        super(Response.status(Status.SERVICE_UNAVAILABLE)
+                .type(MediaType.APPLICATION_XHTML_XML)
+                .entity(message).build());
     }
 
-    public OpenStackException(Throwable e) {
-        super(e);
-    }
-
-    public OpenStackException(String msg, Throwable e) {
-        super(msg, e);
-    }
 }

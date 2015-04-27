@@ -28,16 +28,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 import net.sf.json.JSONArray;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.claudia.ClaudiaClient;
 import com.telefonica.euro_iaas.paasmanager.exception.ClaudiaResourceNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.ClaudiaRetrieveInfoException;
@@ -45,7 +45,7 @@ import com.telefonica.euro_iaas.paasmanager.exception.IPNotRetrievedException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.NetworkNotRetrievedException;
 import com.telefonica.euro_iaas.paasmanager.exception.OSNotRetrievedException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.VMStatusNotRetrievedException;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.TierInstanceManager;
@@ -55,12 +55,11 @@ import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetwork;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtils;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
-import org.apache.commons.codec.binary.Base64;
+import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
  * @author jesus.movilla
@@ -83,6 +82,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     /**
      * Get the response of the server from openstack.
+     * 
      * @param claudiaData
      * @param tier
      * @param replica
@@ -92,7 +92,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
      * @throws ClaudiaResourceNotFoundException
      */
     public String browseVMReplica(ClaudiaData claudiaData, String tier, int replica, VM vm, String region)
-        throws ClaudiaResourceNotFoundException {
+            throws ClaudiaResourceNotFoundException {
 
         String response = "No Content";
 
@@ -111,13 +111,12 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     /**
      * Build the payload to deploy a VM (createServer).
-     *
+     * 
      * @see com.telefonica.euro_iaas.paasmanager.claudia.ClaudiaClient#undeployVMReplica (java.lang.String,
-     * java.lang.String)
+     *      java.lang.String)
      */
     private String buildCreateServerPayload(ClaudiaData claudiaData, TierInstance tierInstance, int replica)
-        throws InfrastructureException {
-
+            throws InfrastructureException {
 
         if ((tierInstance.getTier().getImage() == null) || (tierInstance.getTier().getFlavour() == null)
                 || (tierInstance.getTier().getKeypair() == null)) {
@@ -151,11 +150,8 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     }
 
-    private static String radixBase64 =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz"
-                    + "0123456789"
-                    + "+/";
+    private static String radixBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789"
+            + "+/";
 
     public static String encode(String string) {
         if (string == null) {
@@ -186,37 +182,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         return string + suffix;
     }
 
-    /**
-     * Decodes an base64-encoded UTF-8/ASCII string to it's Base64 value.
-     * Gives anomalous result for string with any other encoding.
-     * Output is similar to output of this command on Linux:
-     * printf "<string>" | base64 -d
-     *
-     * @param string
-     * @return Base64 Decoding of parameter string
-     */
-    public static String decode(String string) {
-        String binary_string = "";
-        for (char c : string.toCharArray()) {
-            if (c == '=')
-                break;
-            String char_to_binary = Integer.toBinaryString(radixBase64.indexOf(c));
-            while (char_to_binary.length() < 6)
-                char_to_binary = "0" + char_to_binary;
-            binary_string += char_to_binary;
-        }
-        if (string.endsWith("=="))
-            binary_string = binary_string.substring(0, binary_string.length() - 4);
-        else if (string.endsWith("="))
-            binary_string = binary_string.substring(0, binary_string.length() - 2);
-        string = "";
-        for (int i = 0; i < binary_string.length(); i += 8) {
-            String eight_binary_digits = binary_string.substring(i, i + 8);
-            string += (char) Integer.parseInt(eight_binary_digits, 2);
-        }
-        return string;
-    }
-
     public String getUserData(ClaudiaData claudiaData, TierInstance tierInstance) {
         log.debug("Creating user data");
         String file = null;
@@ -232,20 +197,15 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         }
 
         try {
-            chefServerUrl = openStackRegion.getChefServerEndPoint(
-                    tierInstance.getTier().getRegion(),
-                    claudiaData.getUser().getToken());
+            chefServerUrl = openStackRegion.getChefServerEndPoint(tierInstance.getTier().getRegion());
 
         } catch (Exception e1) {
             log.warn("Error to obtain the chef-server url" + e1.getMessage());
             return file;
         }
 
-
         try {
-            puppetUrl = openStackRegion.getPuppetMasterEndPoint(
-                    tierInstance.getTier().getRegion(),
-                    claudiaData.getUser().getToken());
+            puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion());
 
         } catch (Exception e1) {
             log.warn("Error to obtain the puppetmaster url" + e1.getMessage());
@@ -257,18 +217,14 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             chefValidationKey = fileUtils.readFile("validation.pem", "/etc/chef/");
         } catch (Exception e1) {
             log.warn("Error to find the validation key file" + e1.getMessage());
-            //return file;
+            // return file;
         }
 
-
-        file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl).
-                replace("{validation_key}", chefValidationKey).
-                replace("{networks}", writeInterfaces(tierInstance)).
-                replace("{if_up}", generateIfUp(tierInstance)).
-                replace("{puppet_master}", puppetUrl);
+        file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl)
+                .replace("{validation_key}", chefValidationKey).replace("{networks}", writeInterfaces(tierInstance))
+                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetUrl);
         log.debug("payload " + file);
         return file;
-
 
     }
 
@@ -283,20 +239,15 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     private String generateFileUbuntu(int networkNoPublic) {
-        String interfaces = "auto lo \n" +
-                "iface lo inet loopback\n";
+        String interfaces = "auto lo \n" + "iface lo inet loopback\n";
         for (int i = 0; i < networkNoPublic; i++) {
-            interfaces = interfaces + " auto eth" + i + " \n" +
-                    " iface eth" + i + "  inet dhcp\n";
+            interfaces = interfaces + " auto eth" + i + " \n" + " iface eth" + i + "  inet dhcp\n";
 
         }
         interfaces = encode(interfaces);
 
-        String file = "write_files: \n" +
-                "-   encoding: b64 \n" +
-                "    content: | \n" +
-                "        " + interfaces + "\n" +
-                "    path: /etc/network/interfaces \n";
+        String file = "write_files: \n" + "-   encoding: b64 \n" + "    content: | \n" + "        " + interfaces + "\n"
+                + "    path: /etc/network/interfaces \n";
         return file;
 
     }
@@ -304,14 +255,10 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private String generateFileCentos(int networkNoPublic) {
         String interfaces = "";
         for (int i = 0; i < networkNoPublic; i++) {
-            interfaces = interfaces + "-   content: |\n" +
-                    "        DEVICE=\"eth" + i + "\"\n" +
-                    "        NM_CONTROLLED=\"yes\"\n" +
-                    "        ONBOOT=\"yes\" \n" +
-                    "        BOOTPROTO=\"dhcp\" \n" +
-                    "        TYPE=\"Ethernet\"\n" +
-                    "    path: /etc/sysconfig/network-scripts/ifcfg-eth" + i + "\n" +
-                    "    permissions: '460'\n";
+            interfaces = interfaces + "-   content: |\n" + "        DEVICE=\"eth" + i + "\"\n"
+                    + "        NM_CONTROLLED=\"yes\"\n" + "        ONBOOT=\"yes\" \n" + "        BOOTPROTO=\"dhcp\" \n"
+                    + "        TYPE=\"Ethernet\"\n" + "    path: /etc/sysconfig/network-scripts/ifcfg-eth" + i + "\n"
+                    + "    permissions: '460'\n";
         }
 
         return interfaces;
@@ -326,7 +273,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         }
         return interfaces;
     }
-
 
     private void addNetworkToTierInstance(ClaudiaData claudiaData, TierInstance tierInstance)
             throws InfrastructureException, InvalidEntityException, AlreadyExistsEntityException,
@@ -356,8 +302,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             NetworkInstance defaulNet = getDefaultNetwork(networkNoSharedInstances, vdc);
             if (defaulNet == null) {
                 log.debug("There is not a default network. Getting the first one");
-                tierInstance.addNetworkInstance(getFirstNetwork(networkNoSharedInstances,
-                    vdc,  region));
+                tierInstance.addNetworkInstance(getFirstNetwork(networkNoSharedInstances, vdc, region));
                 tierInstanceManager.update(tierInstance);
             }
 
@@ -365,17 +310,16 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     private NetworkInstance getFirstNetwork(List<NetworkInstance> lNetworkInstance, String vdc, String region)
-        throws InvalidEntityException {
+            throws InvalidEntityException {
         NetworkInstance netInstance = null;
         try {
-            netInstance = networkInstanceManager.load(lNetworkInstance.get(0)
-                .getNetworkName(), vdc, region);
+            netInstance = networkInstanceManager.load(lNetworkInstance.get(0).getNetworkName(), vdc, region);
         } catch (EntityNotFoundException e) {
             try {
                 netInstance = networkInstanceManager.createInDB(lNetworkInstance.get(0));
             } catch (Exception e1) {
-                throw new InvalidEntityException("It is not possible to create in DB the network " +
-                    lNetworkInstance.get(0).getNetworkName());
+                throw new InvalidEntityException("It is not possible to create in DB the network "
+                        + lNetworkInstance.get(0).getNetworkName());
             }
         }
         return netInstance;
@@ -392,7 +336,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     private List<NetworkInstance> loadNotSharedNetworksUser(List<NetworkInstance> networks, String tenantId,
-                                                            String region) throws InfrastructureException {
+            String region) throws InfrastructureException {
         List<NetworkInstance> networksNotShared = new ArrayList<NetworkInstance>();
         for (NetworkInstance net : networks) {
             if (!net.getShared() && net.getTenantId().equals(tenantId)) {
@@ -421,7 +365,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     /**ƒ
      * Checks if a certain Server has been finally deleted from OpenStack.
-     *
+     * 
      * @param tierInstance
      * @param claudiaData
      */
@@ -623,12 +567,12 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     /**
-     * @param openStackUtil the openStackUtil to set
+     * @param openStackUtil
+     *            the openStackUtil to set
      */
     public void setOpenStackUtil(OpenStackUtil openStackUtil) {
         this.openStackUtil = openStackUtil;
     }
-
 
     public void setNetworkInstanceManager(NetworkInstanceManager networkInstanceManager) {
         this.networkInstanceManager = networkInstanceManager;
@@ -699,7 +643,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     }
 
     public void setSystemPropertiesProvider(SystemPropertiesProvider systemPropertiesProvider) {
-        this.systemPropertiesProvider= systemPropertiesProvider;
+        this.systemPropertiesProvider = systemPropertiesProvider;
     }
 
     public void setTierInstanceManager(TierInstanceManager tierInstanceManager) {

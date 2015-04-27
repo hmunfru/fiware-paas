@@ -1,0 +1,349 @@
+{
+    "access": {
+        "token": {
+            "issued_at": "2015-04-16T14:47:17.573966",
+            "expires": "2015-04-17T10:47:17Z",
+            "id": "c3ca08d7a8854023bfa19c179697da9d",
+            "tenant": {
+                "description": "Cloud admins",
+                "enabled": true,
+                "id": "00000000000004769113056827337000",
+                "name": "admins"
+            },
+            "audit_ids": [
+                "z4fSnIPsQ2eu3ylzoXRfvA"
+            ]
+        },
+        "serviceCatalog": [
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Spain",
+                        "internalURL": "https://130.206.81.64:8443/paasmanager/rest",
+                        "id": "bf2a8d53b05e4d0bba309a392444992d",
+                        "publicURL": "https://130.206.81.64:8443/paasmanager/rest"
+                    },
+                    {
+                        "adminURL": "https://130.206.81.64:8443/paasmanager/rest",
+                        "region": "Trento",
+                        "internalURL": "https://130.206.81.64:8443/paasmanager/rest",
+                        "id": "0081fa749f944b24ac76f89ce8082eef",
+                        "publicURL": "https://130.206.81.64:8443/paasmanager/rest"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "paas",
+                "name": "paasmanager"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Spain",
+                        "internalURL": "https://130.206.81.91:8443/puppetwrapper/",
+                        "id": "abc703cab11942e98dabe95c3faf7d97",
+                        "publicURL": "https://130.206.81.91:8443/puppetwrapper/"
+                    },
+                    {
+                        "adminURL": "https://130.206.81.91:8443/puppetwrapper/",
+                        "region": "Trento",
+                        "internalURL": "https://130.206.81.91:8443/puppetwrapper/",
+                        "id": "6539ea42362646dca2fe9dc107b06bc3",
+                        "publicURL": "https://130.206.81.91:8443/puppetwrapper/"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "puppetwrapper",
+                "name": "puppetwrapper"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-controller:8774/v2/00000000000004769113056827337000",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-controller:8774/v2/00000000000004769113056827337000",
+                        "id": "82404a2e3f6b49f8a9826a916df55752",
+                        "publicURL": "http://dev-havana-controller:8774/v2/00000000000004769113056827337000"
+                    },
+                    {
+                        "adminURL": "http://130.206.80.58:8774/v2/00000000000004769113056827337000",
+                        "region": "Trento",
+                        "internalURL": "http://130.206.80.58:8774/v2/00000000000004769113056827337000",
+                        "id": "46bb468422c54165be6443c1aea130e1",
+                        "publicURL": "http://130.206.80.58:8774/v2/00000000000004769113056827337000"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "compute",
+                "name": "nova"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-neutron:9696/",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-neutron:9696/",
+                        "id": "0618d925fc2342839f8b49fd70cac3a3",
+                        "publicURL": "http://dev-havana-neutron:9696/"
+                    },
+                    {
+                        "adminURL": "http://130.206.80.58:9696/",
+                        "region": "Trento",
+                        "internalURL": "http://130.206.80.58:9696/",
+                        "id": "03b03ea81921456c82095b24d5d24a9a",
+                        "publicURL": "http://130.206.80.58:9696/"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "network",
+                "name": "neutron"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-cinder:8776/v2/00000000000004769113056827337000",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-cinder:8776/v2/00000000000004769113056827337000",
+                        "id": "33fae00924eb45f7b8317cca9a4cd321",
+                        "publicURL": "http://dev-havana-cinder:8776/v2/00000000000004769113056827337000"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "volumev2",
+                "name": "cinderv2"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "internalURL": "http://puppet-master.dev-havana.fi-ware.org",
+                        "id": "a1de0605399c498086784cf99985c7a4",
+                        "publicURL": "http://puppet-master.dev-havana.fi-ware.org"
+                    },
+                    {
+                        "adminURL": "http://puppet-master.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "internalURL": "http://puppet-master.dev-havana.fi-ware.org",
+                        "id": "240c5d1cfb304c47adf24c9cd3b39cca",
+                        "publicURL": "http://puppet-master.dev-havana.fi-ware.org"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "puppetmaster",
+                "name": "puppetmaster"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://localhost:8082",
+                        "region": "Spain",
+                        "internalURL": "http://localhost:8082",
+                        "id": "4521e14f21584e4bb4e53428b3fde13f",
+                        "publicURL": "http://10.95.61.205:8082"
+                    },
+                    {
+                        "adminURL": "http://10.95.61.205:8082",
+                        "region": "Trento",
+                        "internalURL": "http://10.95.61.205:8082",
+                        "id": "11b0fc82738c4de3bdfcfbb05f8e13b8",
+                        "publicURL": "http://10.95.61.205:8082"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "application_catalog",
+                "name": "application_catalog"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-glance:9292/v1",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-glance:9292/v1",
+                        "id": "088e74f308f14767b3eca426e6bf8d61",
+                        "publicURL": "http://dev-havana-glance:9292/v1"
+                    },
+                    {
+                        "adminURL": "http://130.206.80.58:9292/v1",
+                        "region": "Trento",
+                        "internalURL": "http://130.206.80.58:9292/v1",
+                        "id": "1fb4101aff3740fa80cb055f7b9e74c2",
+                        "publicURL": "http://130.206.80.58:9292/v1"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "image",
+                "name": "glance"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Spain",
+                        "internalURL": "https://chef-server.dev-havana.fi-ware.org",
+                        "id": "05e8858e4d2a41f1849c2c3b5b5b6856",
+                        "publicURL": "https://chef-server.dev-havana.fi-ware.org"
+                    },
+                    {
+                        "adminURL": "https://chef-server.dev-havana.fi-ware.org",
+                        "region": "Trento",
+                        "internalURL": "https://chef-server.dev-havana.fi-ware.org",
+                        "id": "42b4a99795264ab5ba71f2e03b35b9fb",
+                        "publicURL": "https://chef-server.dev-havana.fi-ware.org"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "chef-server",
+                "name": "chef-server"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-heat:8000/v1",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-heat:8000/v1",
+                        "id": "48e4e62883e04b57b7eefd5dd11ad60a",
+                        "publicURL": "http://dev-havana-heat:8000/v1"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "cloudformation",
+                "name": "heat-cfn"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-cinder:8776/v1/00000000000004769113056827337000",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-cinder:8776/v1/00000000000004769113056827337000",
+                        "id": "056795988aaa473abfb0129df8422418",
+                        "publicURL": "http://dev-havana-cinder:8776/v1/00000000000004769113056827337000"
+                    },
+                    {
+                        "adminURL": "http://130.206.80.58:8776/v1/00000000000004769113056827337000",
+                        "region": "Trento",
+                        "internalURL": "http://130.206.80.58:8776/v1/00000000000004769113056827337000",
+                        "id": "628f5bea1f7649d68892932ae3ce9213",
+                        "publicURL": "http://130.206.80.58:8776/v1/00000000000004769113056827337000"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "volume",
+                "name": "cinder"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-heat:8004/v1/00000000000004769113056827337000",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-heat:8004/v1/00000000000004769113056827337000",
+                        "id": "b9ebd863cd9740c0badfd741b4ef98a9",
+                        "publicURL": "http://dev-havana-heat:8004/v1/00000000000004769113056827337000"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "orchestration",
+                "name": "heat"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Spain",
+                        "internalURL": "https://130.206.81.126:8443/sdc/rest",
+                        "id": "cd8f2770f44745cc8252822338c8dc29",
+                        "publicURL": "https://130.206.81.126:8443/sdc/rest"
+                    },
+                    {
+                        "adminURL": "https://130.206.81.126:8443/sdc/rest",
+                        "region": "Trento",
+                        "internalURL": "https://130.206.81.126:8443/sdc/rest",
+                        "id": "085293ff40fa45289c81c944395510a9",
+                        "publicURL": "https://130.206.81.126:8443/sdc/rest"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "sdc",
+                "name": "sdc"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://dev-havana-controller:8080/v1",
+                        "region": "Spain",
+                        "internalURL": "http://dev-havana-controller:8080/v1/AUTH_00000000000004769113056827337000",
+                        "id": "58bb5fb0f15a438b80125de9d8570438",
+                        "publicURL": "http://dev-havana-controller:8080/v1/AUTH_00000000000004769113056827337000"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "object-store",
+                "name": "swift"
+            },
+            {
+                "endpoints": [
+                    {
+                        "adminURL": "http://172.15.10.206:4731/v3",
+                        "region": "RegionOne",
+                        "internalURL": "http://172.15.10.206:4730/v3",
+                        "id": "0af612b78ea74b87be772caad7d9400f",
+                        "publicURL": "http://172.15.10.206:4730/v3"
+                    }
+                ],
+                "endpoints_links": [
+
+                ],
+                "type": "identity",
+                "name": "keystone"
+            }
+        ],
+        "user": {
+            "username": "admin",
+            "roles_links": [
+
+            ],
+            "id": "e12249b99b3e4b9394dd85703b04e851",
+            "roles": [
+                {
+                    "name": "admin"
+                }
+            ],
+            "name": "admin"
+        },
+        "metadata": {
+            "is_admin": 0,
+            "roles": [
+                "bb780354f545410b9cc144809e845148"
+            ]
+        }
+    }
+}

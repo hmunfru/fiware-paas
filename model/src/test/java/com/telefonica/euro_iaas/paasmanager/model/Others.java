@@ -28,22 +28,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
-import java.util.HashSet;
 
 import net.sf.json.JSONObject;
 
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.Token;
-import com.telefonica.euro_iaas.paasmanager.model.keystone.User;
 
 /**
  * Test other model classes.
- *
+ * 
  * @author henar
  */
 public class Others {
@@ -52,22 +47,9 @@ public class Others {
     private static final String VDC = "vdc";
     private static final String SERVICE = "service";
 
-    @Test
-    public void testClaudiaData() throws Exception {
-
-        PaasManagerUser user = new PaasManagerUser("username", "myToken", new HashSet<GrantedAuthority>());
-        user.setTenantName("FIWARE");
-        ClaudiaData claudiaData = new ClaudiaData(ORG, VDC, SERVICE);
-        claudiaData.setUser(user);
-
-        assertEquals(claudiaData.getOrg(), ORG);
-        assertEquals(claudiaData.getVdc(), VDC);
-        assertEquals(claudiaData.getService(), SERVICE);
-        assertEquals(claudiaData.getUser().getTenantName(), "FIWARE");
-    }
-
     /**
      * Test the creation of a task.
+     * 
      * @throws Exception
      */
     @Test
@@ -83,7 +65,6 @@ public class Others {
         task.setError(taskError);
         task.setVdc("vdc");
 
-
         assertEquals(task.getStatus(), TaskStates.RUNNING);
         assertEquals(task.getHref(), "href");
         assertEquals(task.getDescription(), "description");
@@ -97,6 +78,7 @@ public class Others {
 
     /**
      * Test the creation of a Task with tier information.
+     * 
      * @throws Exception
      */
     @Test
@@ -112,16 +94,15 @@ public class Others {
         assertEquals(task.getExpireTime().intValue(), 1000);
         assertNotNull(task.getOwner());
 
-
     }
 
     /**
      * Test the creation of a Task with an error message.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskError() throws Exception {
-
 
         TaskError taskError = new TaskError();
         taskError.setMessage("error");
@@ -138,11 +119,11 @@ public class Others {
 
     /**
      * Test the creation of a error task with a reference.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskReference() throws Exception {
-
 
         TaskReference taskError = new TaskReference();
         taskError.setName("error");
@@ -157,11 +138,11 @@ public class Others {
 
     /**
      * Test the creation of a error task with no reference.
+     * 
      * @throws Exception
      */
     @Test
     public void testTaskReferenceII() throws Exception {
-
 
         TaskReference taskError = new TaskReference("http");
         taskError.setName("error");
@@ -172,7 +153,6 @@ public class Others {
         assertEquals(taskError.getType(), "errortype");
 
     }
-
 
     @Test
     public void testLimitFromJson() throws Exception {
@@ -220,66 +200,6 @@ public class Others {
     }
 
     @Test
-    public void testUser() throws Exception {
-        User user = new User();
-        user.setExtra("extra");
-        user.setId("id");
-        user.setName("name");
-
-        assertEquals(user.getName(), "name");
-        assertEquals(user.getId(), "id");
-        assertEquals(user.getExtra(), "extra");
-    }
-
-    @Test
-    public void testUserII() throws Exception {
-        User user = new User("id", "name", "extra");
-
-        assertEquals(user.getName(), "name");
-        assertEquals(user.getId(), "id");
-        assertEquals(user.getExtra(), "extra");
-    }
-
-    @Test
-    public void testUserIII() throws Exception {
-        User user = new User("id");
-
-        assertEquals(user.getId(), "id");
-    }
-
-    @Test
-    public void testToken() throws Exception {
-        Token token = new Token();
-        token.setExpires("expires");
-        token.setExtra("extra");
-        token.setId("id");
-        token.setTenantId("tenantId");
-
-        assertEquals(token.getExpires(), "expires");
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getExtra(), "extra");
-        assertEquals(token.getTenantId(), "tenantId");
-    }
-
-    @Test
-    public void testTokenII() throws Exception {
-        Token token = new Token("id", "expires", "extra");
-        assertEquals(token.getExpires(), "expires");
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getExtra(), "extra");
-    }
-
-    @Test
-    public void testTokenIII() throws Exception {
-        Token token = new Token("id");
-        JSONObject json = new JSONObject().fromObject("{\"tenantId\": \"tenantId\"}");
-
-        token.setTenantId(json);
-        assertEquals(token.getId(), "id");
-        assertEquals(token.getTenantId(), "tenantId");
-    }
-
-    @Test
     public void testOS() throws Exception {
         OS os = new OS();
         os.setDescription("description");
@@ -287,11 +207,9 @@ public class Others {
         os.setOsType("type");
         os.setVersion("version");
 
-
         OS os2 = new OS("type");
         os2.setDescription("description");
         os2.setName("name2");
-
 
         assertEquals(os.getName(), "name");
         assertEquals(os.getOsType(), "type");
@@ -324,6 +242,5 @@ public class Others {
         assertEquals(vm.equals(vm2), false);
 
     }
-
 
 }

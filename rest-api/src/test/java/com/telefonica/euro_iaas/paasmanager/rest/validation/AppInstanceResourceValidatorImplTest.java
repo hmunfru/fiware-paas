@@ -26,26 +26,21 @@ package com.telefonica.euro_iaas.paasmanager.rest.validation;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-
-
 import com.telefonica.euro_iaas.paasmanager.exception.ApplicationInstanceNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidApplicationReleaseException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEntityException;
-
 import com.telefonica.euro_iaas.paasmanager.manager.ApplicationInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentInstanceManager;
-
 import com.telefonica.euro_iaas.paasmanager.model.ApplicationInstance;
 import com.telefonica.euro_iaas.paasmanager.model.EnvironmentInstance;
-
 import com.telefonica.euro_iaas.paasmanager.model.dto.ApplicationReleaseDto;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 
 /**
  * Test the AppInstanceResourceValidatorImpl class.
@@ -58,7 +53,7 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Initialize the Unit Test.
-     *
+     * 
      * @throws EntityNotFoundException
      * @throws InvalidEntityException
      */
@@ -74,75 +69,69 @@ public class AppInstanceResourceValidatorImplTest {
 
     /**
      * Test the installation of an application instance.
-     *
+     * 
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
      */
     @Test
-    public void testCheckValidateInstall()
-        throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException, EntityNotFoundException {
+    public void testCheckValidateInstall() throws InvalidApplicationReleaseException,
+            ApplicationInstanceNotFoundException, EntityNotFoundException {
 
         // given
         ApplicationReleaseDto applicationReleaseDto = new ApplicationReleaseDto("app", "version", null);
 
-        when(applicationInstanceManager
-                .load(any(String.class), any(String.class))).thenThrow(
+        when(applicationInstanceManager.load(any(String.class), any(String.class))).thenThrow(
                 new EntityNotFoundException(ApplicationInstance.class, "", applicationReleaseDto));
         appInstanceResourceValidator.validateInstall("vdc", "environmentInstance", applicationReleaseDto);
-        verify(applicationInstanceManager)
-                .load(any(String.class), any(String.class));
+        verify(applicationInstanceManager).load(any(String.class), any(String.class));
 
     }
 
     /**
      * Test the exception in the installation of an application instance.
-     *
+     * 
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
      */
     @Test(expected = InvalidApplicationReleaseException.class)
-    public void testCheckValidateInstallError()
-        throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException, EntityNotFoundException {
+    public void testCheckValidateInstallError() throws InvalidApplicationReleaseException,
+            ApplicationInstanceNotFoundException, EntityNotFoundException {
 
         // given
         ApplicationReleaseDto applicationReleaseDto = new ApplicationReleaseDto("app", "version", null);
 
-        when(applicationInstanceManager
-                .load(any(String.class), any(String.class))).thenReturn(new ApplicationInstance());
+        when(applicationInstanceManager.load(any(String.class), any(String.class))).thenReturn(
+                new ApplicationInstance());
         appInstanceResourceValidator.validateInstall("vdc", "environmentInstance", applicationReleaseDto);
-        verify(applicationInstanceManager)
-                .load(any(String.class), any(String.class));
+        verify(applicationInstanceManager).load(any(String.class), any(String.class));
 
     }
 
     /**
      * Test the uninstall an application.
-     *
+     * 
      * @throws InvalidApplicationReleaseException
      * @throws ApplicationInstanceNotFoundException
      * @throws EntityNotFoundException
-     * @throws com.telefonica.euro_iaas.commons.dao.InvalidEntityException
+     * @throws com.telefonica.fiware.commons.dao.InvalidEntityException
      */
     @Test
-    public void testCheckValidateUnInstall()
-            throws InvalidApplicationReleaseException, ApplicationInstanceNotFoundException, EntityNotFoundException,
-            com.telefonica.euro_iaas.commons.dao.InvalidEntityException {
+    public void testCheckValidateUnInstall() throws InvalidApplicationReleaseException,
+            ApplicationInstanceNotFoundException, EntityNotFoundException,
+            com.telefonica.fiware.commons.dao.InvalidEntityException {
 
         // given
 
-        when(applicationInstanceManager
-                .load(any(String.class), any(String.class))).thenReturn(new ApplicationInstance());
-        when(environmentInstanceManager
-                .load(any(String.class), any(String.class))).thenReturn(new EnvironmentInstance());
+        when(applicationInstanceManager.load(any(String.class), any(String.class))).thenReturn(
+                new ApplicationInstance());
+        when(environmentInstanceManager.load(any(String.class), any(String.class))).thenReturn(
+                new EnvironmentInstance());
         appInstanceResourceValidator.validateUnInstall("vdc", "environmentInstance", "applicationName");
-        verify(applicationInstanceManager)
-                .load(any(String.class), any(String.class));
-        verify(environmentInstanceManager)
-                .load(any(String.class), any(String.class));
+        verify(applicationInstanceManager).load(any(String.class), any(String.class));
+        verify(environmentInstanceManager).load(any(String.class), any(String.class));
 
     }
-
 
 }

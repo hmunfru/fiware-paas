@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import org.apache.http.conn.HttpClientConnectionManager;
 
 import com.telefonica.euro_iaas.paasmanager.model.Task;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
 
 /**
  * TaskNotificator rest implementation.

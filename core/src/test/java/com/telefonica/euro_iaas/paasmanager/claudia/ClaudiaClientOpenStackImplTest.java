@@ -33,13 +33,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.claudia.impl.ClaudiaClientOpenStackImpl;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
@@ -49,7 +48,6 @@ import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
@@ -127,7 +125,7 @@ public class ClaudiaClientOpenStackImplTest {
                 + "# Useful for troubleshooting cloud-init issues\n"
                 + "output: {all: '| tee -a /var/log/cloud-init-output.log'}\n";
 
-        PaasManagerUser user = new PaasManagerUser("username", "myToken", new HashSet<GrantedAuthority>());
+        PaasManagerUser user = new PaasManagerUser("username", "myToken");
         user.setTenantName("FIWARE");
         claudiaData = new ClaudiaData("vdc", "org", "service");
         claudiaData.setUser(user);
@@ -177,8 +175,8 @@ public class ClaudiaClientOpenStackImplTest {
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
 
-        when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
 
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         verify(openStackUtil).createServer(any(String.class), anyString(), anyString(), anyString());
@@ -198,8 +196,8 @@ public class ClaudiaClientOpenStackImplTest {
         NetworkInstance network2 = new NetworkInstance("2", "VDC", "REGION");
         tierInstance.addNetworkInstance(network2);
 
-        when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
 
         String result = claudiaClientOpenStack.getUserData(claudiaData, tierInstance);
         assertNotNull(result);
@@ -218,8 +216,8 @@ public class ClaudiaClientOpenStackImplTest {
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
-        when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
 
@@ -242,8 +240,8 @@ public class ClaudiaClientOpenStackImplTest {
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
-        when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
                 networkInstances);
@@ -274,8 +272,8 @@ public class ClaudiaClientOpenStackImplTest {
         NetworkInstance netInst2 = network.toNetworkInstance();
         netInst2.setShared(false);
         netInst2.setDefaultNet(true);
-        when(openStackRegion.getChefServerEndPoint(anyString(), anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString(), anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
                 networkInstances);

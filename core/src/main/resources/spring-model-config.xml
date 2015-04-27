@@ -31,14 +31,7 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="fileUtils" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl">
     </bean>
-    <bean id="openStackSync" lazy-init="true"
-          class="com.telefonica.euro_iaas.paasmanager.util.OpenStackSyncImpl">
-        <property name="tierDao" ref="tierDao"/>
-        <property name="tierInstanceDao" ref="tierInstanceDao"/>
-        <property name="firewallingClient" ref="firewallingClient"/>
-        <property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>
-        <property name="claudiaClient" ref="claudiaClient"/>
-    </bean>
+
 
     <!--  UTIL CLASSES -->
 
@@ -225,7 +218,6 @@ http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="openOperationUtil" lazy-init="true"
           class="com.telefonica.euro_iaas.paasmanager.util.OpenOperationUtilImpl">
         <property name="openStackRegion" ref="openStackRegion"/>
-        <property name="systemPropertiesProvider" ref="systemPropertiesProvider"/>
         <property name="httpConnectionManager" ref="httpConnectionManager"/>
     </bean>
 
