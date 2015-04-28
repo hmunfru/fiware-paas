@@ -80,6 +80,8 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private TierInstanceManager tierInstanceManager = null;
     private SystemPropertiesProvider systemPropertiesProvider = null;
     private static final int POLLING_INTERVAL = 10000;
+    private static String HTTP_START = "://";
+    private static String PORT_START = ":80";
 
     /**
      * Get the response of the server from openstack.
@@ -188,7 +190,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         String file = null;
         String hostname = tierInstance.getVM().getHostname();
         String chefServerUrl;
-        String puppetUrl;
+        String puppetHostname;
         try {
             file = fileUtils.readFile(systemPropertiesProvider.getProperty("user_data_path"));
             log.debug("File userdata read");
@@ -206,8 +208,8 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         }
 
         try {
-            puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion());
-
+            String puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion());
+            puppetHostname = this.getPuppetMasterHostname(puppetUrl);
         } catch (Exception e1) {
             log.warn("Error to obtain the puppetmaster url" + e1.getMessage());
             return file;
@@ -223,10 +225,28 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
         file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl)
                 .replace("{validation_key}", chefValidationKey).replace("{networks}", writeInterfaces(tierInstance))
-                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetUrl);
+                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetHostname);
         log.debug("payload " + file);
         return file;
 
+    }
+
+
+    /**
+     * It obtains the puppet master hostname, required for user data.
+     * @param puppetMasterUlr
+     * @return
+     */
+    public String getPuppetMasterHostname (String puppetMasterUlr){
+        int valueInitial = 0;
+        if (puppetMasterUlr.indexOf(HTTP_START) != -1){
+            valueInitial = puppetMasterUlr.indexOf(HTTP_START) + HTTP_START.length();
+        }
+        int valueEnd = puppetMasterUlr.length();
+        if (puppetMasterUlr.indexOf(PORT_START) != -1){
+            valueEnd = puppetMasterUlr.indexOf(PORT_START);
+        }
+        return puppetMasterUlr.substring(valueInitial, valueEnd);
     }
 
     public String writeInterfaces(TierInstance tierInstance) {
