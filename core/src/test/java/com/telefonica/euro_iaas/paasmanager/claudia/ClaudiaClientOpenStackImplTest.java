@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +50,7 @@ import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
-import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
+import com.telefonica.euro_iaas.paasmanager.util.FileUtils;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -62,11 +63,13 @@ public class ClaudiaClientOpenStackImplTest {
     private Tier tier;
     private ClaudiaData claudiaData;
     private OpenStackUtil openStackUtil;
-    private FileUtilsImpl fileUtils;
+    private FileUtils fileUtils;
     private OpenStackRegion openStackRegion;
     private NetworkInstanceManager networkInstanceManager;
     private ClaudiaClientOpenStackImpl claudiaClientOpenStack;
     private SystemPropertiesProvider systemPropertiesProvider;
+
+    public static String HOSTNAME = "puppet-master.lab.fi-ware.org";
 
     @Before
     public void setUp() throws Exception {
@@ -142,7 +145,9 @@ public class ClaudiaClientOpenStackImplTest {
         openStackUtil = mock(OpenStackUtil.class);
         networkInstanceManager = mock(NetworkInstanceManager.class);
         openStackRegion = mock(OpenStackRegion.class);
-        fileUtils = new FileUtilsImpl();
+        fileUtils = mock(FileUtils.class);
+        when(fileUtils.readFile(anyString())).thenReturn(userData);
+        when(fileUtils.readFile(anyString(), anyString())).thenReturn("");
         systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         when(systemPropertiesProvider.getProperty(anyString())).thenReturn("src/test/resources/userdata");
         claudiaClientOpenStack.setNetworkInstanceManager(networkInstanceManager);
@@ -197,7 +202,8 @@ public class ClaudiaClientOpenStackImplTest {
         tierInstance.addNetworkInstance(network2);
 
         when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://" + HOSTNAME + ":8081");
+
 
         String result = claudiaClientOpenStack.getUserData(claudiaData, tierInstance);
         assertNotNull(result);
@@ -313,9 +319,26 @@ public class ClaudiaClientOpenStackImplTest {
         tierInstance.addNetworkInstance(new Network("NETWORK2", "VDC", "REGION").toNetworkInstance());
 
         String file = claudiaClientOpenStack.writeInterfaces(tierInstance);
-        System.out.println(file);
         assertNotNull(file);
 
+    }
+
+    @Test
+     public void getPuppetMasterHostname() {
+        String hostname = claudiaClientOpenStack.getPuppetMasterHostname(HOSTNAME);
+        assertEquals(hostname, HOSTNAME);
+    }
+
+    @Test
+    public void getPuppetMasterHostname1() {
+        String hostname = claudiaClientOpenStack.getPuppetMasterHostname("http://"+ HOSTNAME);
+        assertEquals(hostname, HOSTNAME);
+    }
+
+    @Test
+    public void getPuppetMasterHostname2() {
+        String hostname = claudiaClientOpenStack.getPuppetMasterHostname("http://"+ HOSTNAME + ":8081");
+        assertEquals(hostname, HOSTNAME);
     }
 
 }
