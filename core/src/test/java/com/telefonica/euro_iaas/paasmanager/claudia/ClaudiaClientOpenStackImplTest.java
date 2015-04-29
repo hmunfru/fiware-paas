@@ -331,13 +331,13 @@ public class ClaudiaClientOpenStackImplTest {
     }
 
     @Test
-    public void getPuppetMasterHostname1() {
+    public void getPuppetMasterHostnameWithHttp() {
         String hostname = claudiaClientOpenStack.getPuppetMasterHostname("http://"+ HOSTNAME);
         assertEquals(hostname, HOSTNAME);
     }
 
     @Test
-    public void getPuppetMasterHostname2() {
+    public void getPuppetMasterHostnameWithPort() {
         String hostname = claudiaClientOpenStack.getPuppetMasterHostname("http://"+ HOSTNAME + ":8081");
         assertEquals(hostname, HOSTNAME);
     }
