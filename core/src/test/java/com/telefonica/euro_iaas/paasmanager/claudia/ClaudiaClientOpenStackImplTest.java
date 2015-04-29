@@ -51,6 +51,7 @@ import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtils;
+import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -339,6 +340,13 @@ public class ClaudiaClientOpenStackImplTest {
     public void getPuppetMasterHostname2() {
         String hostname = claudiaClientOpenStack.getPuppetMasterHostname("http://"+ HOSTNAME + ":8081");
         assertEquals(hostname, HOSTNAME);
+    }
+
+    @Test
+    public void testReadFile() throws Exception {
+        FileUtilsImpl fileUtil = new FileUtilsImpl();
+        assertNotNull(fileUtil.readFile("src/test/resources/userdata"));
+        assertNotNull(fileUtil.readFile("src/test/resources/userdata", "."));
     }
 
 }
