@@ -234,19 +234,19 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     /**
      * It obtains the puppet master hostname, required for user data.
-     * @param puppetMasterUlr
+     * @param puppetMasterUrl
      * @return
      */
-    public String getPuppetMasterHostname (String puppetMasterUlr){
+    public String getPuppetMasterHostname (String puppetMasterUrl){
         int valueInitial = 0;
-        if (puppetMasterUlr.indexOf(HTTP_START) != -1){
-            valueInitial = puppetMasterUlr.indexOf(HTTP_START) + HTTP_START.length();
+        if (puppetMasterUrl.indexOf(HTTP_START) != -1){
+            valueInitial = puppetMasterUrl.indexOf(HTTP_START) + HTTP_START.length();
         }
-        int valueEnd = puppetMasterUlr.length();
-        if (puppetMasterUlr.indexOf(PORT_START) != -1){
-            valueEnd = puppetMasterUlr.indexOf(PORT_START);
+        int valueEnd = puppetMasterUrl.length();
+        if (puppetMasterUrl.indexOf(PORT_START) != -1){
+            valueEnd = puppetMasterUrl.indexOf(PORT_START);
         }
-        return puppetMasterUlr.substring(valueInitial, valueEnd);
+        return puppetMasterUrl.substring(valueInitial, valueEnd);
     }
 
     public String writeInterfaces(TierInstance tierInstance) {
