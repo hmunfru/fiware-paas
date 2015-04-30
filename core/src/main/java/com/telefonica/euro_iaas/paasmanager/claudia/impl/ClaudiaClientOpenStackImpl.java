@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import net.sf.json.JSONArray;
 
 import org.apache.commons.codec.binary.Base64;
@@ -605,24 +606,32 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         return null;  // To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * It undeploys a VM
+     * @param claudiaData
+     * @param tierInstance
+     * @throws InfrastructureException
+     */
     public void undeployVMReplica(ClaudiaData claudiaData, TierInstance tierInstance) throws InfrastructureException {
         log.debug("Undeploy VM replica " + tierInstance.getName() + " for region " + tierInstance.getTier().getRegion()
-                + " and user " + tierInstance.getTier().getVdc());
+            + " and user " + tierInstance.getTier().getVdc());
         try {
-
+            OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
             String region = tierInstance.getTier().getRegion();
-            String token = claudiaData.getUser().getToken();
-            String vdc = tierInstance.getTier().getVdc();
+            log.debug("tenantId " + openStackAccess.getTenantId());
+            log.debug("token " + openStackAccess.getToken());
 
-            openStackUtil.deleteServer(tierInstance.getVM().getVmid(), region, token, vdc);
+            openStackUtil.deleteServer(tierInstance.getVM().getVmid(), tierInstance.getTier().getRegion(),
+                openStackAccess.getToken(), openStackAccess.getTenantId());
 
             checkDeleteServerTaskStatus(tierInstance, claudiaData);
             log.debug("Undeployed VM replica " + tierInstance.getName() + " for region "
-                    + tierInstance.getTier().getRegion() + " and user " + tierInstance.getTier().getVdc());
+                + tierInstance.getTier().getRegion() + " and user " + tierInstance.getTier().getVdc());
 
             if (tierInstance.getTier().getFloatingip().equals("true")) {
                 log.debug("Delete floating ip ");
-                openStackUtil.disAllocateFloatingIP(region, token, vdc, tierInstance.getVM().getFloatingIp());
+                openStackUtil.disAllocateFloatingIP(region, openStackAccess.getToken(), openStackAccess.getTenantId(),
+                    tierInstance.getVM().getFloatingIp());
             }
 
         } catch (OpenStackException oes) {
