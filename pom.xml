@@ -224,12 +224,7 @@
             <dependency>
                 <groupId>com.telefonica.iot</groupId>
                 <artifactId>commons</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.telefonica.euro_iaas</groupId>
-                <artifactId>commons-properties</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>2.1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -312,15 +307,10 @@
                     <!-- aggregated reports for multi-module projects -->
                     <aggregate>true</aggregate>
                     <instrumentation>
-                        <ignores>
-                            <ignore>org.openstack.docs.common.api.v1.*</ignore>
-                        </ignores>
                         <excludes>
                             <exclude>**/*Test*.class</exclude>
                             <exclude>**/model/**.class</exclude>
                             <exclude>**/bean/**.class</exclude>
-                            <exclude>org/openstack/**/*</exclude>
-                            <exclude>org/w3/**/*</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
