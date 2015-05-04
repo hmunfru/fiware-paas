@@ -35,6 +35,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,6 +57,7 @@ import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import org.mockito.Mockito;
 
 /**
  * @author jesus.movilla
