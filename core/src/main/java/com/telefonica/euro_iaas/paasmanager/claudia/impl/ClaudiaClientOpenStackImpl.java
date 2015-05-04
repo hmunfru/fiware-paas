@@ -27,6 +27,8 @@ package com.telefonica.euro_iaas.paasmanager.claudia.impl;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import net.sf.json.JSONArray;
@@ -188,7 +190,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         String file = null;
         String hostname = tierInstance.getVM().getHostname();
         String chefServerUrl;
-        String puppetUrl;
+        String puppetHostname;
         try {
             file = fileUtils.readFile(systemPropertiesProvider.getProperty("user_data_path"));
             log.debug("File userdata read");
@@ -206,8 +208,8 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         }
 
         try {
-            puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion());
-
+            String puppetUrl = openStackRegion.getPuppetMasterEndPoint(tierInstance.getTier().getRegion());
+            puppetHostname = this.getPuppetMasterHostname(puppetUrl);
         } catch (Exception e1) {
             log.warn("Error to obtain the puppetmaster url" + e1.getMessage());
             return file;
@@ -223,9 +225,30 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
         file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl)
                 .replace("{validation_key}", chefValidationKey).replace("{networks}", writeInterfaces(tierInstance))
-                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetUrl);
+                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetHostname);
         log.debug("payload " + file);
         return file;
+
+    }
+
+
+    /**
+     * It obtains the puppet master hostname, required for user data.
+     * @param puppetMasterUrl
+     * @return
+     */
+    public String getPuppetMasterHostname (String puppetMasterUrl){
+        String host;
+        try{
+            URI uri = new URI(puppetMasterUrl); // may throw URISyntaxException
+            host = uri.getHost();
+            if (host == null) {
+                host = puppetMasterUrl;
+            }
+        } catch (URISyntaxException ex) {
+            host = puppetMasterUrl;
+        }
+        return host;
 
     }
 
