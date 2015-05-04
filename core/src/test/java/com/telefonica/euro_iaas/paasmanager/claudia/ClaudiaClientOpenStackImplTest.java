@@ -139,6 +139,7 @@ public class ClaudiaClientOpenStackImplTest {
 
         tier.setName("prueba");
         tier.setKeypair("jesusmovilla");
+        tier.setRegion("region");
 
         claudiaClientOpenStack = new ClaudiaClientOpenStackImpl();
 
@@ -193,14 +194,17 @@ public class ClaudiaClientOpenStackImplTest {
         tierInstance.setTier(tier);
         VM vm = new VM();
         vm.setHostname("hostname");
+        vm.setVmid("ID");
         tierInstance.setVM(vm);
 
         OpenStackAccess access = new OpenStackAccess();
         access.setTenantId("tenantId");
         access.setToken("token");
         when(openStackRegion.getTokenAdmin()).thenReturn(access);
-        when(openStackUtil.deleteServer(anyString(), anyString(), anyString(), anyString())).thenReturn("OK");
-        when(openStackUtil.getServer(anyString(), anyString(), anyString(), anyString())).
+        when(openStackUtil.deleteServer(vm.getVmid(),  tierInstance.getTier().getRegion(),
+            access.getToken(), access.getTenantId())).thenReturn("OK");
+        when(openStackUtil.getServer(vm.getVmid(), tierInstance.getTier().getRegion(),
+            claudiaData.getUser().getToken(), claudiaData.getUser().getTenantId())).
             thenThrow(new OpenStackException("Infrastructure Error"));
 
         claudiaClientOpenStack.undeployVMReplica(claudiaData, tierInstance);
