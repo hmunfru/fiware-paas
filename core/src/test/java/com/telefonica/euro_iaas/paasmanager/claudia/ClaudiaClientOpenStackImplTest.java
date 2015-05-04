@@ -35,6 +35,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -53,6 +55,7 @@ import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import org.mockito.Mockito;
 
 /**
  * @author jesus.movilla
@@ -180,6 +183,27 @@ public class ClaudiaClientOpenStackImplTest {
 
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         verify(openStackUtil).createServer(any(String.class), anyString(), anyString(), anyString());
+
+    }
+
+    @Test
+    public void testUnDeployVMReplica() throws Exception {
+
+        TierInstance tierInstance = new TierInstance();
+        tierInstance.setTier(tier);
+        VM vm = new VM();
+        vm.setHostname("hotname");
+        tierInstance.setVM(vm);
+
+        OpenStackAccess access = new OpenStackAccess();
+        access.setTenantId("tenantId");
+        access.setToken("token");
+        when(openStackRegion.getTokenAdmin()).thenReturn(access);
+        when(openStackUtil.deleteServer(anyString(), anyString(), anyString(), anyString())).thenReturn("");
+        when(openStackUtil.getServer(anyString(), anyString(), anyString(), anyString())).thenThrow(new OpenStackException(""));
+
+        claudiaClientOpenStack.undeployVMReplica(claudiaData, tierInstance);
+        verify(openStackUtil).deleteServer(anyString(), anyString(), anyString(), anyString());
 
     }
 
