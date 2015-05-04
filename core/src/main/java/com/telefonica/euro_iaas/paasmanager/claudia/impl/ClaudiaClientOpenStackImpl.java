@@ -618,19 +618,21 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         try {
             OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
             String region = tierInstance.getTier().getRegion();
-            log.debug("tenantId " + openStackAccess.getTenantId());
-            log.debug("token " + openStackAccess.getToken());
+            String tenantAdminId =  openStackAccess.getTenantId();
+            String tokenAdminId =  openStackAccess.getToken();
+            log.debug("tenantId " + tenantAdminId );
+            log.debug("token " + tokenAdminId);
 
-            openStackUtil.deleteServer(tierInstance.getVM().getVmid(), tierInstance.getTier().getRegion(),
-                openStackAccess.getToken(), openStackAccess.getTenantId());
+            openStackUtil.deleteServer(tierInstance.getVM().getVmid(), region,
+                tokenAdminId, tenantAdminId);
 
             checkDeleteServerTaskStatus(tierInstance, claudiaData);
             log.debug("Undeployed VM replica " + tierInstance.getName() + " for region "
-                + tierInstance.getTier().getRegion() + " and user " + tierInstance.getTier().getVdc());
+                + region + " and user " + tierInstance.getTier().getVdc());
 
             if (tierInstance.getTier().getFloatingip().equals("true")) {
                 log.debug("Delete floating ip ");
-                openStackUtil.disAllocateFloatingIP(region, openStackAccess.getToken(), openStackAccess.getTenantId(),
+                openStackUtil.disAllocateFloatingIP(region, tokenAdminId, tenantAdminId,
                     tierInstance.getVM().getFloatingIp());
             }
 
