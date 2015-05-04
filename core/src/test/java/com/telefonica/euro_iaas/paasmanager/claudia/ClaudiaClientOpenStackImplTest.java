@@ -187,8 +187,8 @@ public class ClaudiaClientOpenStackImplTest {
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
 
-        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
 
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         verify(openStackUtil).createServer(any(String.class), anyString(), anyString(), anyString());
@@ -233,7 +233,7 @@ public class ClaudiaClientOpenStackImplTest {
         NetworkInstance network2 = new NetworkInstance("2", "VDC", "REGION");
         tierInstance.addNetworkInstance(network2);
 
-        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
         when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://" + HOSTNAME + ":8081");
 
 
@@ -254,8 +254,8 @@ public class ClaudiaClientOpenStackImplTest {
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
-        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
 
@@ -278,8 +278,8 @@ public class ClaudiaClientOpenStackImplTest {
         VM vm = new VM();
         vm.setHostname("hotname");
         tierInstance.setVM(vm);
-        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
                 networkInstances);
@@ -310,8 +310,8 @@ public class ClaudiaClientOpenStackImplTest {
         NetworkInstance netInst2 = network.toNetworkInstance();
         netInst2.setShared(false);
         netInst2.setDefaultNet(true);
-        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http");
-        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http");
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
                 networkInstances);

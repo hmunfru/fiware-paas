@@ -27,6 +27,8 @@ package com.telefonica.euro_iaas.paasmanager.claudia.impl;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import net.sf.json.JSONArray;
@@ -80,8 +82,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private TierInstanceManager tierInstanceManager = null;
     private SystemPropertiesProvider systemPropertiesProvider = null;
     private static final int POLLING_INTERVAL = 10000;
-    private static String HTTP_START = "://";
-    private static String PORT_START = ":80";
 
     /**
      * Get the response of the server from openstack.
@@ -238,15 +238,18 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
      * @return
      */
     public String getPuppetMasterHostname (String puppetMasterUrl){
-        int valueInitial = 0;
-        if (puppetMasterUrl.indexOf(HTTP_START) != -1){
-            valueInitial = puppetMasterUrl.indexOf(HTTP_START) + HTTP_START.length();
+        String host;
+        try{
+            URI uri = new URI(puppetMasterUrl); // may throw URISyntaxException
+            host = uri.getHost();
+            if (host == null) {
+                host = puppetMasterUrl;
+            }
+        } catch (URISyntaxException ex) {
+            host = puppetMasterUrl;
         }
-        int valueEnd = puppetMasterUrl.length();
-        if (puppetMasterUrl.indexOf(PORT_START) != -1){
-            valueEnd = puppetMasterUrl.indexOf(PORT_START);
-        }
-        return puppetMasterUrl.substring(valueInitial, valueEnd);
+        return host;
+
     }
 
     public String writeInterfaces(TierInstance tierInstance) {
