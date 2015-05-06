@@ -21,8 +21,6 @@
 # For those usages not covered by the Apache version 2.0 License please
 # contact with opensource@tid.es
 
-__author__ = 'jfernandez'
-
 
 from qa_utils.rest_client_utils import RestClient, API_ROOT_URL_ARG_NAME, model_to_request_body, HEADER_CONTENT_TYPE, \
     HEADER_REPRESENTATION_XML
