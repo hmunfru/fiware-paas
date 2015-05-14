@@ -312,7 +312,11 @@ public class ClaudiaClientOpenStackImplTest {
         when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
-                networkInstances);
+            networkInstances);
+        when(networkInstanceManager.load(any(String.class), any(String.class), any(String.class))).thenReturn(
+            netInst);
+
+
 
         when(networkInstanceManager.create(any(ClaudiaData.class), any(NetworkInstance.class), any(String.class)))
                 .thenReturn(netInst2);

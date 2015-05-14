@@ -309,63 +309,38 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             return;
 
         }
-        List<NetworkInstance> networkNoSharedInstances = loadNotSharedNetworksUser(networkInstances,
-                claudiaData.getVdc(), region);
-        if (networkNoSharedInstances.isEmpty()) {
-            log.debug("There is not any network associated to the user");
-            Network net = new Network(claudiaData.getUser().getTenantName(), vdc, region);
-            SubNetwork subNet = new SubNetwork("default" + vdc, vdc, region);
-            net.addSubNet(subNet);
-            NetworkInstance netinstance = net.toNetworkInstance();
-            NetworkInstance networkInstance = networkInstanceManager.create(claudiaData, netinstance, region);
-            networkInstance.setDefaultNet(true);
-            tierInstance.addNetworkInstance(networkInstance);
-            tierInstanceManager.update(tierInstance);
-        } else {
-            log.debug("Getting the default network ");
-            NetworkInstance defaulNet = getDefaultNetwork(networkNoSharedInstances, vdc);
-            if (defaulNet == null) {
+
+        log.debug("Getting the default network ");
+        NetworkInstance networkInstance = getDefaultNetwork(networkInstances, vdc, region);
+        if (networkInstance == null) {
+            List<NetworkInstance> userNetworks = getUserNetworks(networkInstances, vdc, region);
+            if (userNetworks.isEmpty())
+            {
+                log.debug("There is not any network associated to the user");
+                Network net = new Network(claudiaData.getUser().getTenantName(), vdc, region);
+                SubNetwork subNet = new SubNetwork("default" + vdc, vdc, region);
+                net.addSubNet(subNet);
+                NetworkInstance netinstance = net.toNetworkInstance();
+                networkInstance = networkInstanceManager.create(claudiaData, netinstance, region);
+                networkInstance.setDefaultNet(true);
+            } else {
                 log.debug("There is not a default network. Getting the first one");
-                tierInstance.addNetworkInstance(getFirstNetwork(networkNoSharedInstances, vdc, region));
-                tierInstanceManager.update(tierInstance);
-            }
-
-        }
-    }
-
-    private NetworkInstance getFirstNetwork(List<NetworkInstance> lNetworkInstance, String vdc, String region)
-            throws InvalidEntityException {
-        NetworkInstance netInstance = null;
-        try {
-            netInstance = networkInstanceManager.load(lNetworkInstance.get(0).getNetworkName(), vdc, region);
-        } catch (EntityNotFoundException e) {
-            try {
-                netInstance = networkInstanceManager.createInDB(lNetworkInstance.get(0));
-            } catch (Exception e1) {
-                throw new InvalidEntityException("It is not possible to create in DB the network "
-                        + lNetworkInstance.get(0).getNetworkName());
+                networkInstance = getFirstNetwork(networkInstances, vdc, region);
             }
         }
-        return netInstance;
+
+        tierInstance.addNetworkInstance(networkInstance);
+        tierInstanceManager.update(tierInstance);
     }
 
-    private NetworkInstance getDefaultNetwork(List<NetworkInstance> networkInstances, String vdc)
-            throws EntityNotFoundException {
-        for (NetworkInstance net : networkInstances) {
-            if (net.isDefaultNet()) {
-                return net;
-            }
-        }
-        return null;
-    }
+    private List<NetworkInstance> getUserNetworks(List<NetworkInstance> networks, String tenantId,
+                                                           String region) throws InfrastructureException {
 
-    private List<NetworkInstance> loadNotSharedNetworksUser(List<NetworkInstance> networks, String tenantId,
-            String region) throws InfrastructureException {
-        List<NetworkInstance> networksNotShared = new ArrayList<NetworkInstance>();
+        List<NetworkInstance> tenantNetworks = new ArrayList<NetworkInstance>();
         for (NetworkInstance net : networks) {
-            if (!net.getShared() && net.getTenantId().equals(tenantId)) {
+            if ( net.getTenantId().equals(tenantId)) {
                 try {
-                    networksNotShared.add(loadNetworkInstance(net, tenantId, region));
+                    tenantNetworks.add(loadNetworkInstance(net, tenantId, region));
                 } catch (Exception e) {
                     log.error("The network " + net.getNetworkName() + " cannot be added");
 
@@ -373,7 +348,40 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
             }
         }
-        return networksNotShared;
+        return tenantNetworks;
+    }
+
+    private NetworkInstance getFirstNetwork(List<NetworkInstance> lNetworkInstance, String vdc, String region)
+            throws InvalidEntityException {
+        return getNetworkInstance(lNetworkInstance.get(0), vdc, region);
+    }
+
+    private NetworkInstance getNetworkInstance (NetworkInstance net, String vdc, String region)
+        throws InvalidEntityException {
+        NetworkInstance netInstance = null;
+        try {
+            netInstance = networkInstanceManager.load(net.getNetworkName(), vdc, region);
+        } catch (EntityNotFoundException e) {
+            try {
+                netInstance = networkInstanceManager.createInDB(net);
+            } catch (Exception e1) {
+                throw new InvalidEntityException("It is not possible to create in DB the network "
+                    + net.getNetworkName());
+            }
+        }
+        return netInstance;
+
+    }
+
+    private NetworkInstance getDefaultNetwork(List<NetworkInstance> networkInstances, String vdc, String region)
+        throws InvalidEntityException {
+        for (NetworkInstance net : networkInstances) {
+            if (net.getShared()) {
+                net.setDefaultNet(true);
+                return getNetworkInstance(net, vdc, region);
+            }
+        }
+        return null;
     }
 
     private NetworkInstance loadNetworkInstance(NetworkInstance networkInstance, String tenantId, String region)
