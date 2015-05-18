@@ -54,7 +54,7 @@ public enum ErrorCode {
     		"(.*)InvalidEntityException:(.*)The number of replicas is not valid(.*)",
     		400),
  	PRODUCTINSTANCE_ALREADY_EXIST (90, "ProductInstance Already Exist", "(.*)ProductInstallatorException (.*)already exists(.*)", 400),
- 	ERROR_INSTALLING_A_PRODUCT (91, "Error installing a product ", "(.*)ProductInstallatorException (.*)Error installing product(.*)", 400),
+ 	ERROR_INSTALLING_A_PRODUCT (91, "Error installing a product ", "(.*)ProductInstallatorException (.*)Error installing product(.*)", 412),
     DEFAULT(500, "Internal PaasManager Server error", "(?s).*", 500);
 
     private final int code;
