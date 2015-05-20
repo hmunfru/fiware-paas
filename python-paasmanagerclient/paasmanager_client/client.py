@@ -75,7 +75,7 @@ class PaaSManagerClient():
 
         logger.info("Init PaaSManager Client")
         logger.debug("Client parameters: Username: %s, Password: %s, TenantId: %s, AuthURL: %s, RegionName: %s, "
-                     "ServiceType: %s, EndopointType: %s", username, password, tenant_id, auth_url, region_name,
+                     "ServiceType: %s, EndpointType: %s", username, password, tenant_id, auth_url, region_name,
                      service_type, endpoint_type)
         self.tenant_id = tenant_id
 

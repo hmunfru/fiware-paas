@@ -1,7 +1,7 @@
 FIWARE PaaSManager Python Client
 ================================
 
-This is a client for Pegasus PaaSManager API. This API client has been developed in Python_. This client will use
+This is a client for Pegasus PaaSManager API. This API client has been developed in Python_. This client uses
 the OpenStack Keystone service for authorization and service endpoint management.
 
 Environment
@@ -22,7 +22,7 @@ __ `Python - Downloads`_
 **Installation**
 
 All dependencies has been defined in ``requirements.txt``.
-To install the last version of this client, download it from the GIT PaaSManager repository (stable branch)
+To install the last version of this client, download it from the GIT PaaSManager repository (*master* branch)
 and install it, using following command:
 
 ::
