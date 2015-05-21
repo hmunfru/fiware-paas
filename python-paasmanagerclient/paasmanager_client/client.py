@@ -62,7 +62,7 @@ class PaaSManagerClient():
     def __init__(self, username, password, tenant_id, auth_url, region_name, service_type=PAASMANAGER_SERVICE_TYPE,
                  endpoint_type=PAASMANAGER_ENDPOINT_TYPE):
         """
-        Inits Nova-Client. Url will be loaded from Keystone Service Catalog (publicURL, compute service)
+        Init Nova-Client. Url will be loaded from Keystone Service Catalog (publicURL, compute service)
         :param username: Fiware username
         :param password: Fiware password
         :param tenant_id: Fiware Tenant ID
@@ -87,7 +87,7 @@ class PaaSManagerClient():
 
     def __init_keystone_client__(self, username, password, tenant_id, auth_url):
         """
-        Inits the keystone client to request token and endpoint data
+        Init the keystone client to request token and endpoint data
         :param string username: Username for authentication.
         :param string password: Password for authentication.
         :param string tenant_id: Tenant id.
@@ -112,7 +112,7 @@ class PaaSManagerClient():
 
     def get_paasmanager_endpoint_from_keystone(self, region_name, service_type, endpoint_type):
         """
-        Gets the endpoint of PaaSManager from Keystone Service Catalog
+        Get the endpoint of PaaSManager from Keystone Service Catalog
         :param region_name: Name of the region
         :param service_type: Type of service (Endpoint name)
         :param endpoint_type: Type of the URL to look for
@@ -174,7 +174,7 @@ class PaaSManagerClient():
 
     def getEnvironmentResourceClient(self):
         """
-        Creates an API resource REST client
+        Create an API resource REST client
         :return: Rest client for 'Environment' API resource
         """
         split_regex = "(.*)://(.*):(\d*)/(.*)"

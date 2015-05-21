@@ -61,7 +61,7 @@ class EnvironmentResourceClient(RestClient):
 
     def create_environment(self, name, description=None):
         """
-        Creates a new environment (Tenant)
+        Create a new environment (Tenant)
         :param name: Name of the environment
         :param description: Description of the environment
         :return: 'Requests' response
@@ -74,7 +74,7 @@ class EnvironmentResourceClient(RestClient):
 
     def delete_environment(self, name):
         """
-        Deletes an environemnt (Tenant)
+        Delete an environemnt (Tenant)
         :param name: Name of the environment to be deleted
         :return: 'Request' response
         """

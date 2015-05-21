@@ -61,7 +61,7 @@ class RestClient(object):
 
     def __init__(self, protocol, host, port, resource=None):
         """
-        This method init the RestClient with an URL ROOT Pattern using the specified params
+        Init the RestClient with an URL ROOT Pattern using the specified params
         :param protocol: Web protocol [HTTP | HTTPS] (string)
         :param host: Hostname or IP (string)
         :param port: Service port (string)
@@ -76,7 +76,7 @@ class RestClient(object):
     @staticmethod
     def _generate_url_root(protocol, host, port):
         """
-        Generates API root URL without resources
+        Generate API root URL without resources
         :param protocol: Web protocol [HTTP | HTTPS] (string)
         :param host: Hostname or IP (string)
         :param port: Service port (string)
@@ -175,7 +175,7 @@ class RestClient(object):
 
 def _xml_to_dict(xml_to_convert):
     """
-    Converts RAW XML string to Python dict
+    Convert RAW XML string to Python dict
     :param xml_to_convert: XML to convert (string/text)
     :return: Python dict with all XML data
     """
@@ -186,7 +186,7 @@ def _xml_to_dict(xml_to_convert):
 
 def _dict_to_xml(dict_to_convert):
     """
-    Converts Python dict to XML
+    Convert Python dict to XML
     :param dict_to_convert: Python dict to be converted (dict)
     :return: XML (string)
     """
@@ -197,7 +197,7 @@ def _dict_to_xml(dict_to_convert):
 
 def response_body_to_dict(http_requests_response, content_type, xml_root_element_name=None, is_list=False):
     """
-    Method to convert a XML or JSON response in a Python dict
+    Convert a XML or JSON response in a Python dict
     :param http_requests_response: 'Requests (lib)' response
     :param content_type: Expected content-type header value (Accept header value in the request)
     :param xml_root_element_name: For XML requests. XML root element in response.
@@ -230,7 +230,7 @@ def response_body_to_dict(http_requests_response, content_type, xml_root_element
 
 def model_to_request_body(body_model, content_type, body_model_root_element=None):
     """
-    Converts a Python dict (body model) to XML or JSON
+    Convert a Python dict (body model) to XML or JSON
     :param body_model: Model to be parsed. This model should have a root element.
     :param content_type: Target representation (Content-Type header value)
     :param body_model_root_element: For XML requests. XML root element in the model (if exists).

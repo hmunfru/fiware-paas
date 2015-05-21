@@ -52,7 +52,7 @@ logging_level = logging.ERROR
 
 def configure_logging(level):
     """
-    Configures global log level to given one
+    Configure global log level to given one
     :param level: Level (INFO | DEBUG | WARN | ERROR)
     :return:
     """
@@ -69,7 +69,7 @@ def configure_logging(level):
 
 def get_logger(name):
     """
-    Creates new logger with the given name
+    Create new logger with the given name
     :param name: Name of the logger
     :return: Logger
     """
@@ -80,7 +80,7 @@ def get_logger(name):
 
 def _get_pretty_body(headers, body):
     """
-    Returns a pretty printed body using the Content-Type header information
+    Return a pretty printed body using the Content-Type header information
     :param headers: Headers for the request/response (dict)
     :param body: Body to pretty print (string)
     :return: Body pretty printed (string)
@@ -103,7 +103,7 @@ def _get_pretty_body(headers, body):
 
 def log_print_request(logger, method, url, query_params=None, headers=None, body=None):
     """
-    Logs an HTTP request data.
+    Log an HTTP request data.
     :param logger: Logger to use
     :param method: HTTP method
     :param url: URL
@@ -128,7 +128,7 @@ def log_print_request(logger, method, url, query_params=None, headers=None, body
 
 def log_print_response(logger, response):
     """
-    Logs an HTTP response data
+    Log an HTTP response data
     :param logger: logger to use
     :param response: HTTP response ('Requests' lib)
     :return: None
