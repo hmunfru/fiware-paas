@@ -72,7 +72,6 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
 
     }
 
-
     private NetworkInstance findByNetworkInstanceName(String name, String vdc, String region)
             throws EntityNotFoundException {
         Query query = getEntityManager().createQuery(

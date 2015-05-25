@@ -282,7 +282,7 @@ public class ClaudiaClientOpenStackImplTest {
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
                 networkInstances);
 
-        when(networkInstanceManager.load(any(String.class), any(String.class), any(String.class))).thenReturn(netInst);
+        when(networkInstanceManager.load(any(String.class), any(ClaudiaData.class), any(String.class))).thenReturn(netInst);
 
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
 
@@ -291,7 +291,7 @@ public class ClaudiaClientOpenStackImplTest {
     }
 
     @Test
-    public void testDeployVMEGrizzlyNotNetwork2() throws Exception {
+     public void testDeploySharedNetwork() throws Exception {
 
         TierInstance tierInstance = new TierInstance();
         tierInstance.setTier(tier);
@@ -310,16 +310,52 @@ public class ClaudiaClientOpenStackImplTest {
         netInst2.setDefaultNet(true);
         when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
         when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
+        OpenStackAccess access = new OpenStackAccess();
+        access.setTenantId("tenantId");
+        access.setToken("token");
+        when(openStackRegion.getTokenAdmin()).thenReturn(access);
 
         when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
             networkInstances);
-        when(networkInstanceManager.load(any(String.class), any(String.class), any(String.class))).thenReturn(
+        when(networkInstanceManager.load(any(String.class), any(ClaudiaData.class), any(String.class))).thenReturn(
+            netInst);
+        when(networkInstanceManager.create(any(ClaudiaData.class), any(NetworkInstance.class), any(String.class)))
+            .thenReturn(netInst2);
+
+        claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
+        assertEquals(tierInstance.getNetworkInstances().size(), 1);
+        verify(openStackUtil).createServer(any(String.class), any(String.class), any(String.class), any(String.class));
+
+    }
+
+    @Test
+    public void testDeployNoSharedNetwork() throws Exception {
+
+        TierInstance tierInstance = new TierInstance();
+        tierInstance.setTier(tier);
+
+        Network network = new Network("NETWORK", "VDC", "REGION");
+        NetworkInstance netInst = network.toNetworkInstance();
+        netInst.setShared(false);
+        netInst.setTenantId(claudiaData.getVdc());
+        List<NetworkInstance> networkInstances = new ArrayList<NetworkInstance>();
+        networkInstances.add(netInst);
+
+        VM vm = new VM();
+        vm.setHostname("hotname");
+        tierInstance.setVM(vm);
+        when(openStackRegion.getChefServerEndPoint(anyString())).thenReturn("http://chef");
+        when(openStackRegion.getPuppetMasterEndPoint(anyString())).thenReturn("http://puppet");
+
+        when(networkInstanceManager.listNetworks(any(ClaudiaData.class), any(String.class))).thenReturn(
+            networkInstances);
+        when(networkInstanceManager.load(any(String.class), any(ClaudiaData.class), any(String.class))).thenReturn(
             netInst);
 
 
 
         when(networkInstanceManager.create(any(ClaudiaData.class), any(NetworkInstance.class), any(String.class)))
-                .thenReturn(netInst2);
+            .thenReturn(netInst);
 
         claudiaClientOpenStack.deployVM(claudiaData, tierInstance, 1, vm);
         assertEquals(tierInstance.getNetworkInstances().size(), 1);

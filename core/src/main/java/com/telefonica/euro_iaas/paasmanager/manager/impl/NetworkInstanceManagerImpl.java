@@ -27,6 +27,7 @@ package com.telefonica.euro_iaas.paasmanager.manager.impl;
 import java.util.List;
 import java.util.Set;
 
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 
 /**
  * @author henar
@@ -52,6 +54,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     private NetworkInstanceDao networkInstanceDao = null;
     private NetworkClient networkClient = null;
+    private OpenStackRegion openStackRegion = null;
     private SubNetworkInstanceManager subNetworkInstanceManager = null;
     private RouterManager routerManager = null;
     private SystemPropertiesProvider systemPropertiesProvider;
@@ -74,12 +77,14 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      */
     public boolean exists (ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
         throws InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException {
-    	if (existsInDB(networkInstance.getNetworkName(), claudiaData.getVdc(), region)) {
-    		networkInstance = networkInstanceDao.load(networkInstance.getNetworkName(), claudiaData.getVdc(), region);
+
+
+    	if (existsInDB(networkInstance.getNetworkName(), claudiaData, region)) {
+    		networkInstance = load(networkInstance.getNetworkName(), claudiaData, region);
             if (!existsInOpenstack (claudiaData, networkInstance, region)) {
             	log.warn ("The network "+  networkInstance.getNetworkName()+ " with id "
                     + networkInstance.getIdNetwork() + " does no exists in Openstack") ;
-            	this.deleteInDb(networkInstance, claudiaData.getVdc(), region);
+            	this.deleteInDb(networkInstance, claudiaData, region);
             	return false;
 
             } else {
@@ -169,7 +174,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     private void restoreNetwork(ClaudiaData claudiaData, NetworkInstance networkInstance, String region)
             throws EntityNotFoundException, InvalidEntityException, InfrastructureException {
         Set<SubNetworkInstance> subNets = networkInstance.cloneSubNets();
-        this.deleteInDb(networkInstance, claudiaData.getVdc(), region);
+        this.deleteInDb(networkInstance, claudiaData, region);
         for (SubNetworkInstance subNet : subNets) {
             if (subNetworkInstanceManager.isSubNetworkDeployed(claudiaData, subNet, region)) {
                 subNetworkInstanceManager.delete(claudiaData, subNet, region);
@@ -178,6 +183,17 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         log.info("Deleting the network");
         networkClient.destroyNetwork(claudiaData, networkInstance, region);
     }
+
+    private String getAdminTenantId (ClaudiaData data) {
+        try {
+            OpenStackAccess openStackAccess = this.openStackRegion.getTokenAdmin();
+            return openStackAccess.getTenantId();
+        } catch (Exception e) {
+            return null;
+
+        }
+    }
+
 
     /**
      * It creates a subnet in the network.
@@ -220,7 +236,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         log.info("Destroying network " + networkInstance.getNetworkName() + " region " + region);
         try {
             networkInstance = load(networkInstance.getNetworkName(),
-                claudiaData.getVdc(), region);
+                claudiaData, region);
         } catch (EntityNotFoundException e) {
             log.error("Error to remove the network in BD, since it is not exist in BD " + e.getMessage());
             throw new InvalidEntityException(networkInstance);
@@ -233,7 +249,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         }
 
         log.info("Deleting from DB");
-        deleteInDb(networkInstance, claudiaData.getVdc(), region);
+        deleteInDb(networkInstance, claudiaData, region);
 
         log.info("Deleting the public interface");
         try {
@@ -255,13 +271,13 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
 
 
-    private void deleteInDb(NetworkInstance networkInstance, String vdc, String region)
+    private void deleteInDb(NetworkInstance networkInstance, ClaudiaData data, String region)
         throws InvalidEntityException {
         log.info("Destroying network in DB" + networkInstance.getNetworkName());
 
         try {
             networkInstance = load(networkInstance.getNetworkName(),
-                vdc, region);
+                data, region);
             Set<SubNetworkInstance> subNetAux = networkInstance.cloneSubNets();
             networkInstance.getSubNets().clear();
             networkInstanceDao.update(networkInstance);
@@ -289,20 +305,23 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
         log.info("Checking if any blueprint is using the network"
             + networkInstance.getNetworkName());
         boolean isDeleted = false;
-        try {
-            List<TierInstance> lTierInstance = networkInstanceDao.
-                findTierInstanceUsedByNetwork(networkInstance.getNetworkName(),
-                claudiaData.getVdc(), region);
-            if (lTierInstance.size() > 0) {
-                isDeleted = false;
-            } else {
-                isDeleted = true;
-            }
+        if (!networkInstance.getShared()) {
+            try {
+                List<TierInstance> lTierInstance = networkInstanceDao.
+                    findTierInstanceUsedByNetwork(networkInstance.getNetworkName(),
+                        claudiaData.getVdc(), region);
+                if (lTierInstance.size() > 0) {
+                    isDeleted = false;
+                } else {
+                    isDeleted = true;
+                }
 
-        } catch (EntityNotFoundException e) {
-            log.warn("Not network Instance found");
-            isDeleted = false;
+            } catch (EntityNotFoundException e) {
+                log.warn("Not network Instance found");
+                isDeleted = false;
+            }
         }
+
         return isDeleted;
     }
 
@@ -338,9 +357,9 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      * @return the network list
      */
     private boolean existsInDB(String networkInstance,
-                               String vdc, String region) {
+                               ClaudiaData data, String region) {
         try {
-            networkInstanceDao.load(networkInstance, vdc, region);
+            load(networkInstance, data, region);
             return true;
         } catch (Exception e) {
             return false;
@@ -348,7 +367,7 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
 
     }
 
-    private NetworkInstance createInBD (ClaudiaData data,
+    public NetworkInstance createInBD (ClaudiaData data,
                                         NetworkInstance netInstance,
                                         String region)
         throws EntityNotFoundException, AlreadyExistsEntityException, InvalidEntityException {
@@ -389,9 +408,15 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
      * @param networkName
      * @return the network
      */
-    public NetworkInstance load(String networkName, String vdc, String region)
+    public NetworkInstance load(String networkName, ClaudiaData data, String region)
         throws EntityNotFoundException {
-        return networkInstanceDao.load(networkName, vdc, region);
+        try {
+            return networkInstanceDao.load(networkName, data.getVdc(), region);
+        } catch (Exception e) {
+            log.debug("Trying with admin network");
+            String tenantAdminId = this.getAdminTenantId(data);
+            return networkInstanceDao.load(networkName, tenantAdminId, region);
+        }
     }
 
     public void setNetworkClient(NetworkClient networkClient) {
@@ -418,6 +443,11 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     public void setSystemPropertiesProvider(SystemPropertiesProvider
                                                 systemPropertiesProvider) {
         this.systemPropertiesProvider = systemPropertiesProvider;
+    }
+
+    public void setOpenStackRegion(OpenStackRegion
+                                       openStackRegion) {
+        this.openStackRegion = openStackRegion;
     }
 
     public NetworkInstance update(NetworkInstance networkInstance)
