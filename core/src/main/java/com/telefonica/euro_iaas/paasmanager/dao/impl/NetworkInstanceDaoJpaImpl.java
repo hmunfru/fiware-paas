@@ -72,6 +72,17 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
 
     }
 
+    /**
+     * It obtains the network from database.
+     * @param name
+     * @param region
+     * @return
+     * @throws EntityNotFoundException
+     */
+    public NetworkInstance load(String name, String region) throws EntityNotFoundException {
+        return findByNetworkInstanceName(name, region);
+    }
+
 
     private NetworkInstance findByNetworkInstanceName(String name, String vdc, String region)
             throws EntityNotFoundException {
@@ -89,6 +100,27 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
                     + region + " Exception: "
 
                     + e.getMessage();
+            log.debug(message);
+            throw new EntityNotFoundException(NetworkInstance.class, "name", name);
+        }
+        return networkInstance;
+    }
+
+    private NetworkInstance findByNetworkInstanceName(String name, String region)
+        throws EntityNotFoundException {
+        Query query = getEntityManager().createQuery(
+            "select p from NetworkInstance p left join "
+                + "fetch p.subNets where p.name = :name and p.region = :region");
+        query.setParameter("name", name);
+        query.setParameter("region", region);
+        NetworkInstance networkInstance = null;
+        try {
+            networkInstance = (NetworkInstance) query.getSingleResult();
+        } catch (NoResultException e) {
+            String message = " No NetworkInstance found in the database with id: " + name + " region "
+                + region + " Exception: "
+
+                + e.getMessage();
             log.debug(message);
             throw new EntityNotFoundException(NetworkInstance.class, "name", name);
         }

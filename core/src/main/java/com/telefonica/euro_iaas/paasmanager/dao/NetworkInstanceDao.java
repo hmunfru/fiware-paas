@@ -51,6 +51,15 @@ public interface NetworkInstanceDao extends BaseDAO<NetworkInstance, String> {
     NetworkInstance load(String name, String vdc, String region) throws EntityNotFoundException ;
 
     /**
+     * It obtains the networkInstance from DB.
+     * @param name
+     * @param region
+     * @return
+     * @throws EntityNotFoundException
+     */
+    NetworkInstance load(String name, String region) throws EntityNotFoundException ;
+
+    /**
      * It obtains the tierinstances which have network instance associated.
      * @param name
      * @param vdc
