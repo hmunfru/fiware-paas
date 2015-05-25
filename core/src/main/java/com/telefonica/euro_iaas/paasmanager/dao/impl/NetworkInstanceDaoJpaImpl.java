@@ -94,6 +94,7 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
         return networkInstance;
     }
 
+
     /**
      * It get the tier instance which have the concrete network.
      * @param name: the network name
