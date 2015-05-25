@@ -518,12 +518,9 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
         try {
             List<NetworkInstance> loadAllNetworks = this.loadAllNetwork(claudiaData, region);
             for (NetworkInstance net : loadAllNetworks) {
-                if (net.getNetworkName().equals(network.getNetworkName())) {
-                    if (net.getShared()) {
-                        networkId = net.getIdNetwork();
-                    } else if (net.getTenantId().equals(claudiaData.getVdc())){
-                        networkId =  net.getIdNetwork();
-                    }
+                if (net.getNetworkName().equals(network.getNetworkName()) &&
+                    (net.getShared() || net.getTenantId().equals(claudiaData.getVdc()))) {
+                    networkId = net.getIdNetwork();
                 }
             }
         } catch (InfrastructureException e) {
