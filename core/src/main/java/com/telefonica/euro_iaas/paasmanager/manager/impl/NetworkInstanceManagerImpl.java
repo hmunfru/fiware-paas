@@ -185,13 +185,14 @@ public class NetworkInstanceManagerImpl implements NetworkInstanceManager {
     }
 
     private String getAdminTenantId (ClaudiaData data) {
+        String tenantAdminId = null;
         try {
             OpenStackAccess openStackAccess = this.openStackRegion.getTokenAdmin();
-            return openStackAccess.getTenantId();
+            tenantAdminId = openStackAccess.getTenantId();
         } catch (Exception e) {
-            return null;
-
+            log.warn("No admin token found");
         }
+        return tenantAdminId;
     }
 
 
