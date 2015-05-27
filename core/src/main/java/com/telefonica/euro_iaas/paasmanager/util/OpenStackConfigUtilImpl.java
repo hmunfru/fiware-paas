@@ -225,19 +225,22 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
     private NetworkInstance getPublicNetwork(java.util.List<NetworkInstance> netInsts) {
 
         for (NetworkInstance net: netInsts) {
-            if (net.getNetworkName().contains("public")) {
+            if (net.getNetworkName().contains("public") &&
+                !net.getNetworkName().contains("federation") ) {
                 return net;
             }
         }
 
         for (NetworkInstance net: netInsts) {
-            if (net.getNetworkName().contains("ext-net")) {
+            if (net.getNetworkName().contains("ext-net") &&
+                !net.getNetworkName().contains("federation")) {
                 return net;
             }
         }
 
         for (NetworkInstance net: netInsts) {
-            if (net.getNetworkName().contains("ext")) {
+            if (net.getNetworkName().contains("ext")&&
+                !net.getNetworkName().contains("federation")) {
                 return net;
             }
         }
