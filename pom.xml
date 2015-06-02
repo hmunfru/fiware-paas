@@ -5,7 +5,7 @@
     <artifactId>paas-manager-server</artifactId>
     <packaging>pom</packaging>
     <name>Pegasus - PaaS Manager</name>
-    <version>1.7.0</version>
+    <version>1.8.0-SNAPSHOT</version>
 
 
     <properties>
