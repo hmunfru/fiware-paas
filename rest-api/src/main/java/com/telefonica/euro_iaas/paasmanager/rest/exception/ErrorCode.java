@@ -42,7 +42,7 @@ public enum ErrorCode {
             "The environment is being used by an instance",
             "(.*)InvalidEntityException: (.*)is being used(.*)",
             403),
-    INVALID_NUMBER_INITIAL_VMS_IN_TIER(70, "Invalid Tier. Number of Initial VMs is not correct", 
+    INVALID_NUMBER_INITIAL_VMS_IN_TIER(70, "Invalid Tier. Initial, minimum or maximun number of instances are not correct", 
             		"(.*)InvalidEntityException(.*)Error in the initial number of instances(.*)", 400),
     NAME_NO_VALID(41, "The name is not valid", "(.*)InvalidEntityException:(.*)", 400),
     OPENSTACK_ERROR_CREATINGSERVER (50, "Openstack error creating a server/assigning floating ip", "(.*)InfrastructureException(.*)Error interacting with OpenStack(.*)", 500),
