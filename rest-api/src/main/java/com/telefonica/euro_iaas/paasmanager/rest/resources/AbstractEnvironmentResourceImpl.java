@@ -33,16 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.AlreadyExistEntityException;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentManager;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentDto;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.EnvironmentResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -110,7 +109,7 @@ public class AbstractEnvironmentResourceImpl implements AbstractEnvironmentResou
         log.info("Inserting env " + environmentDto.getName() + " from org " + org);
         ClaudiaData claudiaData = new ClaudiaData(org, "", environmentDto.getName());
 
-        addCredentialsToClaudiaData(claudiaData);
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         try {
 
@@ -156,33 +155,6 @@ public class AbstractEnvironmentResourceImpl implements AbstractEnvironmentResou
         }
 
         return environmentDtos;
-
-    }
-
-    /**
-     * Add PaasManagerUser to claudiaData.
-     * 
-     * @param claudiaData
-     */
-    public void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-
-            claudiaData.setUser(getCredentials());
-        }
-
-    }
-
-    /**
-     * Get the credentials associated to an user.
-     * 
-     * @return
-     */
-    public PaasManagerUser getCredentials() {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            return (PaasManagerUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } else {
-            return null;
-        }
 
     }
 

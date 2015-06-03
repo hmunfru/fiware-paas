@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -42,8 +43,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     /**
      * (non-Javadoc).
-     * @see org.springframework.security.web.AuthenticationEntryPoint#commence( javax.servlet.http.HttpServletRequest,
-     * javax.servlet.http.HttpServletResponse, org.springframework.security.core.AuthenticationException)
+     * 
+     * @see org.springframework.security.web.AuthenticationEntryPoint#commence(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse,
+     *      org.springframework.security.core.AuthenticationException)
      */
     public final void commence(final HttpServletRequest request, final HttpServletResponse response,
             final AuthenticationException authException) throws IOException, ServletException {
@@ -54,6 +57,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         // authException.getMessage());
         // }
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        if (authException instanceof InsufficientAuthenticationException) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        }
     }
 }

@@ -6,6 +6,7 @@ Feature: Create an instance of an environment in a tenant
     so that I can use them and work with them
 
 
+    @release_4_1
     Scenario: Create instance of an environment with one tier without products
         Given the paas manager is up and properly configured
         And a list of tiers has been defined with data:
@@ -22,6 +23,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have not NID metadata
 
 
+    @release_4_1
     Scenario: Create instance of an environment with several tiers without products
         Given the paas manager is up and properly configured
         And a list of tiers has been defined with data:
@@ -40,6 +42,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have not NID metadata
 
 
+    @release_4_1
     Scenario: Create instance of an environment with one tier and one product (without nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_no_nid" with version "0.0.1" is created in SDC
@@ -57,6 +60,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have not NID metadata
 
 
+    @release_4_1
     Scenario Outline: Create instance of an environment with one tier and one product (with invalid nid metadata)
         Given the paas manager is up and properly configured
         And the product "<product>" with version "0.0.1" is created in SDC with metadatas:
@@ -81,7 +85,7 @@ Feature: Create an instance of an environment in a tenant
         | envqa2   | instqa2   |testing_paas_product_no_nid | NID       | testing_paas_product_no_nid=0.0.1 |
 
 
-    @happy_path
+    @happy_path @release_4_1
     Scenario: Create instance of an environment with one tier and one product (with valid nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_nid_01" with version "0.0.1" is created in SDC with metadatas:
@@ -101,6 +105,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have the correct NID metadata value
 
 
+    @release_4_1
     Scenario: Create instance of an environment with several tiers with the same product (with valid nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_nid_01" with version "0.0.1" is created in SDC with metadatas:
@@ -121,6 +126,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have the correct NID metadata value
 
 
+    @release_4_1
     Scenario: Create instance of an environment with several tiers and different products (with valid nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_nid_01" with version "0.0.1" is created in SDC with metadatas:
@@ -144,6 +150,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have the correct NID metadata value
 
 
+    @release_4_1
     Scenario: Create instance of an environment with several tiers and only one product in the first tier (with valid nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_nid_01" with version "0.0.1" is created in SDC with metadatas:
@@ -164,6 +171,7 @@ Feature: Create an instance of an environment in a tenant
         And the created instances have the correct NID metadata value
 
 
+    @release_4_1
     Scenario: Create instance of an environment with one tier and two different products (with valid nid metadata)
         Given the paas manager is up and properly configured
         And the product "testing_paas_product_nid_01" with version "0.0.1" is created in SDC with metadatas:

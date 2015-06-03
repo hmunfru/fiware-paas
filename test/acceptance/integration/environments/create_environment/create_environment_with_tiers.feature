@@ -136,6 +136,7 @@ Feature: Create an environment with tiers in a tenant
         Then I receive a "No Content" response
 
 
+    @release_4_1
     Scenario Outline: Create environment. Products with valid attributes
         Given the paas manager is up and properly configured
         And the product "<product_name>" with version "<product_version>" is created in SDC with attributes:
@@ -160,6 +161,7 @@ Feature: Create an environment with tiers in a tenant
         | qa_paas_att_04  | 0.0.1             | [MISSING_PARAM] | default_value    | qa_paas_att_04=0.0.1 | qaenvatt04  |
 
 
+    @release_4_1
     Scenario Outline: Create environment. Products with invalid attribute type
         Given the paas manager is up and properly configured
         And the product "<product_name>" with version "<product_version>" is created in SDC with attributes:
@@ -185,6 +187,7 @@ Feature: Create an environment with tiers in a tenant
         | qa_paas_att_05a  | 0.0.1             | Plain              |                      | qa_paas_att_05a=0.0.1 | qaenvatt05  |
 
 
+    @release_4_1
     Scenario Outline: Create environment. Products with invalid attribute value
         Given the paas manager is up and properly configured
         And the product "<product_name>" with version "<product_version>" is created in SDC with attributes:

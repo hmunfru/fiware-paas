@@ -32,9 +32,9 @@ import javax.persistence.Query;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractBaseDao;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AbstractBaseDao;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.SecurityGroupDao;
 import com.telefonica.euro_iaas.paasmanager.model.SecurityGroup;
 
@@ -61,6 +61,21 @@ public class SecurityGroupDaoJpaImpl extends AbstractBaseDao<SecurityGroup, Stri
         return super.loadByField(SecurityGroup.class, "name", arg0);
     }
 
+    public SecurityGroup loadWithRules(String name) throws EntityNotFoundException {
+
+        Query query = getEntityManager().createQuery(
+                "select p from SecurityGroup p left join " + " fetch p.rules where p.name = :name");
+        query.setParameter("name", name);
+        SecurityGroup securityGroup = null;
+        try {
+        	securityGroup = (SecurityGroup) query.getResultList().get(0);
+        } catch (Exception e) {
+            String message = " No SecurityGroup found in the database with name: " + name + " Exception: "
+                    + e.getMessage();
+            throw new EntityNotFoundException(SecurityGroup.class, "name", name);
+        }
+        return securityGroup;
+    }
     public SecurityGroup updateSecurityGroupId(String idSecurityGroup, SecurityGroup securityGroup)
             throws InvalidEntityException {
         Query query = getEntityManager().createQuery(

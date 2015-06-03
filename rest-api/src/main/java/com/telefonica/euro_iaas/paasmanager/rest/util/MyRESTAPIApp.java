@@ -34,7 +34,7 @@ public class MyRESTAPIApp extends ResourceConfig {
 
         register(MyObjectMapperProvider.class);
         register(JacksonFeature.class);
-        register(org.glassfish.jersey.filter.LoggingFilter.class);
+        register(new MyLoggingFilter());
         property("jersey.config.beanValidation.enableOutputValidationErrorEntity.server", "true");
     }
 }

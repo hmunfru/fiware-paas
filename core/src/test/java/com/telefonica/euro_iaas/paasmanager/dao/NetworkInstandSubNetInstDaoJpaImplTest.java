@@ -38,11 +38,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 
 /**
  * @author jesus.movilla
@@ -55,6 +56,8 @@ public class NetworkInstandSubNetInstDaoJpaImplTest {
     private NetworkInstanceDao networkInstanceDao;
     @Autowired
     private SubNetworkInstanceDao subNetworkInstanceDao;
+    @Autowired
+    private TierInstanceDao tierInstanceDao;
     public static String NETWORK_NAME = "network_name";
     public static String SUB_NETWORK_NAME = "subnetwork_name";
 
@@ -68,21 +71,68 @@ public class NetworkInstandSubNetInstDaoJpaImplTest {
     @Test
     public void testNetworkNoSubNet() throws Exception {
 
-        NetworkInstance network = new NetworkInstance(NETWORK_NAME+1, "vdc", REGION);
+        NetworkInstance network = new NetworkInstance(NETWORK_NAME + 1, "vdc", REGION);
 
         network = networkInstanceDao.create(network);
         assertNotNull(network);
-        assertEquals(network.getNetworkName(), NETWORK_NAME+1);
+        assertEquals(network.getNetworkName(), NETWORK_NAME + 1);
         assertEquals(network.getSubNets().size(), 0);
 
         List<NetworkInstance> networks = networkInstanceDao.findAll();
         assertNotNull(networks);
 
-        NetworkInstance networkOut = networkInstanceDao.load(NETWORK_NAME+1,VDC, REGION);
+        NetworkInstance networkOut = networkInstanceDao.load(NETWORK_NAME + 1, VDC, REGION);
         assertNotNull(networkOut);
-        assertEquals(networkOut.getNetworkName(), NETWORK_NAME+1);
+        assertEquals(networkOut.getNetworkName(), NETWORK_NAME + 1);
         assertEquals(networkOut.getSubNets().size(), 0);
 
+    }
+
+    /**
+     * It test finding tier instances.
+     * @throws Exception
+     */
+    @Test
+    public void testFindTierInstanceUsedByNetwork() throws Exception {
+
+        TierInstance tierInst = new TierInstance ();
+        tierInst.setName("tiername");
+        tierInstanceDao.create(tierInst);
+        NetworkInstance net = new NetworkInstance("netname" , "vdc", "region");
+        networkInstanceDao.create(net);
+        tierInst.addNetworkInstance(net);
+        tierInstanceDao.update(tierInst);
+
+        TierInstance tierInst2 = new TierInstance ();
+        tierInst2.setName("tiername2");
+        tierInstanceDao.create(tierInst2);
+        NetworkInstance net2 = new NetworkInstance("netname2" , "vdc", "region");
+        networkInstanceDao.create(net2);
+        tierInst2.addNetworkInstance(net2);
+        tierInstanceDao.update(tierInst2);
+
+        List<TierInstance> networkOut = networkInstanceDao.
+            findTierInstanceUsedByNetwork("netname", "vdc", "region");
+        assertNotNull(networkOut);
+        assertEquals(networkOut.size(), 1);
+
+
+    }
+
+    /**
+     * It test finding tier instances no existing network.
+     * @throws Exception
+     */
+    @Test
+    public void testFindTierInstanceNoNetwork() throws Exception {
+
+        TierInstance tierInst = new TierInstance ();
+        tierInst.setName("tiername_nonexisting_net");
+        tierInstanceDao.create(tierInst);
+        List<TierInstance> networkOut = networkInstanceDao.
+            findTierInstanceUsedByNetwork("netname_nonexisting", "vdc", "region");
+        assertNotNull(networkOut);
+        assertEquals(networkOut.size(), 0);
     }
 
     @Test

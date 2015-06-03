@@ -24,9 +24,12 @@
 
 package com.telefonica.euro_iaas.paasmanager.dao;
 
-import com.telefonica.euro_iaas.commons.dao.BaseDAO;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.BaseDAO;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
+
+import java.util.List;
 
 
 /**
@@ -35,7 +38,26 @@ import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
  * @author Henar Munoz
  */
 public interface NetworkInstanceDao extends BaseDAO<NetworkInstance, String> {
-    
+
+    /**
+     * It obtains the networkInstance from DB.
+     * @param name
+     * @param vdc
+     * @param region
+     * @return
+     * @throws EntityNotFoundException
+     */
     NetworkInstance load(String name, String vdc, String region) throws EntityNotFoundException ;
+
+    /**
+     * It obtains the tierinstances which have network instance associated.
+     * @param name
+     * @param vdc
+     * @param region
+     * @return
+     * @throws EntityNotFoundException
+     */
+    public List<TierInstance> findTierInstanceUsedByNetwork(String name, String vdc, String region)
+        throws EntityNotFoundException;
 
 }

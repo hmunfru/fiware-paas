@@ -24,30 +24,22 @@
 
 package com.telefonica.euro_iaas.paasmanager.util.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
-import com.telefonica.euro_iaas.paasmanager.util.RegionCache;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.RegionCache;
+import com.telefonica.fiware.commons.util.TokenCache;
 
 /**
  * This class implements OpenStackRegion interface.<br>
@@ -57,36 +49,48 @@ public class OpenStackRegionImpl implements OpenStackRegion {
 
     private Client client;
 
-    private static Logger log = LoggerFactory.getLogger(OpenStackRegionImpl.class);
     private RegionCache regionCache;
 
-    /**
-     * Default constructor. It creates a jersey client.
-     */
-    public OpenStackRegionImpl() {
-        client = ClientBuilder.newClient();
-        regionCache = new RegionCache();
-    }
+    private TokenCache tokenCache;
+
+    private OpenStackAuthenticationToken openStackAuthenticationToken;
+
+    private HttpClientConnectionManager httpConnectionManager;
 
     /**
      * the properties configuration.
      */
     private SystemPropertiesProvider systemPropertiesProvider;
 
+    /**
+     * Logger.
+     */
+    private static Logger log = LoggerFactory.getLogger(OpenStackRegionImpl.class);
+
+    /**
+     * Default constructor. Configure caches
+     */
+    public OpenStackRegionImpl() {
+
+        client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        regionCache = new RegionCache();
+
+        tokenCache = new TokenCache();
+    }
+
     @Override
-    public String getEndPointByNameAndRegionName(String type, String regionName, String token)
-            throws OpenStackException {
+    public String getEndPointByNameAndRegionName(String type, String regionName) throws OpenStackException {
 
         String url = regionCache.getUrl(regionName, type);
 
-        String tokenadmin = this.getTokenAdmin();
         if (url != null) {
             log.debug("Get url for sdc in region " + url);
             return url;
         } else {
-            String responseJSON = callToKeystone(token, tokenadmin);
+            OpenStackAccess openStackAccess = this.getTokenAdmin();
 
-            String result = parseEndpoint(token, responseJSON, type, regionName);
+            String result = openStackAccess.getOpenStackKeystone().parseEndpoint(openStackAccess.getAccessJSON(), type,
+                    regionName);
             if (result == null) {
                 throw new OpenStackException("region not found");
             }
@@ -96,18 +100,36 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
     }
 
-    public String getTokenAdmin() throws OpenStackException {
+    public OpenStackAccess getTokenAdmin() throws OpenStackException {
 
-        Response response = getEndPointsThroughTokenRequest();
-        return parseToken(response.readEntity(String.class));
+        OpenStackAccess openStackAccess;
+
+        openStackAccess = tokenCache.getAdmin();
+
+        if (openStackAccess == null) {
+
+            if (openStackAuthenticationToken == null) {
+                String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+
+                String user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+
+                String pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+
+                String tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+                openStackAuthenticationToken = new OpenStackAuthenticationToken(url, user, pass, tenant);
+            }
+            openStackAccess = openStackAuthenticationToken.getAdminCredentials(client);
+            tokenCache.putAdmin(openStackAccess);
+        }
+        return openStackAccess;
 
     }
 
     @Override
-    public String getNovaEndPoint(String regionName, String token) throws OpenStackException {
+    public String getNovaEndPoint(String regionName) throws OpenStackException {
 
-        String url = getEndPointByNameAndRegionName("compute", regionName, token);
-        log.debug("getNovaEndPoint " + regionName + " " + token + " " + url);
+        String url = getEndPointByNameAndRegionName("compute", regionName);
+        log.debug("getNovaEndPoint " + regionName + " " + url);
 
         Integer index = url.lastIndexOf("/");
         url = url.substring(0, index + 1);
@@ -117,12 +139,11 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getPuppetMasterEndPoint(String regionName, String token) throws OpenStackException {
-        String defaulRegion = this.getDefaultRegion(token);
-        log.info("Get url for puppet for default region " + defaulRegion);
+    public String getPuppetMasterEndPoint(String regionName) throws OpenStackException {
         String url;
         try {
-            url = getEndPointByNameAndRegionName("puppetmaster", defaulRegion, token);
+            log.info("Get url for puppet for default region " + regionName);
+            url = getEndPointByNameAndRegionName("puppetmaster", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the Puppet Master endpoint";
             log.info(msn);
@@ -133,8 +154,8 @@ public class OpenStackRegionImpl implements OpenStackRegion {
     }
 
     @Override
-    public String getQuantumEndPoint(String regionName, String token) throws OpenStackException {
-        String url = getEndPointByNameAndRegionName("network", regionName, token);
+    public String getQuantumEndPoint(String regionName) throws OpenStackException {
+        String url = getEndPointByNameAndRegionName("network", regionName);
         Integer index = url.lastIndexOf("/v");
         if (index == -1) {
             url = url + "v2.0/";
@@ -142,11 +163,11 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return url;
     }
 
-    public String getSdcEndPoint(String regionName, String token) throws OpenStackException {
+    public String getSdcEndPoint(String regionName) throws OpenStackException {
         log.debug("Get url for sdc in region " + regionName);
         String url;
         try {
-            url = getEndPointByNameAndRegionName("sdc", regionName, token);
+            url = getEndPointByNameAndRegionName("sdc", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the SDC endpoint";
             log.error(msn);
@@ -156,12 +177,12 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return url;
     }
 
-    public String getDefaultRegion(String token) throws OpenStackException {
-        log.debug("Get defautl region for token " + token);
+    public String getDefaultRegion() throws OpenStackException {
+        log.debug("Get default region");
 
-        List<String> regions = null;
+        List<String> regions;
         try {
-            regions = getRegionNames(token);
+            regions = getRegionNames();
             log.debug("regions " + regions + " " + regions.size());
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the SDC endpoint";
@@ -172,242 +193,13 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         return regions.get(0);
     }
 
-    @Override
-    public List<String> getRegionNames(String token) throws OpenStackException {
-
-        String tokenAdmin = this.getTokenAdmin();
-        String responseJSON = callToKeystone(token, tokenAdmin);
-        return parseRegionName(responseJSON, "nova");
-
-    }
-
-    private String callToKeystone(String token, String tokenAdmin) throws OpenStackException {
-        Response response = getJSONWithEndpoints(token, tokenAdmin);
-        return response.readEntity(String.class);
-
-    }
-
-    private Response getJSONWithEndpoints(String token, String tokenadmin) throws OpenStackException {
-        String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens/" + token
-                + "/endpoints";
-
-        WebTarget webResource = client.target(url);
-        log.debug("url " + url);
-        Invocation.Builder builder = webResource.request(MediaType.APPLICATION_JSON);
-        builder.header("X-Auth-Token", tokenadmin);
-
-        Response response = builder.get();
-
-        int code = response.getStatus();
-        log.debug("code " + code);
-
-        if (code != 200) {
-            String message = "Failed : HTTP (url:" + url + ") error code : " + code + " body: "
-                    + response.readEntity(String.class);
-
-            if (code == 501) {
-                log.warn(message);
-                response = getEndPointsThroughTokenRequest();
-            } else {
-                log.error(message);
-                throw new OpenStackException(message);
-            }
-
-        }
-        return response;
-    }
-
-    private String parseEndpoint(String token, String response, String type, String regionName)
-            throws OpenStackException {
-
-        JSONObject jsonObject = JSONObject.fromObject(response);
-
-        String url = null;
-        Map<String, String> urlMap = new HashMap<String, String>();
-        if (jsonObject.containsKey("endpoints")) {
-
-            JSONArray endpointsArray = jsonObject.getJSONArray("endpoints");
-
-            boolean notFound = true;
-            Iterator it = endpointsArray.iterator();
-            JSONObject endpointJson = null;
-            while (notFound && it.hasNext()) {
-
-                endpointJson = JSONObject.fromObject(it.next());
-                String name1 = endpointJson.get("type").toString();
-                String regionName1 = endpointJson.get("region").toString();
-
-                if (type.equals(name1)) {
-                    url = endpointJson.get("publicURL").toString();
-                    urlMap.put(regionName1, url);
-                    if ((regionName != null) && (regionName.equals(regionName1))) {
-                        notFound = false;
-                    }
-                }
-            }
-            if (!notFound) {
-                return url;
-            }
-            // return default regionName
-
-        } else {
-            if (jsonObject.containsKey("access")) {
-                JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
-
-                boolean notFound = true;
-                Iterator it = servicesArray.iterator();
-                JSONObject serviceJSON;
-                while (notFound && it.hasNext()) {
-
-                    serviceJSON = JSONObject.fromObject(it.next());
-                    String name1 = serviceJSON.get("type").toString();
-
-                    if (type.equals(name1)) {
-                        JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
-                        Iterator it2 = endpointsArray.iterator();
-
-                        while (notFound && it2.hasNext()) {
-                            JSONObject endpointJson = JSONObject.fromObject(it2.next());
-
-                            String regionName1 = endpointJson.get("region").toString();
-                            url = endpointJson.get("publicURL").toString();
-                            if (regionName.equals(regionName1)) {
-                                notFound = false;
-                            }
-                            urlMap.put(regionName1, url);
-
-                        }
-
-                    }
-                }
-                if (!notFound) {
-                    return url;
-                }
-
-            }
-
-        }
-        ;
-        return urlMap.get(this.getDefaultRegion(token));
-    }
-
     /**
-     * Parse region name, with compatibility with essex,grizzly.
-     * 
-     * @param response
-     * @param name
-     * @return
+     * Get a list with the name of all regions for token.
      */
-    private List<String> parseRegionName(String response, String name) {
+    private List<String> getRegionNames() throws OpenStackException {
 
-        List<String> names = new ArrayList<String>(2);
-
-        JSONObject jsonObject = JSONObject.fromObject(response);
-
-        if (jsonObject.containsKey("endpoints")) {
-
-            JSONArray endpointsArray = jsonObject.getJSONArray("endpoints");
-
-            Iterator it = endpointsArray.iterator();
-            JSONObject endpointJson;
-            while (it.hasNext()) {
-
-                endpointJson = JSONObject.fromObject(it.next());
-                String name1 = endpointJson.get("name").toString();
-                String regionName1 = endpointJson.get("region").toString();
-
-                if (name.equals(name1)) {
-                    if (!names.contains(regionName1)) {
-                        names.add(regionName1);
-                    }
-                }
-            }
-        } else {
-            if (jsonObject.containsKey("access")) {
-
-                JSONArray servicesArray = jsonObject.getJSONObject("access").getJSONArray("serviceCatalog");
-
-                boolean notFound = true;
-                Iterator it = servicesArray.iterator();
-                JSONObject serviceJSON;
-                while (notFound && it.hasNext()) {
-
-                    serviceJSON = JSONObject.fromObject(it.next());
-                    String name1 = serviceJSON.get("name").toString();
-
-                    if (name.equals(name1)) {
-                        JSONArray endpointsArray = serviceJSON.getJSONArray("endpoints");
-
-                        Iterator it2 = endpointsArray.iterator();
-                        while (it2.hasNext()) {
-                            JSONObject endpointJson = JSONObject.fromObject(it2.next());
-
-                            String regionName1 = endpointJson.get("region").toString();
-                            if (!names.contains(regionName1)) {
-                                names.add(regionName1);
-                            }
-
-                        }
-                        notFound = false;
-
-                    }
-                }
-            }
-        }
-        return names;
-    }
-
-    /**
-     * Parse region name, with compatibility with essex,grizzly.
-     * 
-     * @param response
-     * @return
-     */
-    private String parseToken(String response) {
-
-        String token = null;
-
-        JSONObject jsonObject = JSONObject.fromObject(response);
-        jsonObject = (JSONObject) jsonObject.get("access");
-
-        if (jsonObject.containsKey("token")) {
-
-            JSONObject tokenObject = (JSONObject) jsonObject.get("token");
-            token = (String) tokenObject.get("id");
-
-        }
-        return token;
-    }
-
-    public Response getEndPointsThroughTokenRequest() throws OpenStackException {
-        String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL) + "tokens";
-        log.debug("actionUri: " + url);
-
-        Response response;
-
-        WebTarget wr = client.target(url);
-
-        String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
-        String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
-        String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
-
-        String payload = "{\"auth\": {\"tenantName\": \"" + adminTenant + "\", \""
-                + "passwordCredentials\":{\"username\": \"" + adminUser + "\"," + " \"password\": \"" + adminPass
-                + "\"}}}";
-
-        Invocation.Builder builder = wr.request(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
-
-        response = builder.post(Entity.entity(payload, MediaType.APPLICATION_JSON));
-
-        int httpCode = response.getStatus();
-        if (httpCode != 200) {
-            String message = "Error calling OpenStack for valid token. " + "Status " + httpCode + ": "
-                    + response.readEntity(String.class);
-            log.warn(message);
-            throw new OpenStackException(message);
-        }
-
-        return response;
+        OpenStackAccess openStackAccess = this.getTokenAdmin();
+        return openStackAccess.getOpenStackKeystone().parseRegionNames(openStackAccess.getAccessJSON(), "nova");
 
     }
 
@@ -427,15 +219,15 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         this.client = client;
     }
 
-    public String getFederatedQuantumEndPoint(String token) throws OpenStackException {
-        String url = getEndPointByNameAndRegionName("federatednetwork", getDefaultRegion(token), token);
+    public String getFederatedQuantumEndPoint() throws OpenStackException {
+        String url = getEndPointByNameAndRegionName("federatednetwork", getDefaultRegion());
         return url;
     }
 
-    public String getChefServerEndPoint(String regionName, String token) throws OpenStackException {
+    public String getChefServerEndPoint(String regionName) throws OpenStackException {
         String url;
         try {
-            url = getEndPointByNameAndRegionName("chef-server", regionName, token);
+            url = getEndPointByNameAndRegionName("chef-server", regionName);
         } catch (OpenStackException e) {
             String msn = "It is not possible to obtain the chef-server endpoint";
             log.error(msn);
@@ -444,6 +236,18 @@ public class OpenStackRegionImpl implements OpenStackRegion {
         }
         log.debug("Obtained chef-server endpoint " + url);
         return url;
+    }
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
+    public RegionCache getRegionCache() {
+        return regionCache;
     }
 
 }

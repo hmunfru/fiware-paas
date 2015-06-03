@@ -42,7 +42,7 @@ def before_all():
 
 
 @before.each_feature
-def before_each_scenario(feature):
+def before_each_feature(feature):
     world.env_requests = EnvironmentRequest(world.config[PAAS][KEYSTONE_URL],
         world.config[PAAS][PAASMANAGER_URL],
         world.config[PAAS][TENANT],
@@ -77,15 +77,15 @@ def before_each_scenario(feature):
     world.product_and_release_list = list()
     world.product_installator = 'chef'
 
-    # Create product in SDC to be used by this feature
-    terrain_steps.init_products_in_sdc()
-
 
 @before.each_scenario
 def before_each_scenario(scenario):
     """ Lettuce Hook. Will be executed before each scenario. Init global scenario vars. """
     world.product_list_with_attributes = list()
     world.paas_product_list_with_attributes = list()
+
+    # Create product in SDC to be used by this feature
+    terrain_steps.init_products_in_sdc()
 
 
 @before.outline
@@ -100,6 +100,7 @@ def after_each_scenario(scenario):
     environment_instance_request.delete_created_instances()
     environment_request.delete_created_environments()
 
+    # Remove SDC product data
     for product_and_release in world.product_and_release_list:
         world.product_sdc_request.delete_product_and_release(product_and_release['product_name'],
                                                              product_and_release['product_release'])
@@ -109,3 +110,4 @@ def after_each_scenario(scenario):
 def after_outline(param1, param2, param3, param4):
     """ Hook: Will be executed after each Scenario Outline. Same behaviour as 'after_each_scenario'"""
     after_each_scenario(None)
+

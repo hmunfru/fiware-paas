@@ -26,32 +26,42 @@ package com.telefonica.euro_iaas.paasmanager.manager;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.InvalidSecurityGroupRequestException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
-import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TierSearchCriteria;
 
 public interface TierManager {
 
     /**
-     * Update an tierInstance
+     * Update an tier
      * 
-     * @param tierInstance
-     * @return the tierInstance created
+     * @param tier
+     * @return the tier updated
      */
     Tier update(Tier tier) throws InvalidEntityException;
 
+    /**
+     * Create a Tier
+     * 
+     * @param claudiaData
+     * @param envName
+     * @param tier
+     * @return the created tier
+     * @throws InvalidEntityException
+     * @throws InfrastructureException
+     * @throws EntityNotFoundException
+     * @throws AlreadyExistsEntityException
+     */
     Tier create(ClaudiaData claudiaData, String envName, Tier tier) throws InvalidEntityException,
-            InvalidSecurityGroupRequestException, InfrastructureException, EntityNotFoundException, AlreadyExistsEntityException;
+            InfrastructureException, EntityNotFoundException, AlreadyExistsEntityException;
 
     /**
-     * Find the Environment using the given name.
+     * Find the Tier.
      * 
      * @param name
      *            the name
@@ -61,8 +71,9 @@ public interface TierManager {
      */
 
     Tier load(String name, String vdc, String environmentNamae) throws EntityNotFoundException;
-    
+
     /**
+     * Load the Tier with Network Information
      * 
      * @param name
      * @param vdc
@@ -89,7 +100,7 @@ public interface TierManager {
     List<Tier> findAll();
 
     /**
-     * Delete a TierInstance
+     * Delete a Tier
      * 
      * @param claudiaData
      * @param tier
@@ -101,15 +112,15 @@ public interface TierManager {
             InfrastructureException;
 
     /**
-     * Find the TierInstance by Environment
+     * Find the Tiers by Environment
      * 
      * @param environment
-     * @return
+     * @return list of tiers
      */
     List<Tier> findByEnvironment(Environment environment);
 
     /**
-     * Find the Tier Instance by a certain criteria
+     * Find the Tier by a certain criteria
      * 
      * @param criteria
      * @return
@@ -118,24 +129,22 @@ public interface TierManager {
     List<Tier> findByCriteria(TierSearchCriteria criteria) throws EntityNotFoundException;
 
     /**
-     * Add a Security Group to a ProductRelease
-     * 
-     * @param claudiaData
-     * @param tier
-     * @param productRelease
-     * @throws InfrastructureException
-     * @throws AlreadyExistsEntityException
-     * @throws InvalidEntityException
-     */
-    void addSecurityGroupToProductRelease(ClaudiaData claudiaData, Tier tier, ProductRelease productRelease)
-            throws InvalidEntityException, AlreadyExistsEntityException, InfrastructureException;
-    
-    /**
      * Update tier
+     * 
      * @param tierold
      * @param tiernew
      * @throws InvalidEntityException
+     * @throws EntityNotFoundException
+     * @throws AlreadyExistsEntityException
      */
-    void updateTier(ClaudiaData data, Tier tierold, Tier tiernew) throws InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException;
+    void updateTier(ClaudiaData data, Tier tierold, Tier tiernew) throws InvalidEntityException,
+            EntityNotFoundException, AlreadyExistsEntityException;
 
+    /**
+     * Load with networks, products, security groups from database
+     * 
+     * @param tier
+     * @return
+     */
+    Tier loadComplete(Tier tier) throws EntityNotFoundException;
 }

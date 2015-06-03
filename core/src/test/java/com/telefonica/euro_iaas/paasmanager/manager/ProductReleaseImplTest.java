@@ -24,9 +24,9 @@
 
 package com.telefonica.euro_iaas.paasmanager.manager;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.dao.sdc.ProductReleaseSdcDao;
 import com.telefonica.euro_iaas.paasmanager.exception.SdcException;
@@ -109,6 +109,16 @@ public class ProductReleaseImplTest extends TestCase {
         productRelease2 = productReleaseManager.load("product-2.0", claudiaData);
         assertEquals(productRelease2.getName(), "product-2.0");
         
+    }
+
+    @Test
+    public void testLoadProductReleaseAttributeType() throws EntityNotFoundException, AlreadyExistsEntityException, InvalidEntityException {
+        ProductRelease productRelease2 = new ProductRelease("product", "2.0");
+        productRelease2.addAttribute(new Attribute("openports", "8080", "des", "type"));
+        when(productReleaseDao.load(any(String.class))).thenReturn(productRelease2);
+        productRelease2 = productReleaseManager.load("product", "2.0");
+        assertEquals(productRelease2.getName(), "product-2.0");
+        assertEquals(productRelease2.getAttribute("openports").getType(), "type");
     }
 
 }

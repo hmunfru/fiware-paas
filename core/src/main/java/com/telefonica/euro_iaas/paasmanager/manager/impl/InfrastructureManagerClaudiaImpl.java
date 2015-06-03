@@ -35,9 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.claudia.ClaudiaClient;
 import com.telefonica.euro_iaas.paasmanager.dao.EnvironmentInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.exception.ClaudiaResourceNotFoundException;
@@ -98,8 +98,8 @@ public class InfrastructureManagerClaudiaImpl implements InfrastructureManager {
     }
 
     public EnvironmentInstance createInfrasctuctureEnvironmentInstance(EnvironmentInstance environmentInstance,
-            Set<Tier> tiers, ClaudiaData claudiaData) throws InfrastructureException, InvalidVappException,
-            InvalidOVFException, InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException {
+            Set<Tier> tiers, ClaudiaData claudiaData) throws InfrastructureException,
+            InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException {
 
         // Deploy MVs
         log.info("Creating infrastructure for environment instance " + environmentInstance.getBlueprintName());
@@ -139,25 +139,14 @@ public class InfrastructureManagerClaudiaImpl implements InfrastructureManager {
                 log.info("Number of networks " + tierInstance.getNetworkInstances().size() + " floatin ip "
                         + tierInstance.getTier().getFloatingip());
 
-                try {
-                    log.info("Inserting in database ");
-                    tierInstance = insertTierInstanceBD(claudiaData, environmentInstance.getEnvironment().getName(),
-                            tierInstance);
-                    log.info("Return: Number of networks " + tierInstance.getNetworkInstances().size()
-                            + " floating ip " + tierInstance.getTier().getFloatingip());
-                    environmentInstance.addTierInstance(tierInstance);
-                    environmentInstanceDao.update(environmentInstance);
-                } catch (EntityNotFoundException e) {
-                    log.error("Entity Not found: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                } catch (InvalidEntityException e) {
-                    log.error("Invalid: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                } catch (AlreadyExistsEntityException e) {
-                    log.error("AllReady found: Tier " + tierInstance.getTier().getName() + " " + e.getMessage());
-                    throw new InfrastructureException(e);
-                }
-
+                log.info("Inserting in database ");
+                tierInstance = insertTierInstanceBD(claudiaData, environmentInstance.getEnvironment().getName(),
+                		tierInstance);
+                log.info("Return: Number of networks " + tierInstance.getNetworkInstances().size() 
+                		+ " floating ip " + tierInstance.getTier().getFloatingip());
+                environmentInstance.addTierInstance(tierInstance);
+                environmentInstanceDao.update(environmentInstance);
+                
                 try {
                     tierInstanceManager.update(claudiaData, environmentInstance.getEnvironment().getName(),
                             tierInstance);
@@ -402,7 +391,7 @@ public class InfrastructureManagerClaudiaImpl implements InfrastructureManager {
             if (networkInstanceManager.exists(data, networkInst, tier.getRegion())) {
                 log.info("the network inst " + networkInst.getNetworkName() + " already exists");
                 networkInst = networkInstanceManager
-                        .load(networkInst.getNetworkName(), data.getVdc(), tier.getRegion());
+                        .load(networkInst.getNetworkName(), data, tier.getRegion());
             } else {
                 try {
                     log.info("the network inst " + networkInst.getNetworkName() + " do not exists");

@@ -27,7 +27,7 @@ import json
 
 
 class KeystoneRequest:
-    def __init__(self, keystone_url, tenant, user, password, vdc):
+    def __init__(self, keystone_url, tenant, user, password, vdc=None):
         """
         Class constructor. Initializes class attributes.
         :param keystone_url: Keystone URL

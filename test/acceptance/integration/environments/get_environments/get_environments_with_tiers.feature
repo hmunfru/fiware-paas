@@ -205,3 +205,16 @@ Feature: Get the environments with tiers in a tenant
         And there is an environment in the list with "1" tier and data:
             | name    | description |
             | nameqa2 | descqa2     |
+
+
+    Scenario: A Tenant creates an environment with tiers and other Tenant gets the list of environments of the first one
+        Given the paas manager is up and properly configured
+        And   a list of tiers has been defined with data:
+              | name        |
+              | tiernameqa1 |
+        And   an environment has already been created with the previous tiers and data:
+              | name        | description |
+              | envqaother  | descqa      |
+        And   a token requested by other user
+        When  I request the list of existing environments
+        Then  I receive an "Forbidden" response

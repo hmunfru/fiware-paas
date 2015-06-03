@@ -28,8 +28,12 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.http.conn.HttpClientConnectionManager;
 
 import com.telefonica.euro_iaas.paasmanager.model.Task;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
 
 /**
  * TaskNotificator rest implementation.
@@ -38,21 +42,32 @@ import com.telefonica.euro_iaas.paasmanager.model.Task;
  */
 public class TaskNotificatorImpl implements TaskNotificator {
 
-    private Client client;
+    HttpClientConnectionManager httpConnectionManager;
 
     /**
      * {@inheritDoc}
      */
     public void notify(String url, Task task) {
-        WebTarget webResource = client.target(url);
-        webResource.request(MediaType.APPLICATION_XML).post(Entity.entity(null, MediaType.APPLICATION_JSON));
+        Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        Response response = null;
+        try {
+            WebTarget webResource = client.target(url);
+            response = webResource.request(MediaType.APPLICATION_XML).post(Entity.entity(null,
+
+            MediaType.APPLICATION_JSON));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
     }
 
-    /**
-     * @param client
-     *            the client to set
-     */
-    public void setClient(Client client) {
-        this.client = client;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
 }

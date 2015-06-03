@@ -30,9 +30,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.dao.EnvironmentDao;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentRequestException;
@@ -119,12 +119,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
 
     public Environment load(String name, String vdc) throws EntityNotFoundException {
         if (vdc == null || vdc.isEmpty()) {
-            return environmentDao.load(name);
+            return environmentDao.findByEnvironmentNameVdc(name, vdc);
         } else {
             try {
 
                 Environment env = environmentDao.findByEnvironmentNameVdc(name, vdc);
-                log.info("in load before rturn");
+                log.info("in load before return");
                 return env;
             } catch (Exception e) {
                 log.info("error in load " + e.getMessage());
@@ -151,6 +151,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager {
     @Override
     public List<Environment> findByOrg(String org) {
         return environmentDao.findByOrg(org);
+    }
+
+    @Override
+    public void loadNetworks(Environment environment) {
+        environmentDao.loadNetworks(environment);
     }
 
     /**

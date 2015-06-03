@@ -24,7 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.model;
 
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 
 /**
  * Defines the data to be used with Claudia.

@@ -25,8 +25,10 @@ from lettuce_tools.dataset_utils.dataset_utils import DatasetUtils
 from tools import http
 from tools import environment_request
 from tools.tier import Tier
+from tools.keystone_request import KeystoneRequest, get_token_value
+from tools.utils import raw_httplib_request_to_python_dic
 from tools.constants import NAME, DESCRIPTION, PRODUCTS, NETWORKS, PAAS,\
-    TIER_IMAGE
+    TIER_IMAGE, KEYSTONE_URL, TENANT_ALT, USER_ALT, PASSWORD_ALT, VDC_ALT
 
 dataset_utils = DatasetUtils()
 
@@ -66,7 +68,13 @@ def no_environments_have_been_created_yet(step):
 
 @step(u'I request the list of existing environments')
 def i_request_the_list_of_existing_environments(step):
-    world.env_requests.get_environments()
+    world.env_requests.get_environments(headers=world.headers)
+
+
+@step(u'I receive an? "([^"]*)" response$')
+def i_receive_a_response_of_type_with_items(step, response_type):
+    status_code = http.status_codes[response_type]
+    environment_request.check_get_environments_response(world.response, status_code)
 
 
 @step(u'I receive an? "([^"]*)" response with "(\d)" items? in the list')
@@ -90,9 +98,25 @@ def there_is_an_environment_in_the_list_with_data(step):
         data.get(NAME), data.get(DESCRIPTION))
 
 
+@step(u'the environment "(.*)" is not in the list')
+def the_environment_is_not_in_the_list(step, environment_name):
+    environment_request.check_if_environment_not_in_list(world.response.environments, environment_name)
+
+
 @step(u'there is an environment in the list with "(\d)" tiers? and data:')
 def there_is_an_environment_in_the_list_with_tiers_and_data(step, tiers_number):
     data = dataset_utils.prepare_data(step.hashes[0])
     environment_request.check_environment_in_list(world.response.environments,
         data.get(NAME), data.get(DESCRIPTION),
         int(tiers_number))
+
+
+@step(u'a token requested by other user')
+def a_token_requested_by_other_user(step):
+
+    #Request new token for 'alternate' user
+    keystone_request = KeystoneRequest(world.config[PAAS][KEYSTONE_URL], world.config[PAAS][TENANT_ALT],
+                                       world.config[PAAS][USER_ALT], world.config[PAAS][PASSWORD_ALT])
+    token = get_token_value(raw_httplib_request_to_python_dic(keystone_request.get_token()))
+    world.headers.update({'X-Auth-Token': token})
+    world.headers.update({'Tenant-Id': world.config[PAAS][VDC_ALT]})

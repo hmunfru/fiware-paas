@@ -26,9 +26,9 @@ package com.telefonica.euro_iaas.paasmanager.manager;
 
 import java.util.Set;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidOVFException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidVappException;
@@ -55,7 +55,7 @@ public interface InfrastructureManager {
      * @throws EntityNotFoundException
      */
     EnvironmentInstance createInfrasctuctureEnvironmentInstance(EnvironmentInstance environmentInstance, Set<Tier> set,
-            ClaudiaData claudiaData) throws InfrastructureException, InvalidVappException, InvalidOVFException,
+            ClaudiaData claudiaData) throws InfrastructureException,
             InvalidEntityException, EntityNotFoundException, AlreadyExistsEntityException;
 
     /**

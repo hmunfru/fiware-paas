@@ -26,7 +26,7 @@ package com.telefonica.euro_iaas.paasmanager.manager.async;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.model.Task;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TaskSearchCriteria;
 

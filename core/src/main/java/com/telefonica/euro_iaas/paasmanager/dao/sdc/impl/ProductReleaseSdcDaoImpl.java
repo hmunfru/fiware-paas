@@ -26,8 +26,6 @@ package com.telefonica.euro_iaas.paasmanager.dao.sdc.impl;
 
 import static com.telefonica.euro_iaas.paasmanager.util.Configuration.SDC_SERVER_MEDIATYPE;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,24 +33,27 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.sdc.ProductReleaseSdcDao;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.exception.SdcException;
+import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtil;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
+import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
-import com.telefonica.euro_iaas.sdc.client.SDCClient;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
 import com.telefonica.euro_iaas.sdc.client.exception.ResourceNotFoundException;
 
 /**
@@ -61,9 +62,26 @@ import com.telefonica.euro_iaas.sdc.client.exception.ResourceNotFoundException;
 public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
 
     private static Logger log = LoggerFactory.getLogger(ProductReleaseSdcDaoImpl.class);
-    private Client client;
+    private Client client = null;
     private SDCUtil sDCUtil;
     private SDCClient sDCClient;
+
+    /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
+    ProductReleaseSdcDaoImpl() {
+
+    }
 
     /**
      * load product from sdc
@@ -81,7 +99,7 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
         ProductRelease p = null;
 
         try {
-            String url = sDCUtil.getSdcUtil(data.getUser().getToken());
+            String url = sDCUtil.getSdcUtil();
             log.info("Loading from SDC in url: " + url);
 
             com.telefonica.euro_iaas.sdc.client.services.ProductReleaseService pIService = sDCClient
@@ -97,9 +115,17 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
                 metadata.setDescription(sdcMetadata.getDescription());
                 p.addMetadata(metadata);
             }
+            for (com.telefonica.euro_iaas.sdc.model.Attribute att : prod.getProduct().getAttributes()) {
+                Attribute attribute = new Attribute();
+                attribute.setKey(att.getKey());
+                attribute.setValue(att.getValue());
+                attribute.setType(att.getType());
+                attribute.setDescription(att.getDescription());
+                p.addAttribute(attribute);
+            }
 
         } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
+            String message = "Error calling SDC to obtain the product: " + e.getMessage();
             log.error(message);
             throw new SdcException(message);
         } catch (ResourceNotFoundException e) {
@@ -112,47 +138,26 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
     }
 
     public List<String> findAllProducts(String token, String tenant) throws SdcException {
+        Response response = null;
+
         try {
-            String url = sDCUtil.getSdcUtil(token) + "/catalog/product";
+            String url = sDCUtil.getSdcUtil() + "/catalog/product";
             log.debug("url: " + url);
 
             Invocation.Builder builder = createWebResource(url, token, tenant);
             builder = builder.accept(MediaType.APPLICATION_JSON);
-            InputStream inputStream = builder.get(InputStream.class);
-            String response;
-            response = IOUtils.toString(inputStream);
-            return fromSDCToProductNames(response);
-        } catch (IOException e) {
-            String message = "Error calling SDC to obtain the products ";
+            response = builder.get();
+            String responseJSON = response.readEntity(String.class);
+            return fromSDCToProductNames(responseJSON);
+        } catch (Exception e) {
+            String message = "Error calling SDC to obtain the all product list " + e.getMessage();
+            ;
             log.error(message);
             throw new SdcException(message);
-        } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
-            log.error(message);
-            throw new SdcException(message);
-        }
-
-    }
-
-    public List<ProductRelease> findAllProductReleasesOfProduct(String pName, String token, String tenant)
-            throws SdcException {
-        try {
-            String url = sDCUtil.getSdcUtil(token) + "/catalog/product/" + pName + "/release";
-            log.debug("url: " + url);
-
-            Invocation.Builder builder = createWebResource(url, token, tenant);
-            builder = builder.accept(MediaType.APPLICATION_JSON);
-            InputStream inputStream = builder.get(InputStream.class);
-            String response = IOUtils.toString(inputStream);
-            return fromSDCToPaasManager(response);
-        } catch (IOException e) {
-            String message = "Error calling SDC to obtain the products ";
-            log.error(message);
-            throw new SdcException(message);
-        } catch (OpenStackException e) {
-            String message = "Error calling SDC to obtain the products " + e.getMessage();
-            log.error(message);
-            throw new SdcException(message);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
     }
@@ -213,6 +218,13 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
         this.client = client;
     }
 
+    public Client getClient() {
+        if (this.client == null) {
+            this.client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        }
+        return this.client;
+    }
+
     public void setSDCUtil(SDCUtil sDCUtil) {
         this.sDCUtil = sDCUtil;
     }
@@ -222,9 +234,8 @@ public class ProductReleaseSdcDaoImpl implements ProductReleaseSdcDao {
     }
 
     private Invocation.Builder createWebResource(String url, String token, String tenant) {
-        // client.addFilter(new LoggingFilter(System.out));
 
-        WebTarget webResource = client.target(url);
+        WebTarget webResource = getClient().target(url);
         Invocation.Builder builder = webResource.request(MediaType.APPLICATION_JSON);
 
         builder.header("X-Auth-Token", token);

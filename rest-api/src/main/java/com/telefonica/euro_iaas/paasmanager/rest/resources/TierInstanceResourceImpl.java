@@ -35,10 +35,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidTierInstanceRequestException;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentInstanceManager;
 import com.telefonica.euro_iaas.paasmanager.manager.TierInstanceManager;
@@ -53,11 +52,11 @@ import com.telefonica.euro_iaas.paasmanager.model.Task;
 import com.telefonica.euro_iaas.paasmanager.model.Task.TaskStates;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.TierDto;
 import com.telefonica.euro_iaas.paasmanager.model.dto.TierInstanceDto;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TaskSearchCriteria;
 import com.telefonica.euro_iaas.paasmanager.model.searchcriteria.TierInstanceSearchCriteria;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.TierInstanceResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -159,7 +158,7 @@ public class TierInstanceResourceImpl implements TierInstanceResource {
     public Task update(String org, String vdc, String environmentInstance, TierInstanceDto tierInstanceDto,
             String callback) {
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentInstance);
-        claudiaData.setUser(getCredentials());
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         Task task = null;
         try {
@@ -187,7 +186,7 @@ public class TierInstanceResourceImpl implements TierInstanceResource {
             String callback) throws APIException {
 
         ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentInstance);
-        claudiaData.setUser(getCredentials());
+        OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
         Task task = null;
 
@@ -223,14 +222,12 @@ public class TierInstanceResourceImpl implements TierInstanceResource {
      * Creates a new TierInstance.
      */
     public Task insert(String org, String vdc, String environmentName, TierDto tierDto, String callback)
-        throws APIException {
+            throws APIException {
 
         try {
             log.info("Insert tierinstance " + tierDto.getName() + " from environment " + environmentName);
             ClaudiaData claudiaData = new ClaudiaData(org, vdc, environmentName);
-            if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-                claudiaData.setUser(getCredentials());
-            }
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
             Task task = null;
 
@@ -327,7 +324,7 @@ public class TierInstanceResourceImpl implements TierInstanceResource {
     }
 
     private List<ProductInstance> getProductFirst(EnvironmentInstance environmentInstance, String tierName)
-        throws EntityNotFoundException {
+            throws EntityNotFoundException {
 
         TierInstance tierInstanceFirst = getTierInstanceFromTier(environmentInstance, tierName);
         return tierInstanceFirst.getProductInstances();
@@ -409,17 +406,6 @@ public class TierInstanceResourceImpl implements TierInstanceResource {
             }
         }
         return rTierInstance;
-    }
-
-    /**
-     * Get the user credentials.
-     */
-    public PaasManagerUser getCredentials() {
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            return (PaasManagerUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        } else {
-            return null;
-        }
     }
 
 }

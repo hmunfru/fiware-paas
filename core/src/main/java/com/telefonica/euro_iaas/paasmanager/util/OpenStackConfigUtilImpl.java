@@ -26,17 +26,18 @@ package com.telefonica.euro_iaas.paasmanager.util;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+import com.telefonica.fiware.commons.util.RegionCache;
 
 /**
  * @author jesus.movilla
@@ -49,7 +50,7 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
 
     private static Logger log = LoggerFactory.getLogger(OpenStackConfigUtilImpl.class);
 
-    private HttpClientConnectionManager connectionManager;
+    private HttpClientConnectionManager httpConnectionManager;
 
     private OpenStackRegion openStackRegion;
 
@@ -61,16 +62,15 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
      * The constructor.
      */
     public OpenStackConfigUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
         regionCache = new RegionCache();
     }
 
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
 
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
     /**
@@ -85,52 +85,12 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             log.debug("in cache " + networkId);
             return networkId;
         }
-
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
-
-        log.debug("tenatn id" + adminUser.getTenantId() + " tenant name " + adminUser.getTenantName() + " user name"
-                + adminUser.getUserName());
-        HttpUriRequest request;
-        try {
-
-            request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS, APPLICATION_JSON, region,
-                    adminUser.getToken(), adminUser.getTenantId());
-        } catch (OpenStackException e) {
-            log.warn("It is not possible to obtain the quantum endpoint for obtaining the public network net");
-            return null;
-
+        NetworkInstance net = this.getPublicAdmin(user, region);
+        if (net != null) {
+            log.debug("net " + net.getNetworkName() + " " + net.getIdNetwork());
+            regionCache.putUrl(region, type, net.getNetworkName());
+            return net.getIdNetwork();
         }
-
-        String response = null;
-
-        try {
-            response = openOperationUtil.executeNovaRequest(request);
-            JSONObject lNetworkString = new JSONObject(response);
-            JSONArray jsonNetworks = lNetworkString.getJSONArray("networks");
-
-            for (int i = 0; i < jsonNetworks.length(); i++) {
-
-                JSONObject jsonNet = jsonNetworks.getJSONObject(i);
-                NetworkInstance net = isPublicNetwork(jsonNet, adminUser.getUserName(), region);
-
-                if (net != null) {
-                    log.debug("net " + net.getNetworkName() + " " + net.getIdNetwork());
-                    regionCache.putUrl(region, type, net.getNetworkName());
-                    return net.getIdNetwork();
-                }
-
-            }
-
-        } catch (OpenStackException e) {
-            String errorMessage = "Error getting networks for obtaining the public network: " + e;
-            log.error(errorMessage);
-            throw new OpenStackException(errorMessage);
-        } catch (Exception e) {
-            String errorMessage = "Error getting networks from OpenStack for obtaining the public network: " + e;
-            log.error(errorMessage);
-            throw new OpenStackException(errorMessage);
-        }
-
         return null;
     }
 
@@ -141,16 +101,27 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
         if (networkId != null) {
             return networkId;
         }
+        NetworkInstance net = getPublicAdmin(user, region);
+        if (net != null) {
+           regionCache.putUrl(region, type, net.getNetworkName());
+           return net.getNetworkName();
+        }
+        return null;
+    }
 
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
+    public NetworkInstance getPublicAdmin(PaasManagerUser user, String region) throws OpenStackException {
+        log.debug("Obtain public admin network");
+        NetworkInstance net = null;
+
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
         HttpUriRequest request;
-
         try {
-            request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS, APPLICATION_JSON, region,
-                    adminUser.getToken(), adminUser.getTenantId());
+            request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS +
+                    ".json?router%3Aexternal=True", APPLICATION_JSON, region,
+                openStackAccess.getToken(), openStackAccess.getTenantId());
         } catch (OpenStackException e) {
             log.warn("Error to obtain the quantum request url ");
-            return "net8300";
+            return net;
         }
 
         String response = null;
@@ -159,18 +130,16 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             response = openOperationUtil.executeNovaRequest(request);
             JSONObject lNetworkString = new JSONObject(response);
             JSONArray jsonNetworks = lNetworkString.getJSONArray("networks");
+            java.util.List<NetworkInstance> nets = new java.util.ArrayList ();
 
-            for (int i = 0; i < jsonNetworks.length(); i++) {
+            for (int i = 0; i< jsonNetworks.length(); i++) {
 
                 JSONObject jsonNet = jsonNetworks.getJSONObject(i);
-                NetworkInstance net = isPublicNetwork(jsonNet, adminUser.getUserName(), region);
-                if (net != null) {
-
-                    regionCache.putUrl(region, type, net.getNetworkName());
-                    return net.getNetworkName();
-                }
-
+                NetworkInstance netInst = NetworkInstance.fromJson(jsonNet, region);
+                nets.add(netInst);
             }
+
+            net = this.getPublicNetwork(nets);
 
         } catch (OpenStackException e) {
             String errorMessage = "Error getting networks for obtaining the public network: " + e;
@@ -182,7 +151,7 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
             throw new OpenStackException(errorMessage);
         }
 
-        return null;
+        return net;
     }
 
     /**
@@ -204,16 +173,15 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
 
         // String publicNetworkId = this.getPublicAdminNetwork(user, region).getIdNetwork();
 
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
-
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
         HttpUriRequest request = openOperationUtil.createQuantumGetRequest(RESOURCE_ROUTERS, APPLICATION_JSON, region,
-                adminUser.getToken(), adminUser.getTenantId());
+                openStackAccess.getToken(), openStackAccess.getTenantId());
 
         String response = null;
 
         try {
             response = openOperationUtil.executeNovaRequest(request);
-            routerId = getPublicRouterId(response, adminUser.getUserName(), publicNetworkId);
+            routerId = getPublicRouterId(response, openStackAccess.getTenantId(), publicNetworkId);
             if (routerId == null) {
                 String errorMessage = "It is not possible to find a public router for network " + publicNetworkId
                         + ": ";
@@ -254,41 +222,30 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
 
     }
 
-    private NetworkInstance isPublicNetwork(JSONObject jsonNet, String vdc, String region) {
+    private NetworkInstance getPublicNetwork(java.util.List<NetworkInstance> netInsts) {
 
-        NetworkInstance netInst;
-        try {
-            netInst = NetworkInstance.fromJson(jsonNet, region);
-        } catch (JSONException e) {
-            log.warn("Error to parser the json for the network");
-            return null;
+        for (NetworkInstance net: netInsts) {
+            if (net.getNetworkName().contains("public") &&
+                !net.getNetworkName().contains("federation") ) {
+                return net;
+            }
         }
 
-        log.debug("net " + netInst.getNetworkName() + " " + netInst.getIdNetwork() + " " + netInst.getExternal() + " "
-                + netInst.getTenantId() + " vdc " + vdc);
-
-        if (!netInst.getExternal()) {
-            log.debug("external " + netInst.getExternal());
-            return null;
+        for (NetworkInstance net: netInsts) {
+            if (net.getNetworkName().contains("ext-net") &&
+                !net.getNetworkName().contains("federation")) {
+                return net;
+            }
         }
 
-        if (vdc.contains(netInst.getTenantId())) {
-            return netInst;
+        for (NetworkInstance net: netInsts) {
+            if (net.getNetworkName().contains("ext")&&
+                !net.getNetworkName().contains("federation")) {
+                return net;
+            }
         }
-
-        if (netInst.getNetworkName().contains("public")) {
-            return netInst;
-        }
-
-        if (netInst.getNetworkName().contains("ext-net")) {
-            return netInst;
-        }
-
-        if (netInst.getNetworkName().contains("ext")) {
-            return netInst;
-        }
-
         return null;
+
     }
 
     private RouterInstance isPublicRouter(JSONObject jsonRouter, String vdc, String networkPublic) {
@@ -308,7 +265,6 @@ public class OpenStackConfigUtilImpl implements OpenStackConfigUtil {
         } else {
             return routerInst;
         }
-
     }
 
     public OpenStackRegion getOpenStackRegion() {

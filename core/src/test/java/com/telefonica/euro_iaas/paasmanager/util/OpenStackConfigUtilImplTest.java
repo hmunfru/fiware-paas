@@ -33,8 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -45,72 +43,71 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 
 public class OpenStackConfigUtilImplTest {
 
     private OpenStackConfigUtilImplTestable openStackUtil;
     private CloseableHttpClient closeableHttpClientMock;
-    private CloseableHttpResponse httpResponse;
     private PaasManagerUser paasManagerUser;
     private OpenOperationUtil openOperationUtil;
 
     private OpenStackRegion openStackRegion;
 
-    String CONTENT_NETWORKS = "{ " + "\"networks\": [ " + "{ " + "\"status\": \"ACTIVE\", " + "\"subnets\": [ "
-            + "\"81f10269-e0a2-46b0-9583-2c83aa4cc76f\" " + " ], " + "\"name\": \"jesuspg-net\", "
-            + "\"provider:physical_network\": null, " + "\"admin_state_up\": true, "
-            + "\"tenant_id\": \"67c979f51c5b4e89b85c1f876bdffe31\", " + "\"router:external\": false, "
-            + "\"shared\": false, " + "\"id\": \"047e6dd3-3101-434e-af1e-eea571ab57a4\", "
-            + "\"provider:segmentation_id\": 29 " + "}, " + "{ " + "\"status\": \"ACTIVE\", " + "\"subnets\": [ "
-            + "\"e2d10e6b-33c3-400c-88d6-f905d4cd02f2\" " + " ], " + "\"name\": \"ext-net\", "
-            + "\"provider:physical_network\": null, " + "\"admin_state_up\": true, "
-            + "\"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\", " + "\"router:external\": true, "
-            + "\"shared\": false, " + "\"id\": \"080b5f2a-668f-45e0-be23-361c3a7d11d0\", "
-            + "\"provider:segmentation_id\": 1 " + "} ]} ";
+    String CONTENT_NETWORKS = "{\"networks\": [{\"status\": \"ACTIVE\", \"subnets\":" +
+        " [\"f948cae1-fec2-4afe-bde6-337ebf7ca522\"], \"name\": \"federation-ext-net-01\", " +
+        "\"provider:physical_network\": \"phy-ex-2\", \"admin_state_up\": true, \"tenant_id\": " +
+        "\"0ccaf1d0ed9e4b19bf4aba6e0f1e4d6f\", \"provider:network_type\": \"flat\", \"router:external\": " +
+        "true, \"shared\": false, \"id\": \"2514b343-1913-41e4-9744-fbe34a446548\", " +
+        "\"provider:segmentation_id\": null}, {\"status\": \"ACTIVE\", \"subnets\": " +
+        "[\"074437be-4a13-42f7-bab9-f488ea7f9395\"], \"name\": \"public-ext-net-01\", " +
+        "\"provider:physical_network\": \"phy-ex\", \"admin_state_up\": true, \"tenant_id\":" +
+        " \"0ccaf1d0ed9e4b19bf4aba6e0f1e4d6f\", \"provider:network_type\": \"flat\", " +
+        "\"router:external\": true, \"shared\": false, \"id\": \"83c3d979-4a43-4ce3-ac39-ef7bfb0b89e5\"," +
+        " \"provider:segmentation_id\": null}, {\"status\": \"ACTIVE\", " +
+        "\"subnets\": [\"3b1d048c-aa96-47bb-9449-383021324e68\"], \"name\": \"public-ext-net-02\"," +
+        " \"provider:physical_network\": \"phy-ex-3\", \"admin_state_up\": true, \"tenant_id\": " +
+        "\"0ccaf1d0ed9e4b19bf4aba6e0f1e4d6f\", \"provider:network_type\": \"flat\", \"router:external\":" +
+        " true, \"shared\": false, \"id\": \"c3eb6a02-571b-4510-84af-d1ff82bc015a\", " +
+        "\"provider:segmentation_id\": null}]}";
 
     String ROUTER = " { " + "\"routers\": [ {" + "\"status\": \"ACTIVE\", " + " \"external_gateway_info\": { "
             + " \"network_id\": \"080b5f2a-668f-45e0-be23-361c3a7d11d0\" " + " }, " + " \"name\": \"test-rt1\", "
             + "\"admin_state_up\": true, " + "\"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\", "
             + "\"routes\": [], " + "\"id\": \"5af6238b-0e9c-4c20-8981-6e4db6de2e17\"" + "}  ]}";
 
-    String ROUTERS = " {\"routers\": [{\"status\": \"ACTIVE\", \"external_gateway_info\":" +
-    		" { \"network_id\": \"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, " +
-    	    "\"name\": \"router\", \"admin_state_up\": true," +
-            " \"tenant_id\": \"f8b9284b4a5f4875b591d22185ba835c\", \"routes\": " +
-            "[], \"id\": \"084d97ec-a348-4907-94d4-95e339b1cdd4\"}, {\"status\": \"ACTIVE\", "
-            + " \"external_gateway_info\": [{\"network_id\":\"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}] ," +
-         	" \"name\": \"test\", \"admin_state_up\": true, \"tenant_id\": \"f8b9284b4a5f4875b591d22185ba835c\"," +
-         	"\"routes\": [], "
-            + " \"id\": \"46a97147-27ed-4ee1-b88e-b74a5a831706\"}, {\"status\": \"ACTIVE\", " +
-            "\"external_gateway_info\": {\"network_id\": "
-            + "\"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, \"name\": \"test-rt1\", \"admin_state_up\": " +
-            "true, \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
-            + " \"routes\": [], \"id\": \"5af6238b-0e9c-4c20-8981-6e4db6de2e17\"}, {\"status\":" +
-            "\"ACTIVE\", \"external_gateway_info\": {\"network_id\": "
-            + " \"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, \"name\": \"prueba\", \"admin_state_up\": " +
-            "true, \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\", "
+    String ROUTERS = " {\"routers\": [{\"status\": \"ACTIVE\", \"external_gateway_info\":"
+            + " { \"network_id\": \"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, "
+            + "\"name\": \"router\", \"admin_state_up\": true,"
+            + " \"tenant_id\": \"f8b9284b4a5f4875b591d22185ba835c\", \"routes\": "
+            + "[], \"id\": \"084d97ec-a348-4907-94d4-95e339b1cdd4\"}, {\"status\": \"ACTIVE\", "
+            + " \"external_gateway_info\": [{\"network_id\":\"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}] ,"
+            + " \"name\": \"test\", \"admin_state_up\": true, \"tenant_id\": \"f8b9284b4a5f4875b591d22185ba835c\","
+            + "\"routes\": [], " + " \"id\": \"46a97147-27ed-4ee1-b88e-b74a5a831706\"}, {\"status\": \"ACTIVE\", "
+            + "\"external_gateway_info\": {\"network_id\": "
+            + "\"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, \"name\": \"test-rt1\", \"admin_state_up\": "
+            + "true, \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
+            + " \"routes\": [], \"id\": \"5af6238b-0e9c-4c20-8981-6e4db6de2e17\"}, {\"status\":"
+            + "\"ACTIVE\", \"external_gateway_info\": {\"network_id\": "
+            + " \"080b5f2a-668f-45e0-be23-361c3a7d11d0\"}, \"name\": \"prueba\", \"admin_state_up\": "
+            + "true, \"tenant_id\": \"08bed031f6c54c9d9b35b42aa06b51c0\", "
             + " \"routes\": [], \"id\": \"89c6eca5-99d5-41bd-b6c6-deb8d03820ac\"}]} ";
 
     @Before
     public void setUp() throws OpenStackException, ClientProtocolException, IOException {
         openStackUtil = new OpenStackConfigUtilImplTestable();
 
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new HashSet();
-        authorities.add(grantedAuthority);
-        paasManagerUser = new PaasManagerUser("user", "aa", authorities);
+        paasManagerUser = new PaasManagerUser("user", "aa");
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
         paasManagerUser.setUsername("08bed031f6c54c9d9b35b42aa06b51c0");
 
         HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
-        openStackUtil.setConnectionManager(httpClientConnectionManager);
-
-        httpResponse = mock(CloseableHttpResponse.class);
+        openStackUtil.setHttpConnectionManager(httpClientConnectionManager);
+        CloseableHttpResponse httpResponse = mock(CloseableHttpResponse.class);
 
         openOperationUtil = mock(OpenOperationUtil.class);
         closeableHttpClientMock = mock(CloseableHttpClient.class);
@@ -118,10 +115,10 @@ public class OpenStackConfigUtilImplTest {
         openStackUtil.setOpenStackRegion(openStackRegion);
         openStackUtil.setOpenOperationUtil(openOperationUtil);
 
-        String responseJSON = "{\"access\": {\"token\": {\"issued_at\": " +
-        		"\"2014-01-13T14:00:10.103025\", \"expires\": \"2014-01-14T14:00:09Z\","
-                + "\"id\": \"ec3ecab46f0c4830ad2a5837fd0ad0d7\", \"tenant\": " +
-                "{ \"description\": null, \"enabled\": true, \"id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
+        String responseJSON = "{\"access\": {\"token\": {\"issued_at\": "
+                + "\"2014-01-13T14:00:10.103025\", \"expires\": \"2014-01-14T14:00:09Z\","
+                + "\"id\": \"ec3ecab46f0c4830ad2a5837fd0ad0d7\", \"tenant\": "
+                + "{ \"description\": null, \"enabled\": true, \"id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
                 + "\"name\": \"admin\" } },         \"serviceCatalog\": []}}}";
 
         HttpPost httpPost = mock(HttpPost.class);
@@ -148,15 +145,18 @@ public class OpenStackConfigUtilImplTest {
         // given
         String region = "RegionOne";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
 
         String net = openStackUtil.getPublicAdminNetwork(paasManagerUser, region);
 
         // then
         assertNotNull(net);
-        assertEquals(net, "080b5f2a-668f-45e0-be23-361c3a7d11d0");
+        assertEquals(net, "83c3d979-4a43-4ce3-ac39-ef7bfb0b89e5");
     }
 
     @Test
@@ -164,26 +164,34 @@ public class OpenStackConfigUtilImplTest {
         // given
         String region = "RegionOne2";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
 
         String net = openStackUtil.getPublicFloatingPool(paasManagerUser, region);
 
         // then
         assertNotNull(net);
-        assertEquals(net, "ext-net");
+        assertEquals(net, "public-ext-net-01");
 
     }
+
 
     @Test
     public void shouldObtainPublicRouter() throws OpenStackException, IOException {
         // given
         String region = "RegionOne3";
 
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
+
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
+        // when
 
         String router = openStackUtil.getPublicRouter(paasManagerUser, region, "080b5f2a-668f-45e0-be23-361c3a7d11d0");
 
@@ -191,79 +199,82 @@ public class OpenStackConfigUtilImplTest {
         assertNotNull(router);
 
     }
-    
+
     /**
      * There is a bug if the network is null. Just lanch an exception in this case.
+     * 
      * @throws OpenStackException
      */
     @Test
-    public void testBugFindRouterNetworkNull () throws OpenStackException {
-    	// given
+    public void testBugFindRouterNetworkNull() throws OpenStackException {
+        // given
         String region = "RegionOne4";
-
-        // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
+        // when
 
         try {
             openStackUtil.getPublicRouter(paasManagerUser, region, null);
             fail("The method should have lanch an exception");
         } catch (Exception e) {
-        	
+
         }
     }
-    
+
     /**
-     * Obtaining the external network if the tenant id is not a 
-     * keystone valid one.
+     * Obtaining the external network if the tenant id is not a keystone valid one.
+     * 
      * @throws OpenStackException
      */
     @Test
-    public void testObtainPublicNetworkSeveralExternalNetworks () 
-        throws OpenStackException {
-    	 String CONTENT_NETWORKS= "{\"networks\": [{\"status\": \"ACTIVE\", " +
-    	     "\"subnets\": [\"eb602a2b-13cd-46c8-9055-99ad45180730\"],"+
-    	     "\"name\": \"net04_ext\", \"provider:physical_network\": null, " +
-    	     "\"admin_state_up\": true, \"tenant_id\": "+
-    	     "\"eab8403e83e048719ab220353c10806f\", \"provider:network_type\": " +
-    	     "\"gre\", \"router:external\": true, \"shared\": "+
-    	     "true, \"id\": \"04c9aedf-aeb6-4553-8ddb-845701da71bd\", " +
-    	     "\"provider:segmentation_id\": 3}, "+
-    	     "{\"status\": \"ACTIVE\", \"subnets\": [\"6ba86d6b-b7ad-4d0b-b552-cb63b36c9ef2\"], " +
-    	     "\"name\": \"sec_ext_net\", "+
-    	     "\"provider:physical_network\": \"physnet1\", \"admin_state_up\": true, \"tenant_id\":" +
-    	     "\"eab8403e83e048719ab220353c10806f\", "+
-    	     "\"provider:network_type\": \"flat\", \"router:external\": true, \"shared\": false," +
-    	     " \"id\": \"063f1075-77eb-45f9-be7a-205a591840ee\"," +
-    	     "\"provider:segmentation_id\": null}]}";
-    	 
-    	 System.out.print(CONTENT_NETWORKS);
-    	 
-    	 String region = "RegionOne5";
+    public void testObtainPublicNetworkSeveralExternalNetworks() throws OpenStackException {
+        String CONTENT_NETWORKS = "{\"networks\": [{\"status\": \"ACTIVE\", "
+                + "\"subnets\": [\"eb602a2b-13cd-46c8-9055-99ad45180730\"],"
+                + "\"name\": \"net04_ext\", \"provider:physical_network\": null, "
+                + "\"admin_state_up\": true, \"tenant_id\": "
+                + "\"eab8403e83e048719ab220353c10806f\", \"provider:network_type\": "
+                + "\"gre\", \"router:external\": true, \"shared\": "
+                + "true, \"id\": \"04c9aedf-aeb6-4553-8ddb-845701da71bd\", " + "\"provider:segmentation_id\": 3}, "
+                + "{\"status\": \"ACTIVE\", \"subnets\": [\"6ba86d6b-b7ad-4d0b-b552-cb63b36c9ef2\"], "
+                + "\"name\": \"sec_ext_net\", "
+                + "\"provider:physical_network\": \"physnet1\", \"admin_state_up\": true, \"tenant_id\":"
+                + "\"eab8403e83e048719ab220353c10806f\", "
+                + "\"provider:network_type\": \"flat\", \"router:external\": true, \"shared\": false,"
+                + " \"id\": \"063f1075-77eb-45f9-be7a-205a591840ee\"," + "\"provider:segmentation_id\": null}]}";
 
-         // when
-         when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
-         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        System.out.print(CONTENT_NETWORKS);
 
-         String net = openStackUtil.getPublicAdminNetwork(paasManagerUser, region);
+        String region = "RegionOne5";
 
-         // then
-         assertNotNull(net);
-         assertEquals(net, "04c9aedf-aeb6-4553-8ddb-845701da71bd");
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(CONTENT_NETWORKS);
+        // when
+
+        String net = openStackUtil.getPublicAdminNetwork(paasManagerUser, region);
+
+        // then
+        assertNotNull(net);
+        assertEquals(net, "04c9aedf-aeb6-4553-8ddb-845701da71bd");
     }
 
     @Test
     public void shouldGetPublicRouterId() throws JSONException {
 
-        String response = "{\"routers\": [{\"status\": \"ACTIVE\", \"external_gateway_info\":" +
-            " {\"network_id\": \"e8892de7-38f9-4002-90f9-eedf0e72f5fc\"}, \"name\": " +
-        	"\"router-1137229409\", \"admin_state_up\": false, "
-            + "\"tenant_id\": \"00000000000000000000000000000017\", \"routes\": [], " +
-            "\"id\": \"2fe38e4d-a4cb-4c0a-b1b9-e87e0d147f9c\"}, {\"status\": \"ACTIVE\", "
-            + "\"external_gateway_info\": {\"network_id\": \"e5892de7-38f9-4002-90f9-eedf0e72f5fc\"," +
-            " \"enable_snat\": true}, \"name\": \"ext-rt\", \"admin_state_up\": "
-            + " true, \"tenant_id\": \"00000000000000000000000000000001\", \"routes\": [], \"id\":" +
-            "\"35da5189-03f8-4167-868d-932637d83105\"}]}";
+        String response = "{\"routers\": [{\"status\": \"ACTIVE\", \"external_gateway_info\":"
+                + " {\"network_id\": \"e8892de7-38f9-4002-90f9-eedf0e72f5fc\"}, \"name\": "
+                + "\"router-1137229409\", \"admin_state_up\": false, "
+                + "\"tenant_id\": \"00000000000000000000000000000017\", \"routes\": [], "
+                + "\"id\": \"2fe38e4d-a4cb-4c0a-b1b9-e87e0d147f9c\"}, {\"status\": \"ACTIVE\", "
+                + "\"external_gateway_info\": {\"network_id\": \"e5892de7-38f9-4002-90f9-eedf0e72f5fc\","
+                + " \"enable_snat\": true}, \"name\": \"ext-rt\", \"admin_state_up\": "
+                + " true, \"tenant_id\": \"00000000000000000000000000000001\", \"routes\": [], \"id\":"
+                + "\"35da5189-03f8-4167-868d-932637d83105\"}]}";
 
         String routerId = openStackUtil.getPublicRouterId(response, "00000000000000000000000000000001",
                 "e5892de7-38f9-4002-90f9-eedf0e72f5fc");

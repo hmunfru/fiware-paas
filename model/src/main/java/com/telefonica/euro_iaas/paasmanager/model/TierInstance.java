@@ -78,13 +78,20 @@ public class TierInstance extends InstallableInstance {
     private VM vm;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tierinstance_has_productinstances", joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "productinstance_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tierinstance_has_productinstances", 
+    joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, 
+    inverseJoinColumns = { @JoinColumn(name = "productinstance_ID", nullable = false, updatable = false) })
     private List<ProductInstance> productInstances;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tierinstance_has_networkinstance", joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "networkinstance_ID", nullable = false, updatable = false) })
+    @JoinTable(name = "tierinstance_has_networkinstance", 
+    joinColumns = { @JoinColumn(name = "tierinstance_ID", nullable = false, updatable = false) }, 
+    inverseJoinColumns = { @JoinColumn(name = "networkinstance_ID", nullable = false, updatable = false) })
     private Set<NetworkInstance> networkInstances;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private SecurityGroup securityGroup;
+    
     /**
      * Constructor.
      */
@@ -223,6 +230,10 @@ public class TierInstance extends InstallableInstance {
 
     }
 
+    public SecurityGroup getSecurityGroup() {
+        return this.securityGroup;
+    }
+    
     /**
      * Check if there is a public network (Internet) in the list of network instances.
      * 
@@ -312,6 +323,10 @@ public class TierInstance extends InstallableInstance {
 
     }
 
+    public void setSecurityGroup(SecurityGroup securityGroup) {
+        this.securityGroup = securityGroup;
+    }
+
     /**
      * @param tier
      *            the tier to set
@@ -341,6 +356,9 @@ public class TierInstance extends InstallableInstance {
         tierInstanceDto.setTierInstanceName(getName());
         tierInstanceDto.setTierDto(getTier().toDto());
         tierInstanceDto.setReplicaNumber(getNumberReplica());
+        if (getSecurityGroup() != null) {
+        	tierInstanceDto.setSecurityGroup(this.getSecurityGroup().getName());
+        }
         if (this.getVM() != null) {
             tierInstanceDto.setVM(getVM().toDto());
         }
@@ -369,8 +387,8 @@ public class TierInstance extends InstallableInstance {
      */
     public String toJson(String userData) {
         String payload = "{\"server\": " + "{\"key_name\": \"" + getTier().getKeypair() + "\", ";
-        if (getTier().getSecurityGroup() != null) {
-            payload = payload + "\"security_groups\": [{ \"name\": \"" + getTier().getSecurityGroup().getName()
+        if (getSecurityGroup() != null) {
+            payload = payload + "\"security_groups\": [{ \"name\": \"" + getSecurityGroup().getName()
                     + "\"}], ";
         }
         if (!this.getNetworkInstances().isEmpty()) {
@@ -469,6 +487,7 @@ public class TierInstance extends InstallableInstance {
         sb.append("[vm = ").append(this.vm).append("]");
         sb.append("[productInstances = ").append(this.productInstances).append("]");
         sb.append("[networkInstances = ").append(this.networkInstances).append("]");
+        sb.append("[securityGroup = ").append(this.securityGroup).append("]");
         sb.append("]");
         return sb.toString();
     }

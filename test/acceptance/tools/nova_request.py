@@ -81,6 +81,14 @@ class NovaRequest:
         url = "{}/{}/{}".format(self.nova_url, 'servers', server_id)
         return self.__get__(url)
 
+    def get_security_group_list(self):
+        """
+        Gets the list of security groups
+        :return: HTTPlib request
+        """
+        url = "{}/{}".format(self.nova_url, 'os-security-groups')
+        return self.__get__(url)
+
 
 def get_number_of_flavors(body_response):
     """
@@ -103,6 +111,7 @@ def get_first_flavor_in_list(body_response, name_filter=None):
             flavor = body_response['flavors'][0]['id']
 
     return flavor
+
 
 def get_server_id_by_partial_name(body_response_server_list, partial_server_name):
     """
@@ -132,3 +141,40 @@ def get_metadata_value(body_response_server_details, metadata_key):
         metadata_value = body_response_server_details['server']['metadata'][metadata_key]
 
     return metadata_value
+
+
+def get_security_group_rules(body_response_sec_group_list, sec_group_name):
+    """
+    Retrieve security group rules list
+    :param body_response_sec_group_list: Parsed response (python dic). List of sec. groups
+    :param sec_group_name: Name of Sec. Group to look for
+    :return: Return the first sec. group with sec_group_name IN name.
+    """
+    rules_list = None
+    for sec_group in body_response_sec_group_list:
+        if sec_group_name in sec_group['name']:
+            rules_list = sec_group['rules']
+            break
+
+    return rules_list
+
+
+def get_ports_from_rules(body_response_sec_group_list, sec_group_name, protocol='TCP'):
+    """
+    Retrieve the list of TCP open ports
+    :param body_response_sec_group_list: Parsed response (python dic). List of sec. groups
+    :param sec_group_name: Name of Sec. Group to look for
+    :param protocol: TCP or UDP
+    :return: List of TCP ports (list of strings)
+    """
+    port_list = []
+    for sec_group in body_response_sec_group_list['security_groups']:
+        if sec_group_name in sec_group['name']:
+            for rule in sec_group['rules']:
+                if rule['ip_protocol'] == protocol.lower():
+                    port = str(rule['from_port'])
+                    to_port = str(rule['to_port'])
+                    port = port + "-" + to_port if to_port != port else port
+                    port_list.append(port)
+
+    return port_list

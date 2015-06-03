@@ -26,8 +26,8 @@ package com.telefonica.euro_iaas.paasmanager.dao;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.BaseDAO;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.BaseDAO;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 
 /**
@@ -73,4 +73,11 @@ public interface EnvironmentDao extends BaseDAO<Environment, String> {
      * @return
      */
     List<Environment> findByOrg(String org);
+
+    /**
+     * Load networks from database.
+     * 
+     * @param environment
+     */
+    void loadNetworks(Environment environment);
 }

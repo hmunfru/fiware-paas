@@ -25,23 +25,22 @@
 package com.telefonica.euro_iaas.paasmanager.manager;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.claudia.NetworkClient;
 import com.telefonica.euro_iaas.paasmanager.dao.NetworkInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
@@ -49,6 +48,7 @@ import com.telefonica.euro_iaas.paasmanager.manager.impl.NetworkInstanceManagerI
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Port;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetwork;
@@ -65,6 +65,7 @@ public class NetworkInstanceManagerImplTest {
     private static String NETWORK_NAME = "name";
     private static String SUB_NETWORK_NAME = "subname";
     private static String CIDR = "10.100.1.0/24";
+    private ClaudiaData claudiaData;
 
     private NetworkInstanceManagerImpl networkInstanceManager;
     private NetworkInstanceDao networkInstanceDao;
@@ -88,6 +89,7 @@ public class NetworkInstanceManagerImplTest {
         networkInstanceManager.setNetworkClient(networkClient);
         networkInstanceManager.setSubNetworkInstanceManager(subNetworkInstanceManager);
         networkInstanceManager.setRouterManager(routerManager);
+        claudiaData = new ClaudiaData("dd", "dd", "");
 
     }
 
@@ -104,7 +106,6 @@ public class NetworkInstanceManagerImplTest {
         net.addSubNet(subNet);
         NetworkInstance netInst = net.toNetworkInstance();
         netInst.setIdNetwork("ID");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
         when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenThrow(
@@ -138,7 +139,6 @@ public class NetworkInstanceManagerImplTest {
         net.addSubNet(subNet);
         NetworkInstance netInst = net.toNetworkInstance();
         netInst.setIdNetwork("ID");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
         when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenReturn(netInst);
@@ -172,31 +172,59 @@ public class NetworkInstanceManagerImplTest {
      */
 
     @Test(expected=InfrastructureException.class)
-    public void testCreateNetworkSubNetFailure() throws EntityNotFoundException, InfrastructureException, InvalidEntityException, AlreadyExistsEntityException {
+    public void testCreateNetworkSubNetFailure() throws EntityNotFoundException,
+        InfrastructureException, InvalidEntityException, AlreadyExistsEntityException {
         // Given
         Network net = new Network(NETWORK_NAME, "vdc", "region");
         SubNetwork subNet = new SubNetwork(SUB_NETWORK_NAME, "vdc", "region");
         net.addSubNet(subNet);
         NetworkInstance netInst = net.toNetworkInstance();
         netInst.setIdNetwork("ID");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
-        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenThrow(
-                new EntityNotFoundException(Network.class, "test", net));
+        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).
+            thenReturn(netInst);
         when(systemPropertiesProvider.getProperty("key")).thenReturn("VALUE");
         Mockito.doNothing().when(networkClient)
-                .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+            .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
         Mockito.doNothing().when(networkClient)
-                .addNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+            .addNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
         when(subNetworkInstanceManager.create(any(ClaudiaData.class), any(SubNetworkInstance.class), anyString()))
-                .thenThrow(InfrastructureException.class);
-        when(
-                subNetworkInstanceManager.isSubNetworkDeployed(any(ClaudiaData.class), any(SubNetworkInstance.class),
-                        anyString())).thenReturn(false);
+            .thenThrow(InfrastructureException.class);
+        when(subNetworkInstanceManager.isSubNetworkDeployed(any(ClaudiaData.class), any(SubNetworkInstance.class),
+            anyString())).thenReturn(false);
 
         Mockito.doNothing().when(routerManager)
                 .create(any(ClaudiaData.class), any(RouterInstance.class), any(NetworkInstance.class), anyString());
+        when(networkInstanceDao.create(any(NetworkInstance.class))).thenReturn(netInst);
+
+        // Verify
+        networkInstanceManager.create(claudiaData, netInst, "region");
+    }
+
+    @Test(expected=InfrastructureException.class)
+    public void testCreateNetworkSubNetFailuretoAddInterface() throws EntityNotFoundException,
+        InfrastructureException, InvalidEntityException, AlreadyExistsEntityException {
+        // Given
+        Network net = new Network(NETWORK_NAME, "vdc", "region");
+        SubNetwork subNet = new SubNetwork(SUB_NETWORK_NAME, "vdc", "region");
+        net.addSubNet(subNet);
+        NetworkInstance netInst = net.toNetworkInstance();
+        netInst.setIdNetwork("ID");
+        netInst.addSubNet(subNet.toInstance("", ""));
+
+        // When
+        when(networkInstanceDao.load(any(String.class), any(String.class), any(String.class))).
+            thenReturn(netInst);
+        when(systemPropertiesProvider.getProperty("key")).thenReturn("VALUE");
+        Mockito.doNothing().when(networkClient)
+            .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+        Mockito.doThrow(new InfrastructureException("")).when(networkClient)
+            .addNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+        when(subNetworkInstanceManager.create(any(ClaudiaData.class), any(SubNetworkInstance.class), anyString()))
+            .thenReturn(subNet.toInstance("", ""));
+        when(subNetworkInstanceManager.isSubNetworkDeployed(any(ClaudiaData.class), any(SubNetworkInstance.class),
+            anyString())).thenReturn(true);
         when(networkInstanceDao.create(any(NetworkInstance.class))).thenReturn(netInst);
 
         // Verify
@@ -215,7 +243,6 @@ public class NetworkInstanceManagerImplTest {
         SubNetwork subNet = new SubNetwork(SUB_NETWORK_NAME, "vdc", "region");
         net.addSubNet(subNet);
         NetworkInstance netInst = net.toNetworkInstance();
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
         when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenReturn(netInst);
@@ -245,10 +272,8 @@ public class NetworkInstanceManagerImplTest {
     public void testDestroyNetwork() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
-       
         when(systemPropertiesProvider.getProperty("key")).thenReturn("VALUE");
         Mockito.doNothing().when(networkClient)
                 .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
@@ -260,20 +285,100 @@ public class NetworkInstanceManagerImplTest {
         // Verify
         networkInstanceManager.delete(claudiaData, net, "region");
         verify(networkInstanceDao).remove(any(NetworkInstance.class));
-
     }
-    
+
+    /**
+     * It test the deletion of a network, when there is a problem in Openstack.
+     * @throws Exception
+     */
     @Test
-    public void testCanbeDeleted() throws Exception {
+    public void testDestroyNetworkFailureOpenstack() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
+        when(systemPropertiesProvider.getProperty("key")).thenReturn("VALUE");
+        Mockito.doNothing().when(networkClient)
+            .deployNetwork(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).thenReturn(net);
+        Mockito.doNothing().when(networkClient).
+            deleteNetworkToPublicRouter(any(ClaudiaData.class), any(NetworkInstance.class), anyString());
+        Mockito.doNothing().when(networkInstanceDao).remove(any(NetworkInstance.class));
+
+        // Verify
+        networkInstanceManager.delete(claudiaData, net, "region");
+        verify(networkInstanceDao).remove(any(NetworkInstance.class));
+
+    }
+
+    @Test(expected=InvalidEntityException.class)
+    public void testDestroyNetworkNoExists() throws Exception {
+        // Given
+        NetworkInstance net = new NetworkInstance("noexists", "VDC", "region");
+        // When
+        when(networkInstanceDao.load(any(String.class),any(String.class),any(String.class))).
+            thenThrow(new EntityNotFoundException(NetworkInstance.class, "", "noexists"));
+
+        // Verify
+        networkInstanceManager.delete(claudiaData, net, "region");
+    }
+
+    /**
+     * It tests that the network cannot be deleted.
+     * @throws Exception
+     */
+    @Test
+    public void testCannotBeDeleted() throws Exception {
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        List<TierInstance> lTierInstance = new ArrayList();
+        lTierInstance.add(new TierInstance());
+
+        // When
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+                anyString(), anyString())).thenReturn(lTierInstance);
+
+        // Verify
+        boolean result = networkInstanceManager.canBeDeleted(claudiaData, net, "region");
+        assertEquals (result, false);
+    }
+
+    /**
+     * It tests that the network can be deleted.
+     * @throws Exception
+     */
+    @Test
+    public void testCanBeDeleted() throws Exception {
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        List<TierInstance> lTierInstance = new ArrayList();
+
+        // When
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+            anyString(), anyString())).thenReturn(lTierInstance);
+
+        // Verify
+        boolean result = networkInstanceManager.canBeDeleted(claudiaData, net, "region");
+        assertEquals (result, true);
+    }
+
+    @Test
+    public void testDestroyNetworkErrorInInterface () throws Exception {
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        List<TierInstance> lTierInstance = new ArrayList();
+        lTierInstance.add(new TierInstance());
+
+        // When
+        when(networkInstanceDao.findTierInstanceUsedByNetwork(anyString(),
+            anyString(), anyString())).thenReturn(lTierInstance);
         List<Port> ports = new ArrayList<Port> ();
         ports.add(new Port ());
-        when(networkClient.listPortsFromNetwork(any(ClaudiaData.class), anyString(), anyString())).thenReturn(ports);
-
+        when(networkClient.listPortsFromNetwork(any(ClaudiaData.class), anyString(),
+            anyString())).thenReturn(ports);
+        Mockito.doThrow(new InfrastructureException("")).when(networkClient).
+            deleteNetworkToPublicRouter(any(ClaudiaData.class),
+            any(NetworkInstance.class), anyString());
         // Verify
         boolean result = networkInstanceManager.canBeDeleted(claudiaData, net, "region");
         assertEquals (result, false);
@@ -283,8 +388,6 @@ public class NetworkInstanceManagerImplTest {
     public void testNetworkInstExistsinDBByNotOPenstack() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
-
         // When
         List<Port> ports = new ArrayList<Port> ();
         ports.add(new Port ());
@@ -300,7 +403,6 @@ public class NetworkInstanceManagerImplTest {
     public void testNetworkInstNoExistsinDBByNotOPenstack() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
         List<Port> ports = new ArrayList<Port> ();
@@ -317,13 +419,13 @@ public class NetworkInstanceManagerImplTest {
     public void testNetworkExists() throws Exception {
         // Given
         NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
 
         // When
         List<Port> ports = new ArrayList<Port> ();
         ports.add(new Port ());
         when(networkInstanceDao.load(anyString(),anyString(),anyString())).thenReturn(net);
-        when (networkClient.loadNetwork(any(ClaudiaData.class), any(NetworkInstance.class),  anyString())).thenThrow(EntityNotFoundException.class);
+        when (networkClient.loadNetwork(any(ClaudiaData.class), any(NetworkInstance.class),
+            anyString())).thenThrow(EntityNotFoundException.class);
 
         // Verify
         boolean result = networkInstanceManager.exists(claudiaData, net, "region");
@@ -337,8 +439,6 @@ public class NetworkInstanceManagerImplTest {
         SubNetworkInstance subNet = new SubNetworkInstance ();
         net.addSubNet(subNet);
 
-        ClaudiaData claudiaData = new ClaudiaData("dd", "dd", "service");
-
         // When
         List<Port> ports = new ArrayList<Port> ();
         ports.add(new Port ());
@@ -348,6 +448,135 @@ public class NetworkInstanceManagerImplTest {
          // Verify
         boolean result = networkInstanceManager.exists(claudiaData, net, "region");
         assertEquals (result, true);
+    }
+
+    @Test
+    public void testGetDefaultCIDRMaxNetworkAchieved() throws Exception {
+        networkInstanceManager.MAX_NETWORK=4;
+        networkInstanceManager.NET_ELEMENT = 2;
+        // Given
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("another");
+        net.addSubNet(subNet);
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        nets.add(net);
+        nets.add(net);
+        nets.add(net);
+
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),anyString())).thenReturn(nets);
+        // Verify
+        String cidr = networkInstanceManager.getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.3.1.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDROnet() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME, "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("another");
+        net.addSubNet(subNet);
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        // When
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),anyString())).thenReturn(nets);
+        // Verify
+        String cidr = networkInstanceManager.getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.2.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDRAlreadyExists() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME,
+            "VDC", "region");
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("10.2.2.0/24");
+
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        List<SubNetworkInstance> subNets =
+            new ArrayList<SubNetworkInstance>();
+        subNets.add(subNet);
+        // When
+
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),
+            anyString())).thenReturn(nets);
+        when (networkClient.loadAllSubNetworks(any(ClaudiaData.class),
+            anyString())).thenReturn(subNets);
+        // Verify
+        String cidr = networkInstanceManager.
+            getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.3.0/24");
+    }
+
+    @Test
+    public void testGetDefaultCIDRAlreadyExistsTwoNets() throws Exception {
+        // Given
+        networkInstanceManager.MAX_NETWORK=254;
+        networkInstanceManager.NET_ELEMENT = 2;
+        NetworkInstance net = new NetworkInstance(NETWORK_NAME,
+            "VDC", "region");
+
+        SubNetworkInstance subNet = new SubNetworkInstance ();
+        subNet.setCidr("10.2.3.0/24");
+        SubNetworkInstance subNet2 = new SubNetworkInstance ();
+        subNet2.setCidr("10.2.4.0/24");
+
+        List<NetworkInstance> nets = new ArrayList<NetworkInstance> ();
+        nets.add(net);
+        nets.add(net);
+        List<SubNetworkInstance> subNets =
+            new ArrayList<SubNetworkInstance>();
+        subNets.add(subNet);
+        subNets.add(subNet2);
+
+        // When
+        when (networkClient.loadAllNetwork(any(ClaudiaData.class),
+            anyString())).thenReturn(nets);
+        when (networkClient.loadAllSubNetworks(any(ClaudiaData.class),
+            anyString())).thenReturn(subNets);
+        // Verify
+        String cidr = networkInstanceManager.
+            getDefaultCidr(claudiaData, "region");
+        assertEquals (cidr, "10.2.5.0/24");
+    }
+
+    /**
+     * It tests the federation functionality.
+     * @throws Exception
+     */
+    @Test
+     public void testFederationNetwork() throws Exception {
+        List<NetworkInstance> lNetworkInstance = new ArrayList();
+        lNetworkInstance.add(new NetworkInstance());
+        lNetworkInstance.add(new NetworkInstance());
+        networkInstanceManager.createFederatedNetwork(claudiaData, lNetworkInstance);
+        verify(networkClient).joinNetworks(any(ClaudiaData.class), any(NetworkInstance.class),
+            any(NetworkInstance.class));
+    }
+
+    /**
+     * It tests the federation functionality.
+     * @throws Exception
+     */
+    @Test
+    public void testJoinNetwork() throws Exception {
+        List<NetworkInstance> lNetworkInstance = new ArrayList();
+        lNetworkInstance.add(new NetworkInstance("name1", "vdc", "region"));
+        lNetworkInstance.add(new NetworkInstance("name1", "vdc", "region"));
+        networkInstanceManager.joinNetwork(claudiaData,
+            lNetworkInstance.get(0), lNetworkInstance.get(1));
+        verify(networkClient).joinNetworks(any(ClaudiaData.class), any(NetworkInstance.class),
+            any(NetworkInstance.class));
     }
 
 

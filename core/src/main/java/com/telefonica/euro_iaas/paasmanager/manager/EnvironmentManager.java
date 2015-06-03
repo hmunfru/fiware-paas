@@ -26,8 +26,8 @@ package com.telefonica.euro_iaas.paasmanager.manager;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentRequestException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
@@ -106,4 +106,11 @@ public interface EnvironmentManager {
      * @return
      */
     List<Environment> findByOrg(String org);
+
+    /**
+     * load network from database
+     * 
+     * @param environment
+     */
+    void loadNetworks(Environment environment);
 }

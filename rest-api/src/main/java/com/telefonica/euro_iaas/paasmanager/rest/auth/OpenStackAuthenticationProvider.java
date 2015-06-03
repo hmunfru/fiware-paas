@@ -24,21 +24,17 @@
 
 package com.telefonica.euro_iaas.paasmanager.rest.auth;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.openstack.docs.identity.api.v2.AuthenticateResponse;
-import org.openstack.docs.identity.api.v2.Role;
+import net.sf.ehcache.Cache;
+
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -46,12 +42,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
-import com.telefonica.euro_iaas.paasmanager.util.Configuration;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAuthenticationToken;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackKeystoneV3;
+import com.telefonica.fiware.commons.util.PoolHttpClient;
+import com.telefonica.fiware.commons.util.TokenCache;
 
 /**
  * The Class OpenStackAuthenticationProvider.
@@ -64,39 +66,29 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * The system properties provider.
      */
     private SystemPropertiesProvider systemPropertiesProvider;
+
     /**
-     * The Constant SYSTEM_FIWARE.
+     * The Constant CODE_200. HTTP 200 ok
      */
-    public static final String SYSTEM_FIWARE = "FIWARE";
-    /**
-     * The Constant SYSTEM_FASTTRACK.
-     */
-    public static final String SYSTEM_FASTTRACK = "FASTTRACK";
+    public static final int CODE_200 = 200;
     /**
      * The Constant CODE_401.
      */
     public static final int CODE_401 = 401;
-    /**
-     * The Constant CODE_403.
-     */
-    public static final int CODE_403 = 403;
-    /**
-     * The Constant CODE_404.
-     */
-    public static final int CODE_404 = 404;
-    /**
-     * The max number of reintent.
-     */
-    public static final int MAX_REINTENT = 5;
     /**
      * The log.
      */
     private static Logger log = LoggerFactory.getLogger(OpenStackAuthenticationProvider.class);
 
     /**
-     * Thread to recover a valid X-Auth-Token each 24 hour.
+     * Thread to recover a valid X-Auth-Token.
      */
     private OpenStackAuthenticationToken oSAuthToken;
+
+    /**
+     * Cache for tokens.
+     */
+    private TokenCache tokenCache;
 
     /**
      * Jersey client used to validates token to OpenStack.
@@ -104,39 +96,26 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     private Client client;
 
     /**
+     * connection manager.
+     */
+    private HttpClientConnectionManager httpConnectionManager;
+
+    /**
      * Default constructor.
      */
     public OpenStackAuthenticationProvider() {
-
-        client = ClientBuilder.newClient();
         oSAuthToken = null;
+        tokenCache = new TokenCache();
     }
 
     /*
-     * (non-Javadoc) @seeorg.springframework.security.authentication.dao.
-     * AbstractUserDetailsAuthenticationProvider
-     * #additionalAuthenticationChecks(
-     * org.springframework.security.core.userdetails.UserDetails,
-     * org.springframework
+     * (non-Javadoc) @seeorg.springframework.security.authentication.dao. AbstractUserDetailsAuthenticationProvider
+     * #additionalAuthenticationChecks( org.springframework.security.core.userdetails.UserDetails, org.springframework
      * .security.authentication.UsernamePasswordAuthenticationToken)
      */
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails,
             UsernamePasswordAuthenticationToken authentication) {
-    }
-
-    /**
-     * Authentication fast track.
-     * 
-     * @param username
-     *            the username
-     * @param tenantId
-     *            the tenantId
-     * @return the open stack user
-     */
-    private PaasManagerUser authenticationFastTrack(String username, String tenantId) {
-        return null;
-
     }
 
     /**
@@ -149,118 +128,85 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      * @return the open stack user
      */
 
-    public PaasManagerUser authenticationFiware(String token, String tenantId) {
+    private PaasManagerUser authenticationFiware(String token, String tenantId) {
 
-        String keystoneURL = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+        OpenStackAccess openStackAccess = generateOpenStackAuthenticationToken();
 
-        String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+        log.debug("Keystone URL : " + oSAuthToken.getKeystoneURL());
+        log.debug("adminToken : " + openStackAccess.getToken());
 
-        String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
-
-        String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
-
-        String thresholdString = Configuration.VALIDATION_TIME_THRESHOLD;
-
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-
-        configureOpenStackAuthenticationToken(keystoneURL, adminUser, adminPass, adminTenant, thresholdString,
-                httpClient);
-
-        String[] credential = oSAuthToken.getCredentials();
-
-        log.debug("Keystone URL : " + keystoneURL);
-        log.debug("adminToken : " + credential[0]);
-
-        WebTarget webResource = client.target(keystoneURL);
+        PaasManagerUser paasManagerUser = (PaasManagerUser) tokenCache.getPaasManagerUser(token, tenantId);
+        Response response = null;
         try {
+            if (paasManagerUser == null) {
 
-            WebTarget tokens = webResource.path("tokens").path(token);
-            Invocation.Builder builder = tokens.request();
-            Response response = builder.accept(MediaType.APPLICATION_XML).header("X-Auth-Token", credential[0]).get();
+                WebTarget webResource = getClient().target(oSAuthToken.getKeystoneURL());
+                PaasManagerUser user;
+                if (OpenStackKeystoneV3.VERSION.equals(openStackAccess.getOpenStackKeystone().getVersion())) {
+                    Invocation.Builder builder = webResource.request();
 
-            if (response.getStatus() == 200) {
-                // Validate user's token
-                return validateUserToken(token, tenantId, response.readEntity(AuthenticateResponse.class));
-            } else {
+                    response = builder.accept(MediaType.APPLICATION_JSON)
+                            .header("X-Auth-Token", openStackAccess.getToken()).header("X-Subject-Token", token).get();
 
-                log.warn("response status:" + response.getStatus());
+                } else {
+                    // v2
+                    webResource = webResource.path(token);
+                    Invocation.Builder builder = webResource.request();
 
-                if (response.getStatus() == CODE_401) {
-                    // create new admin token
-                    configureOpenStackAuthenticationToken(keystoneURL, adminUser, adminPass, adminTenant,
-                            thresholdString, httpClient);
-                    String[] newCredentials = oSAuthToken.getCredentials();
-                    // try validateUserToken
-                    WebTarget webResource2 = client.target(keystoneURL);
-                    return validateUserToken(
-                            token,
-                            tenantId,
-                            webResource2.path("tokens").path(token).request(MediaType.APPLICATION_XML)
-                                    .header("X-Auth-Token", newCredentials[0]).get(AuthenticateResponse.class));
+                    response = builder.accept(MediaType.APPLICATION_JSON)
+                            .header("X-Auth-Token", openStackAccess.getToken()).get();
 
-                } else if ((response.getStatus() == CODE_403) || (response.getStatus() == CODE_404)) {
-                    throw new BadCredentialsException("Token not valid");
                 }
+                String[] values = openStackAccess.getOpenStackKeystone().checkToken(token, tenantId, response);
+                String responseUserName = values[0];
+                String responseTenantName = values[1];
 
-                throw new AuthenticationServiceException("Token not valid");
+                user = new PaasManagerUser(responseUserName, token);
+                user.setTenantId(tenantId);
+                user.setTenantName(responseTenantName);
+
+                log.info("generated new token for tenantId:" + tenantId + ": " + token);
+                tokenCache.put(token + "-" + tenantId, user);
+
+                return user;
+
+            } else {
+                return paasManagerUser;
             }
         } catch (Exception e) {
+            log.warn("Exception in authentication: " + e);
             throw new AuthenticationServiceException("Unknown problem", e);
-        }
-    }
-
-    /**
-     * Connect to keystone and validate user token using admin token.
-     * 
-     * @param token
-     * @param tenantId
-     * @param authenticateResponse
-     * @return
-     */
-    private PaasManagerUser validateUserToken(String token, String tenantId, AuthenticateResponse authenticateResponse) {
-
-        AuthenticateResponse responseAuth = authenticateResponse;
-
-        if (!tenantId.equals(responseAuth.getToken().getTenant().getId())) {
-            throw new AuthenticationServiceException("Token " + responseAuth.getToken().getTenant().getId()
-                    + " not valid for the tenantId provided:" + tenantId);
-        }
-
-        Set<GrantedAuthority> authsSet = new HashSet<GrantedAuthority>();
-
-        if (responseAuth.getUser().getRoles() != null) {
-            for (Role role : responseAuth.getUser().getRoles().getRole()) {
-                authsSet.add(new GrantedAuthorityImpl(role.getName()));
+        } finally {
+            if (response != null) {
+                response.close();
             }
         }
-
-        PaasManagerUser user = new PaasManagerUser(responseAuth.getUser().getOtherAttributes()
-                .get(new QName("username")), token, authsSet);
-
-        user.setTenantId(tenantId);
-        user.setTenantName(responseAuth.getToken().getTenant().getName());
-        user.setToken(token);
-        return user;
     }
 
-    private void configureOpenStackAuthenticationToken(String keystoneURL, String adminUser, String adminPass,
-            String adminTenant, String thresholdString, DefaultHttpClient httpClient) {
-        ArrayList<Object> params = new ArrayList();
+    private OpenStackAccess generateOpenStackAuthenticationToken() {
+        OpenStackAccess openStackAccess;
 
-        Long threshold = Long.parseLong(thresholdString);
+        openStackAccess = tokenCache.getAdmin();
 
-        params.add(keystoneURL);
-        params.add(adminTenant);
-        params.add(adminUser);
-        params.add(adminPass);
-        params.add(httpClient);
-        params.add(threshold);
+        if (openStackAccess == null) {
+            Client client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+            if (oSAuthToken == null) {
 
-        if (oSAuthToken == null) {
-            oSAuthToken = new OpenStackAuthenticationToken(params);
-        } else {
-            oSAuthToken.initialize(params);
+                String url = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
+
+                String user = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
+
+                String pass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
+
+                String tenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
+                oSAuthToken = new OpenStackAuthenticationToken(url, user, pass, tenant);
+            }
+
+            openStackAccess = oSAuthToken.getAdminCredentials(client);
+            tokenCache.putAdmin(openStackAccess);
         }
+        return openStackAccess;
+
     }
 
     /**
@@ -273,34 +219,28 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
     }
 
     /*
-     * (non-Javadoc) @seeorg.springframework.security.authentication.dao.
-     * AbstractUserDetailsAuthenticationProvider #retrieveUser(java.lang.String,
-     * org
-     * .springframework.security.authentication.UsernamePasswordAuthenticationToken
+     * (non-Javadoc) @seeorg.springframework.security.authentication.dao. AbstractUserDetailsAuthenticationProvider
+     * #retrieveUser(java.lang.String, org .springframework.security.authentication.UsernamePasswordAuthenticationToken
      * )
      */
     @Override
     protected final UserDetails retrieveUser(final String username,
             final UsernamePasswordAuthenticationToken authentication) {
-        String system = systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM);
-
-        PaasManagerUser user = null;
 
         if (null != authentication.getCredentials()) {
             String tenantId = authentication.getCredentials().toString();
 
-            if (SYSTEM_FIWARE.equals(system)) {
-                user = authenticationFiware(username, tenantId);
-            } else if (SYSTEM_FASTTRACK.equals(system)) {
-                user = authenticationFastTrack(username, tenantId);
-            }
+            PaasManagerUser paasManagerUser = authenticationFiware(username, tenantId);
+
+            UserDetails userDetails = new User(paasManagerUser.getUserName(), paasManagerUser.getToken(),
+                    new HashSet<GrantedAuthority>());
+            return userDetails;
         } else {
             String str = "Missing tenantId header";
             log.info(str);
             throw new BadCredentialsException(str);
         }
 
-        return user;
     }
 
     /**
@@ -317,11 +257,12 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
         this.client = client;
     }
 
-    /**
-     * Getter the oSAuthToken.
-     */
-    public OpenStackAuthenticationToken getoSAuthToken() {
-        return oSAuthToken;
+    public Client getClient() {
+
+        if (this.client == null) {
+            this.client = PoolHttpClient.getInstance(httpConnectionManager).getClient();
+        }
+        return this.client;
     }
 
     /**
@@ -329,6 +270,42 @@ public class OpenStackAuthenticationProvider extends AbstractUserDetailsAuthenti
      */
     public void setoSAuthToken(OpenStackAuthenticationToken oSAuthToken) {
         this.oSAuthToken = oSAuthToken;
+    }
+
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
+    }
+
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
+    }
+
+    /**
+     * reset cache
+     */
+    public Cache getTokenCache() {
+        return tokenCache.getCache();
+    }
+
+    /**
+     * Add PaasManagerUser to claudiaData.
+     * 
+     * @param claudiaData
+     */
+    public static void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
+
+        PaasManagerUser paasManagerUser = new PaasManagerUser("unknown", "unknown");
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder
+                    .getContext().getAuthentication();
+            if (usernamePasswordAuthenticationToken != null) {
+                paasManagerUser.setToken(usernamePasswordAuthenticationToken.getPrincipal().toString());
+                paasManagerUser.setTenantId(usernamePasswordAuthenticationToken.getCredentials().toString());
+
+            }
+        }
+        claudiaData.setUser(paasManagerUser);
+
     }
 
 }

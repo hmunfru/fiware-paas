@@ -47,6 +47,7 @@ public class TierInstanceDto {
     private TierDto tierDto;
     private Set<Attribute> attributes;
     private int replicaNumber;
+    private String securityGroup = "";
     private List<ProductInstanceDto> productInstanceDtos;
     private VMDto vm;
 
@@ -104,6 +105,15 @@ public class TierInstanceDto {
         return tierInstanceName;
     }
 
+    /**
+     * Get the security group.
+     *
+     * @return
+     */
+    public String getSecurityGroup() {
+        return this.securityGroup;
+    }
+    
     public void setAttributes(Set<Attribute> attributes) {
         this.attributes = attributes;
     }
@@ -129,6 +139,14 @@ public class TierInstanceDto {
     }
 
     /**
+     * @param securityGroup the securityGroup to set
+     */
+    public void setSecurityGroup(String securityGroup) {
+        this.securityGroup = securityGroup;
+
+    }
+    
+    /**
      * Constructs a <code>String</code> with all attributes
      * in name = value format.
      *
@@ -141,6 +159,7 @@ public class TierInstanceDto {
         sb.append("[tierDto = ").append(this.tierDto).append("]");
         sb.append("[attributes = ").append(this.attributes).append("]");
         sb.append("[replicaNumber = ").append(this.replicaNumber).append("]");
+        sb.append("[securityGroup = ").append(this.securityGroup).append("]");
         sb.append("[productInstanceDtos = ").append(this.productInstanceDtos).append("]");
         sb.append("[vm = ").append(this.vm).append("]");
         sb.append("]");

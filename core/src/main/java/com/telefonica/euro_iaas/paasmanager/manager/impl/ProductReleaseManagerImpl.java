@@ -29,9 +29,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
+import com.telefonica.euro_iaas.paasmanager.dao.MetadataDao;
+import com.telefonica.euro_iaas.paasmanager.dao.AttributeDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.dao.sdc.ProductReleaseSdcDao;
 import com.telefonica.euro_iaas.paasmanager.exception.SdcException;
@@ -48,6 +50,8 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
 
     private ProductReleaseDao productReleaseDao;
     private ProductReleaseSdcDao productReleaseSdcDao;
+    private MetadataDao metadataDao; 
+    private AttributeDao attributeDao;
     private static Logger log = LoggerFactory.getLogger(ProductReleaseManagerImpl.class);
 
     /*
@@ -106,47 +110,48 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
             ProductRelease pRelease = productReleaseSdcDao.load(product, version, data);
             try {
                 productRelease = productReleaseDao.load(name);
-                productRelease = productReleaseDao.update(productRelease);
-
-                boolean isNew;
+               
                 for (Attribute attribute : pRelease.getAttributes()) {
-                    isNew = false;
                     Attribute newAttribute = productRelease.getAttribute(attribute.getKey());
                     if (newAttribute == null) {
                         newAttribute = new Attribute();
-                        isNew = true;
-                    }
-                    newAttribute.setKey(attribute.getKey());
-                    newAttribute.setValue(attribute.getValue());
-                    newAttribute.setDescription(attribute.getDescription());
-                    if (isNew) {
+                        newAttribute.setKey(attribute.getKey());
+                        newAttribute.setValue(attribute.getValue());
+                        newAttribute.setDescription(attribute.getDescription());
+                        newAttribute.setType(attribute.getType());
+                        newAttribute = attributeDao.create(newAttribute);
                         productRelease.addAttribute(newAttribute);
                     }
                 }
 
                 for (Metadata metadata : pRelease.getMetadatas()) {
-                    isNew = false;
                     Metadata newMetadata = productRelease.getMetadata(metadata.getKey());
                     if (newMetadata == null) {
                         newMetadata = new Metadata();
-                        isNew = true;
-                    }
-                    newMetadata.setKey(metadata.getKey());
-                    newMetadata.setValue(metadata.getValue());
-                    newMetadata.setDescription(metadata.getDescription());
-                    if (isNew) {
-                        productRelease.addMetadata(newMetadata);
+                        newMetadata.setKey(metadata.getKey());
+                        newMetadata.setValue(metadata.getValue());
+                        newMetadata.setDescription(metadata.getDescription());
+                       	newMetadata = metadataDao.create(newMetadata);
+
+                       	productRelease.addMetadata(newMetadata);
+                        productReleaseDao.update(productRelease);
+                    } else {
+                    	//if metadata Value has been modified in SDC
+                    	if (!(newMetadata.getValue().equals(metadata.getValue()))) {
+                            newMetadata.setValue(metadata.getValue());
+                            newMetadata = metadataDao.update(newMetadata);
+                            
+                            productRelease.addMetadata(newMetadata);
+                            productRelease.deleteMetadata(metadata);
+                    	}
                     }
                 }
-
-                productReleaseDao.update(productRelease);
             } catch (Exception ex) {
                 log.info("Product don't exist in database: creates");
                 productRelease = create(pRelease);
             }
-
         } catch (EntityNotFoundException e5) {
-            String msg = "Product release don't found in SDC: " + name;
+            String msg = "Product release NOT found in SDC: " + name;
             log.warn(msg);
             throw new EntityNotFoundException(ProductRelease.class, msg, name);
         } catch (SdcException e6) {
@@ -220,5 +225,21 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
     public void setProductReleaseSdcDao(ProductReleaseSdcDao productReleaseSdcDao) {
         this.productReleaseSdcDao = productReleaseSdcDao;
     }
+    
+    /**
+     * @param metadataDao
+     *            the metadataDao to set
+     */
+    public void setMetadataDao(MetadataDao metadataDao) {
+        this.metadataDao = metadataDao;
+    }
+    /**
+     * @param attributeDao
+     *            the attributeDao to set
+     */
+    public void setAttributeDao(AttributeDao attributeDao) {
+        this.attributeDao = attributeDao;
+    }
+
 
 }

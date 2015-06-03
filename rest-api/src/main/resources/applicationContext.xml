@@ -4,7 +4,6 @@
 
     <import resource="classpath:/spring-db-config.xml"/>
     <import resource="classpath:/spring-dao-config.xml"/>
-    <import resource="classpath:/spring-dao-keystone-config.xml"/>
     <import resource="classpath:/spring-dao-sdc-config.xml"/>
     <import resource="classpath:/spring-async-model-config.xml"/>
     <import resource="classpath:/spring-model-config.xml"/>

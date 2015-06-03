@@ -33,10 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -45,42 +42,24 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.GrantedAuthority;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 
 public class OpenStackUtilImplTest {
 
     private OpenStackUtilImplTestable openStackUtil;
     private OpenStackConfigUtil openStackConfig;
-    private SystemPropertiesProvider systemPropertiesProvider;
     private CloseableHttpClient closeableHttpClientMock;
-    private StatusLine statusLine;
     private CloseableHttpResponse httpResponse;
     private PaasManagerUser paasManagerUser;
     private OpenOperationUtil openOperationUtil;
 
     private OpenStackRegion openStackRegion;
-    final int TWICE = 2;
-    final int SEVEN_TIMES = 7;
-    final int FOUR_TIMES = 4;
-    private static int http_code_accepted = 202;
-    /**
-     * HTTP code for accepted requests.
-     */
-    private static int http_code_ok = 200;
-    /**
-     * HTTP code for created requests.
-     */
-    private static int http_code_created = 201;
-    /**
-     * HTTP code for no content response.
-     */
-    private static int http_code_deleted = 204;
 
     String CONTENT_NETWORKS = "{ " + "\"networks\": [ " + "{ " + "\"status\": \"ACTIVE\", " + "\"subnets\": [ "
             + "\"81f10269-e0a2-46b0-9583-2c83aa4cc76f\" " + " ], " + "\"name\": \"jesuspg-net\", "
@@ -102,30 +81,21 @@ public class OpenStackUtilImplTest {
     @Before
     public void setUp() throws OpenStackException, ClientProtocolException, IOException {
         openStackUtil = new OpenStackUtilImplTestable();
-        systemPropertiesProvider = mock(SystemPropertiesProvider.class);
         openStackConfig = mock(OpenStackConfigUtil.class);
         openStackUtil.setOpenStackConfigUtil(openStackConfig);
-        GrantedAuthority grantedAuthority = mock(GrantedAuthority.class);
-        Collection<GrantedAuthority> authorities = new HashSet();
-        authorities.add(grantedAuthority);
-        paasManagerUser = new PaasManagerUser("user", "aa", authorities);
+        paasManagerUser = new PaasManagerUser("user", "aa");
         paasManagerUser.setToken("1234567891234567989");
         paasManagerUser.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
 
         HttpClientConnectionManager httpClientConnectionManager = mock(HttpClientConnectionManager.class);
-        openStackUtil.setConnectionManager(httpClientConnectionManager);
+        openStackUtil.setHttpConnectionManager(httpClientConnectionManager);
 
         httpResponse = mock(CloseableHttpResponse.class);
-        statusLine = mock(StatusLine.class);
         openOperationUtil = mock(OpenOperationUtil.class);
         closeableHttpClientMock = mock(CloseableHttpClient.class);
         openStackRegion = mock(OpenStackRegion.class);
         openStackUtil.setOpenStackRegion(openStackRegion);
         openStackUtil.setOpenOperationUtil(openOperationUtil);
-
-        String responseJSON = "{\"access\": {\"token\": {\"issued_at\": \"2014-01-13T14:00:10.103025\", \"expires\": \"2014-01-14T14:00:09Z\","
-                + "\"id\": \"ec3ecab46f0c4830ad2a5837fd0ad0d7\", \"tenant\": { \"description\": null, \"enabled\": true, \"id\": \"08bed031f6c54c9d9b35b42aa06b51c0\","
-                + "\"name\": \"admin\" } },         \"serviceCatalog\": []}}}";
 
         HttpPost httpPost = mock(HttpPost.class);
 
@@ -142,9 +112,12 @@ public class OpenStackUtilImplTest {
 
     @Test
     public void shouldGetAbsoluteLimitsWithResponse204() throws OpenStackException, IOException {
-
+        // Given
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
         // when
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
 
         String response = openStackUtil.getAbsoluteLimits(paasManagerUser, "region");
@@ -212,12 +185,15 @@ public class OpenStackUtilImplTest {
         net.addSubNet(subNet);
         RouterInstance router = new RouterInstance();
 
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
         when(openStackConfig.getPublicAdminNetwork(any(PaasManagerUser.class), anyString())).thenReturn("NETWORK");
         when(openStackConfig.getPublicRouter(any(PaasManagerUser.class), anyString(), anyString()))
                 .thenReturn("router");
-
+        // When
         String response = openStackUtil.addInterfaceToPublicRouter(paasManagerUser, net, "token");
 
         // then
@@ -237,14 +213,18 @@ public class OpenStackUtilImplTest {
         SubNetworkInstance subNet = new SubNetworkInstance("SUBNET", "vdc", "region", "CIDR");
         net.addSubNet(subNet);
         String region = "RegionOne";
-        RouterInstance router = new RouterInstance();
 
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn(ROUTERS);
         when(openStackConfig.getPublicAdminNetwork(any(PaasManagerUser.class), anyString())).thenReturn("NETWORK");
         when(openStackConfig.getPublicRouter(any(PaasManagerUser.class), anyString(), anyString()))
                 .thenReturn("router");
 
+        // when
         String response = openStackUtil.deleteInterfaceToPublicRouter(paasManagerUser, net, region);
 
         // then
@@ -302,9 +282,37 @@ public class OpenStackUtilImplTest {
     @Test
     public void shouldListNetworks() throws OpenStackException, IOException {
 
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        // Given
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
         when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
+        // when
         String response = openStackUtil.listNetworks(paasManagerUser, "region");
+
+        // then
+        assertNotNull(response);
+    }
+
+    /**
+     * it lists the subnets.
+     * 
+     * @throws OpenStackException
+     * @throws IOException
+     */
+    @Test
+    public void shouldListSubNetworks() throws OpenStackException, IOException {
+        // given
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
+
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
+        // when
+        String response = openStackUtil.listSubNetworks(paasManagerUser, "region");
 
         // then
         assertNotNull(response);
@@ -319,9 +327,13 @@ public class OpenStackUtilImplTest {
     @Test
     public void shouldListPorts() throws OpenStackException, IOException {
         // given
-        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
-        when(openOperationUtil.getAdminUser(any(PaasManagerUser.class))).thenReturn(paasManagerUser);
+        OpenStackAccess openStackAccess = new OpenStackAccess();
+        openStackAccess.setToken("1234567891234567989");
+        openStackAccess.setTenantId("08bed031f6c54c9d9b35b42aa06b51c0");
 
+        when(openStackRegion.getTokenAdmin()).thenReturn(openStackAccess);
+        when(openOperationUtil.executeNovaRequest(any(HttpUriRequest.class))).thenReturn("ok");
+        // when
         String response = openStackUtil.listPorts(paasManagerUser, "region");
 
         // then
@@ -330,7 +342,7 @@ public class OpenStackUtilImplTest {
     }
 
     @Test(expected = OpenStackException.class)
-    public void testShouldDeployVMError() throws OpenStackException, ClientProtocolException, IOException {
+    public void testShouldDeployVMError() throws OpenStackException, IOException {
         // given
         String payload = "";
         String content = "<badRequest code=\"400\" xmlns=\"http://docs.openstack.org/compute/api/v1.1\">"

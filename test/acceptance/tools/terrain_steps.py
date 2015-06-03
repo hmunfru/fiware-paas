@@ -39,6 +39,7 @@ def init_products_in_sdc():
     world.product_sdc_request.create_product_and_release("git", "1.7")
     world.product_sdc_request.create_product_and_release("mediawiki", "1.17.0")
     world.product_sdc_request.create_product_and_release("testing_paas_product", "0.0.1")
+    world.product_sdc_request.create_product_and_release("testing_paas_product_02", "0.0.1")
 
 
 def remove_testing_products_in_sdc():

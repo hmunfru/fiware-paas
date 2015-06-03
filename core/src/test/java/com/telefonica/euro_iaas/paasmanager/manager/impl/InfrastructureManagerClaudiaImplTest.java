@@ -44,7 +44,7 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.ClaudiaClient;
 import com.telefonica.euro_iaas.paasmanager.dao.EnvironmentInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
@@ -58,7 +58,7 @@ import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.Tier;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.ClaudiaResponseAnalyser;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -268,7 +268,7 @@ public class InfrastructureManagerClaudiaImplTest {
                 .thenReturn(tier);
 
         Mockito.doThrow(EntityNotFoundException.class).when(networkInstanceManager)
-                .load(any(String.class), any(String.class), any(String.class));
+                .load(any(String.class), any(ClaudiaData.class), any(String.class));
 
         manager.deployNetworks(claudiaData, tierInstance);
 
@@ -293,7 +293,7 @@ public class InfrastructureManagerClaudiaImplTest {
                 .thenReturn(net.toNetworkInstance());
         when(networkManager.load(any(String.class), any(String.class), any(String.class))).thenReturn(net);
         Mockito.doThrow(EntityNotFoundException.class).when(networkInstanceManager)
-                .load(any(String.class), any(String.class), any(String.class));
+                .load(any(String.class), any(ClaudiaData.class), any(String.class));
 
         manager.deployNetworks(claudiaData, tierInstance);
 
@@ -322,7 +322,7 @@ public class InfrastructureManagerClaudiaImplTest {
                 .thenReturn(net.toNetworkInstance());
 
         Mockito.doThrow(EntityNotFoundException.class).when(networkInstanceManager)
-                .load(any(String.class), any(String.class), any(String.class));
+                .load(any(String.class), any(ClaudiaData.class), any(String.class));
 
         manager.deleteNetworksInTierInstance(claudiaData, tierInstance);
 

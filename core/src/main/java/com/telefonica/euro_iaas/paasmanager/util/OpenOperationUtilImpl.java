@@ -28,19 +28,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -50,18 +41,10 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 
 /**
  * @author jesus.movilla
@@ -73,10 +56,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
      */
 
     private static Logger log = LoggerFactory.getLogger(OpenOperationUtilImpl.class);
-    /**
-     * the properties configuration.
-     */
-    private SystemPropertiesProvider systemPropertiesProvider;
+
     /**
      * HTTP code for accepted requests.
      */
@@ -94,21 +74,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
      */
     private static int http_code_deleted = 204;
 
-    /**
-     * authToken to be used.
-     */
-    private String authToken;
-    /**
-     * tenant to be used.
-     */
-    private String tenant;
-
-    /**
-     * user to be used.
-     */
-    private String user;
-
-    private HttpClientConnectionManager connectionManager;
+    private HttpClientConnectionManager httpConnectionManager;
 
     private OpenStackRegion openStackRegion;
 
@@ -116,15 +82,14 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
      * The constructor.
      */
     public OpenOperationUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
     }
 
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
 
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
     /**
@@ -169,138 +134,6 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
     }
 
     /**
-     * It obtains the credentials to invoke as a admin user.
-     * 
-     * @return
-     * @throws OpenStackException
-     */
-    public PaasManagerUser getAdminUser(PaasManagerUser user) throws OpenStackException {
-        HttpPost postRequest = createKeystonePostRequest();
-        ArrayList<Object> response = executePostRequest(postRequest);
-        return extractData(response, user);
-    }
-
-    /**
-     * It obtains the request for invoking Openstack keystone with admin credentials.
-     * 
-     * @return
-     * @throws OpenStackException
-     */
-    public HttpPost createKeystonePostRequest() throws OpenStackException {
-        // curl -d '{"auth": {"tenantName": "demo", "passwordCredentials":
-        // {"username": "admin", "password": "temporal"}}}'
-        // -H "Content-type: application/json"
-        // -H "Accept: application/xml"�
-        // http://10.95.171.115:35357/v2.0/tokens
-
-        String keystoneURL = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_URL);
-        String adminUser = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_USER);
-        String adminPass = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_PASS);
-        String adminTenant = systemPropertiesProvider.getProperty(SystemPropertiesProvider.KEYSTONE_TENANT);
-
-        HttpEntity entity = null;
-        HttpPost postRequest = new HttpPost(keystoneURL + "tokens");
-        postRequest.setHeader("Content-Type", "application/json");
-        postRequest.setHeader("Accept", "application/xml");
-
-        String msg = "{\"auth\": {\"tenantName\": \"" + adminTenant + "\", \""
-                + "passwordCredentials\":{\"username\": \"" + adminUser + "\"," + " \"password\": \"" + adminPass
-                + "\"}}}";
-
-        try {
-            entity = new StringEntity(msg);
-        } catch (UnsupportedEncodingException ex) {
-            log.error("Unsupported encoding exception");
-            throw new OpenStackException("Unsupported encoding exception " + ex.getMessage());
-        }
-        postRequest.setEntity(entity);
-        return postRequest;
-    }
-
-    public ArrayList<Object> executePostRequest(HttpPost postRequest) throws OpenStackException {
-        HttpResponse response;
-        CloseableHttpClient httpClient = getHttpClient();
-        ArrayList<Object> message = new ArrayList();
-
-        Date localDate = null;
-        String aux;
-        try {
-            response = httpClient.execute(postRequest);
-            localDate = new Date();
-            if ((response.getStatusLine().getStatusCode() != 201) && (response.getStatusLine().getStatusCode() != 200)) {
-                log.error("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-                throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-            }
-            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-            String temp = "";
-
-            while ((aux = br.readLine()) != null) {
-                temp += aux;
-            }
-
-            message.add(temp);
-
-            String aux1 = response.getHeaders("Date")[0].getValue();
-            log.info("Date recibido: " + aux1);
-            message.add(response.getHeaders("Date")[0].getValue());
-            HttpEntity ent = response.getEntity();
-            if (ent != null) {
-                EntityUtils.consume(ent);
-            }
-
-        } catch (ClientProtocolException ex) {
-            log.error("Client protocol exception");
-            throw new OpenStackException("Client protocol exception " + ex.getMessage());
-        } catch (IOException ex) {
-            log.error("I/O exception of some sort has occurred");
-            throw new OpenStackException("I/O exception of some sort has occurred " + ex.getMessage());
-        }
-        return message;
-    }
-
-    protected PaasManagerUser extractData(ArrayList<Object> response, PaasManagerUser user) {
-        String payload = (String) response.get(0);
-
-        int i = payload.indexOf("token");
-        int j = payload.indexOf(">", i);
-        String token = payload.substring(i - 1, j + 1);
-        String tenantId = "";
-
-        // token = "<token expires=\"2012-11-13T15:01:51Z\" id=\"783bec9d7d734f1e943986485a90966d\">";
-        // Regular Expression <\s*token\s*(issued_at=\".*?\"\s*)?expires=\"(.*?)(\"\s*id=\")(.*)\"\/*>
-        // as a Java string "<\\s*token\\s*(issued_at=\\\".*?\\\"\\s*)?expires=\\\"(.*?)(\\\"\\s*id=\\\")(.*)\\\"\\/*>"
-        String pattern1 = "<\\s*token\\s*(issued_at=\\\".*?\\\"\\s*)?expires=\\\"(.*?)(\\\"\\s*id=\\\")(.*)\\\"\\/*>";
-
-        if (token.matches(pattern1)) {
-
-            token = token.replaceAll(pattern1, "$4");
-            log.info("token id: " + token);
-        } else {
-            log.error("Token format unknown: " + token);
-
-            throw new RuntimeException("Token format unknown:\n " + token);
-        }
-
-        i = payload.indexOf("tenant");
-        j = payload.indexOf(">", i);
-        tenantId = payload.substring(i - 1, j + 1);
-
-        // Regular Expression (<\s*tenant\s*.*)("\s*id=")(.*?)("\s*.*/*>)
-        // as a Java string "(<\\s*tenant\\s*.*)(\"\\s*id=\")(.*?)(\"\\s*.*/*>)"
-        pattern1 = "(<\\s*tenant\\s*.*)(\"\\s*id=\")(.*?)(\"\\s*.*/*>)";
-
-        if (tenantId.matches(pattern1)) {
-            tenantId = tenantId.replaceAll(pattern1, "$3");
-        } else {
-            log.error("Tenant format unknown:\n " + tenantId);
-
-            throw new RuntimeException("Tenant format unknown:\n " + tenantId);
-        }
-        PaasManagerUser user2 = new PaasManagerUser(tenantId, token, user.getAuthorities());
-        return user2;
-    }
-
-    /**
      * Returns a request for a NOVA DELETE petition.
      * 
      * @param resource
@@ -317,7 +150,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
         log.debug("novaUrl" + novaUrl);
         request = new HttpDelete(novaUrl + vdc + "/" + resource);
 
@@ -344,7 +177,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
         request = new HttpGet(novaUrl + vdc + "/" + resource);
 
         // request.setHeader(OpenStackConstants.CONTENT_TYPE,
@@ -377,7 +210,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String novaUrl = openStackRegion.getNovaEndPoint(region, token);
+        String novaUrl = openStackRegion.getNovaEndPoint(region);
 
         request = new HttpPost(novaUrl + vdc + "/" + resource);
 
@@ -420,7 +253,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
 
         String quantumUrl = null;
-        quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpDelete(quantumUrl + resource);
 
         // request.setHeader(OpenStackConstants.CONTENT_TYPE, OpenStackConstants.APPLICATION_JSON);
@@ -448,8 +281,8 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         } catch (OpenStackException ex) {
             java.util.logging.Logger.getLogger(OpenOperationUtilImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
-        log.debug ("quantumUrl for region " + region + " " + quantumUrl);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
+        log.debug("quantumUrl for region " + region + " " + quantumUrl);
         request = new HttpGet(quantumUrl + resource);
 
         request.setHeader(ACCEPT, accept);
@@ -479,7 +312,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpPost(quantumUrl + resource);
 
         try {
@@ -523,7 +356,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
         }
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getQuantumEndPoint(region, token);
+        String quantumUrl = openStackRegion.getQuantumEndPoint(region);
         request = new HttpPut(quantumUrl + resource);
 
         try {
@@ -621,85 +454,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
     }
 
     protected CloseableHttpClient getHttpClient() {
-        return HttpClients.custom().setConnectionManager(connectionManager).build();
-    }
-
-    /**
-     * Obtains the attribute value from a node.
-     * 
-     * @param node
-     * @param attribute
-     * @return
-     */
-    private String findAttributeValueInNode(Node node, String attribute) {
-        return node.getAttributes().getNamedItem(attribute).getTextContent();
-    }
-
-    /*
-     * Obtains the list of nodes whose tag is nodeListTag
-     */
-    private NodeList findNodeList(String xmlDoc, String nodeListTag) throws OpenStackException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder;
-        Document doc;
-        NodeList nodeList = null;
-
-        try {
-            builder = factory.newDocumentBuilder();
-            doc = builder.parse(new InputSource(new StringReader(xmlDoc)));
-
-            nodeList = doc.getElementsByTagName(nodeListTag);
-
-        } catch (SAXException e) {
-            String errorMessage = "SAXException when obtaining nodeList." + " Desc: " + e.getMessage();
-            log.warn(errorMessage);
-            throw new OpenStackException(errorMessage);
-        } catch (ParserConfigurationException e) {
-            String errorMessage = "ParserConfigurationException when obtaining " + "NodelIst. Desc: " + e.getMessage();
-            log.warn(errorMessage);
-            throw new OpenStackException(errorMessage);
-        } catch (IOException e) {
-            String errorMessage = "IOException when obtaining " + "NodeList. Desc: " + e.getMessage();
-            log.warn(errorMessage);
-            throw new OpenStackException(errorMessage);
-        } catch (Exception e) {
-            String errorMessage = "Unexpected exception : " + e.getMessage();
-            log.warn(errorMessage);
-            throw new OpenStackException(errorMessage);
-        }
-        return nodeList;
-    }
-
-    /**
-     * Return a string with absolute limits values by tenantId.
-     * 
-     * <pre>
-     * GET http://host:port/v2/tenantId/limits
-     * Accept: application/json
-     * X-Auth-Token: ea90309ce14b4da490fe035c618515db
-     * </pre>
-     */
-    public String getAbsoluteLimits(PaasManagerUser user, String region) throws OpenStackException {
-        PaasManagerUser user2 = this.getAdminUser(user);
-
-        log.debug("tenantid " + user.getTenantId());
-        log.debug("token " + user2.getToken());
-        log.debug("user name " + user2.getUserName());
-
-        HttpUriRequest request = createNovaGetRequest("limits", APPLICATION_JSON, region, user.getToken(),
-                user.getTenantId());
-
-        String response = executeNovaRequest(request);
-
-        return response;
-    }
-
-    /**
-     * @param systemPropertiesProvider
-     *            the systemPropertiesProvider to set
-     */
-    public void setSystemPropertiesProvider(SystemPropertiesProvider systemPropertiesProvider) {
-        this.systemPropertiesProvider = systemPropertiesProvider;
+        return HttpClients.custom().setConnectionManager(httpConnectionManager).build();
     }
 
     public OpenStackRegion getOpenStackRegion() {
@@ -717,7 +472,7 @@ public class OpenOperationUtilImpl implements OpenOperationUtil {
 
         log.info("Payload " + payload);
 
-        String quantumUrl = openStackRegion.getFederatedQuantumEndPoint(token);
+        String quantumUrl = openStackRegion.getFederatedQuantumEndPoint();
         request = new HttpPost(quantumUrl + resource);
 
         try {

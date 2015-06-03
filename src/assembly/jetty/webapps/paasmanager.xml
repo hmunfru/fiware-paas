@@ -18,12 +18,15 @@
         <Arg>jdbc/paasmanager</Arg>
         <Arg>
 
-            <New class="org.postgresql.ds.PGSimpleDataSource">
+            <New class="org.postgresql.ds.PGPoolingDataSource">
                 <Set name="User">user</Set>
                 <Set name="Password">paas</Set>
                 <Set name="DatabaseName">name</Set>
                 <Set name="ServerName">host</Set>
                 <Set name="PortNumber">5432</Set>
+                <Set name="maxConnections">50</Set>
+                <Set name="initialConnections">20</Set>
+
             </New>
 
         </Arg>

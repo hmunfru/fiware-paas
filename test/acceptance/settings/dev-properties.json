@@ -1,0 +1,30 @@
+{
+    "environment": {
+        "name": "dev-havana",
+        "logs_path": "logs",
+        "test_files": "testreport/additional_output_files"
+    },
+    "paas": {
+        "keystone_url": "http://130.206.80.57:4731/v2.0",
+        "sdc_url": "https://130.206.81.126:8443/sdc/rest",
+        "paasmanager_url": "https://130.206.81.64:8443/paasmanager/rest",
+        "glance_url": "",
+        "nova_url": "http://130.206.80.58:8774/v2/******",
+        "vdc": "******",
+        "tenant": "******",
+        "user": "******",
+        "password": "******",
+        "tenant_alt": "******",
+        "vdc_alt": "******",
+        "user_alt": "******",
+        "password_alt": "******",
+        "tier_image": "6e2519b8-1b36-4669-b6fe-ed2e77815b9f",
+        "tier_num_min": "1",
+        "tier_num_max": "1",
+        "tier_num_initial": "1",
+        "tier_flavour": "2",
+        "tier_keypair": "default",
+        "tier_floatingip": "false",
+        "tier_region": "Trento"
+    }
+}

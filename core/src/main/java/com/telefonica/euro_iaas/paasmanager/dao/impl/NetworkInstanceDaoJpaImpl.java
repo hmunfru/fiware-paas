@@ -34,10 +34,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractBaseDao;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.AbstractBaseDao;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.NetworkInstanceDao;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
+import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 
 /**
  * @author Henar Munoz
@@ -71,11 +72,6 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
 
     }
 
-    /**
-     * (non-Javadoc)
-     * 
-     * @see com.telefonica.euro_iaas.paasmanager.dao.TierDao#findByTierId(java.lang .String)
-     */
     private NetworkInstance findByNetworkInstanceName(String name, String vdc, String region)
             throws EntityNotFoundException {
         Query query = getEntityManager().createQuery(
@@ -96,6 +92,35 @@ public class NetworkInstanceDaoJpaImpl extends AbstractBaseDao<NetworkInstance, 
             throw new EntityNotFoundException(NetworkInstance.class, "name", name);
         }
         return networkInstance;
+    }
+
+
+    /**
+     * It get the tier instance which have the concrete network.
+     * @param name: the network name
+     * @param vdc: the vdc
+     * @param region: the region
+     * @return
+     * @throws EntityNotFoundException
+     */
+    public List<TierInstance> findTierInstanceUsedByNetwork(String name, String vdc, String region)
+        throws EntityNotFoundException {
+        Query query = getEntityManager().createQuery(
+            "select tier from TierInstance tier join tier.networkInstances net where " +
+                "net.name = :name and net.vdc = :vdc and net.region = :region");
+        query.setParameter("name", name);
+        query.setParameter("vdc", vdc);
+        query.setParameter("region", region);
+        List<TierInstance> tierInstanceList = null;
+        try {
+            tierInstanceList = (List<TierInstance>) query.getResultList();
+        } catch (NoResultException e) {
+            String message = " No TierInstance found in the database with network Instance: " +
+                name + " vdc " + vdc + " region " + region + " Exception: " + e.getMessage();
+            log.debug(message);
+            throw new EntityNotFoundException(NetworkInstance.class, "name", name);
+        }
+        return tierInstanceList;
     }
 
 }

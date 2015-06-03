@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -43,13 +44,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 
 /**
@@ -109,10 +110,8 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
      * Creates an instance which will authenticate against the supplied.
      * 
      * @param pAuthenticationManager
-     *            the bean to submit authentication requests to
-     *            {@code AuthenticationManager} and which will ignore failed
-     *            authentication attempts, allowing the request to proceed down
-     *            the filter chain.
+     *            the bean to submit authentication requests to {@code AuthenticationManager} and which will ignore
+     *            failed authentication attempts, allowing the request to proceed down the filter chain.
      */
     public OpenStackAuthenticationFilter(final AuthenticationManager pAuthenticationManager) {
         this.authenticationManager = pAuthenticationManager;
@@ -134,9 +133,8 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
     }
 
     /**
-     * (non-Javadoc) @see
-     * javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-     * javax.servlet.ServletResponse, javax.servlet.FilterChain).
+     * (non-Javadoc) @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
+     * javax.servlet.FilterChain).
      */
     public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
             throws IOException, ServletException {
@@ -190,14 +188,24 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
                     logger.debug("Authentication success: " + authResult);
                 }
 
-                PaasManagerUser user = (PaasManagerUser) authResult.getPrincipal();
+                // check AUTH-TOKEN and VDC are the same
+                String uri = request.getRequestURI();
+                logger.debug("URI: " + uri);
+                if (uri.contains("vdc") && !uri.contains(tenantId)) {
+                    String str = "Bad credentials for requested VDC";
+                    logger.info(str);
+                    throw new AccessDeniedException(str);
+                }
+
+                UserDetails user = (UserDetails) authResult.getPrincipal();
 
                 logger.debug("User: " + user.getUsername());
-                logger.debug("Token: " + user.getToken());
-                logger.debug("Tenant: " + user.getTenantId());
-                logger.debug("TenantName - Org: " + user.getTenantName());
+                logger.debug("Token: " + user.getPassword());
+                if (authResult.isAuthenticated()) {
+                    SecurityContextHolder.getContext().setAuthentication(authRequest);
 
-                SecurityContextHolder.getContext().setAuthentication(authResult);
+                }
+
                 // SecurityContextHolder.setStrategyName("MODE_INHERITABLETHREADLOCAL");
 
                 rememberMeServices.loginSuccess(request, response, authResult);
@@ -221,6 +229,8 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
                 }
 
                 return;
+            } catch (AccessDeniedException ex) {
+                throw ex;
             } catch (Exception ex) {
                 SecurityContextHolder.clearContext();
 
@@ -376,24 +386,6 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
         this.rememberMeServices = pRememberMeServices;
     }
 
-    /*
-     * @Override public Authentication attemptAuthentication(HttpServletRequest
-     * request, HttpServletResponse response) throws AuthenticationException,
-     * IOException, ServletException { final String username =
-     * OPENSTACK_IDENTIFIER; String token =
-     * request.getHeader(OPENSTACK_HEADER_TOKEN); if (token == null) {
-     * logger.debug("Failed to obtain an artifact (openstack
-     * tocken)"); token = ""; } UsernamePasswordAuthenticationToken authRequest
-     * = new UsernamePasswordAuthenticationToken(username, token);
-     * authRequest.setDetails
-     * (authenticationDetailsSource.buildDetails(request)); Authentication
-     * authResult = getAuthenticationManager().authenticate(authRequest);
-     * SecurityContextHolder.getContext().setAuthentication(authResult); return
-     * authResult; }
-     * 
-     * @Override protected boolean requiresAuthentication(HttpServletRequest
-     * request, HttpServletResponse response) { return true; }
-     */
     /**
      * Gets the system properties provider.
      * 

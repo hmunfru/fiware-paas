@@ -163,9 +163,9 @@ public class EnvironmentInstance extends InstallableInstance {
             }
         }
         String securitygroup = "";
-        if (tier.getSecurityGroup() != null) {
+        /*if (tier.getSecurityGroup() != null) {
             securitygroup = tier.getSecurityGroup().getName();
-        }
+        }*/
         TierPDto tierPDto = new TierPDto(tier.getName(), tier.getMaximumNumberInstances(),
                 tier.getMinimumNumberInstances(), tier.getInitialNumberInstances(), productReleasedto,
                 tier.getFlavour(), tier.getImage(), tier.getIcono(), securitygroup, tier.getKeypair(),

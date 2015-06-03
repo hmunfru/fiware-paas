@@ -34,11 +34,15 @@ import mimetypes
 status_codes = {"OK": 200,
                 "No Content": 204,
                 "Bad Request": 400,
+                "Unauthorized": 401,
+                "Forbidden": 403,
                 "Not Found": 404,
                 "Conflict": 409,
+                "Not acceptable": 406,
+                "Unsupported media type": 415,
                 "Internal Server Error": 500}
 
-MAX_CHECK_TIMES_FOR_TASK_EXECUTION = 100
+MAX_CHECK_TIMES_FOR_TASK_EXECUTION = 200
 
 
 def post_multipart(host, port, selector, fields, files):

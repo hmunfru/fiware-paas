@@ -35,7 +35,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,11 +44,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
 import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
 import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 
 /**
  * @author jesus.movilla
@@ -67,7 +67,7 @@ public class OpenStackUtilImpl implements OpenStackUtil {
      */
     private String tenant;
 
-    private HttpClientConnectionManager connectionManager;
+    private HttpClientConnectionManager httpConnectionManager;
 
     private OpenStackRegion openStackRegion;
 
@@ -79,15 +79,14 @@ public class OpenStackUtilImpl implements OpenStackUtil {
      * The constructor.
      */
     public OpenStackUtilImpl() {
-        connectionManager = new PoolingHttpClientConnectionManager();
     }
 
-    public HttpClientConnectionManager getConnectionManager() {
-        return connectionManager;
+    public HttpClientConnectionManager getHttpConnectionManager() {
+        return httpConnectionManager;
     }
 
-    public void setConnectionManager(HttpClientConnectionManager connectionManager) {
-        this.connectionManager = connectionManager;
+    public void setHttpConnectionManager(HttpClientConnectionManager httpConnectionManager) {
+        this.httpConnectionManager = httpConnectionManager;
     }
 
     /**
@@ -133,11 +132,10 @@ public class OpenStackUtilImpl implements OpenStackUtil {
 
         String networkId = openStackConfigUtil.getPublicAdminNetwork(user, region);
         String idRouter = openStackConfigUtil.getPublicRouter(user, region, networkId);
-        PaasManagerUser adminUser = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
-        log.debug("tenantId " + adminUser.getTenantId());
-        log.debug("token " + adminUser.getToken());
-        log.debug("user name " + adminUser.getUserName());
+        log.debug("tenantId " + openStackAccess.getTenantId());
+        log.debug("token " + openStackAccess.getToken());
 
         log.debug("Adding an interface from network " + net.getNetworkName() + " to router " + idRouter);
         String response;
@@ -147,8 +145,8 @@ public class OpenStackUtilImpl implements OpenStackUtil {
             log.debug(payload);
 
             HttpUriRequest request = openOperationUtil.createQuantumPutRequest(RESOURCE_ROUTERS + "/" + idRouter + "/"
-                    + RESOURCE_ADD_INTERFACE, payload, APPLICATION_JSON, region, adminUser.getToken(),
-                    adminUser.getTenantId());
+                    + RESOURCE_ADD_INTERFACE, payload, APPLICATION_JSON, region, openStackAccess.getToken(),
+                    openStackAccess.getTenantId());
             response = openOperationUtil.executeNovaRequest(request);
 
         } catch (OpenStackException e) {
@@ -629,7 +627,7 @@ public class OpenStackUtilImpl implements OpenStackUtil {
     }
 
     protected CloseableHttpClient getHttpClient() {
-        return HttpClients.custom().setConnectionManager(connectionManager).build();
+        return HttpClients.custom().setConnectionManager(httpConnectionManager).build();
     }
 
     /**
@@ -970,11 +968,10 @@ public class OpenStackUtilImpl implements OpenStackUtil {
      * </pre>
      */
     public String getAbsoluteLimits(PaasManagerUser user, String region) throws OpenStackException {
-        PaasManagerUser user2 = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
         log.debug("tenantid " + user.getTenantId());
-        log.debug("token " + user2.getToken());
-        log.debug("user name " + user2.getUserName());
+        log.debug("token " + openStackAccess.getToken());
 
         HttpUriRequest request = openOperationUtil.createNovaGetRequest("limits", APPLICATION_JSON, region,
                 user.getToken(), user.getTenantId());
@@ -987,14 +984,13 @@ public class OpenStackUtilImpl implements OpenStackUtil {
     public String listNetworks(PaasManagerUser user, String region) throws OpenStackException {
         log.debug("List networks from user " + user.getUserName());
 
-        PaasManagerUser user2 = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
-        log.debug("tenantid " + user2.getTenantId());
-        log.debug("token " + user2.getToken());
-        log.debug("user name " + user2.getUserName());
+        log.debug("tenantid " + openStackAccess.getTenantId());
+        log.debug("token " + openStackAccess.getToken());
 
         HttpUriRequest request = openOperationUtil.createQuantumGetRequest(RESOURCE_NETWORKS, APPLICATION_JSON, region,
-                user2.getToken(), user2.getUserName());
+                openStackAccess.getToken(), user.getTenantId());
 
         String response = null;
 
@@ -1012,12 +1008,46 @@ public class OpenStackUtilImpl implements OpenStackUtil {
 
     }
 
+    /**
+     * It lists the subnets for the user in a concrete region.
+     * 
+     * @param user
+     *            : the user
+     * @param region
+     *            : the region
+     * @return
+     * @throws OpenStackException
+     */
+    public String listSubNetworks(PaasManagerUser user, String region) throws OpenStackException {
+        log.debug("List subnetworks from user " + user.getUserName());
+
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
+
+        HttpUriRequest request = openOperationUtil.createQuantumGetRequest(RESOURCE_SUBNETS, APPLICATION_JSON, region,
+                openStackAccess.getToken(), openStackAccess.getTenantId());
+
+        String response = null;
+
+        try {
+            response = openOperationUtil.executeNovaRequest(request);
+            log.debug("List network response");
+            log.debug(response);
+
+        } catch (Exception e) {
+            String errorMessage = "Error getting list of subnetworks " + "from OpenStack: " + e;
+            log.error(errorMessage);
+            throw new OpenStackException(errorMessage);
+        }
+        return response;
+
+    }
+
     public String listPorts(PaasManagerUser user, String region) throws OpenStackException {
         log.debug("List ports from user " + user.getUserName());
-        PaasManagerUser user2 = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
         HttpUriRequest request = openOperationUtil.createQuantumGetRequest(RESOURCE_PORTS, APPLICATION_JSON, region,
-                user2.getToken(), user2.getUserName());
+                openStackAccess.getToken(), openStackAccess.getTenantId());
 
         String response = null;
 
@@ -1038,11 +1068,10 @@ public class OpenStackUtilImpl implements OpenStackUtil {
         log.debug("Delete interface in public router");
         String networkId = openStackConfigUtil.getPublicAdminNetwork(user, region);
         String idRouter = openStackConfigUtil.getPublicRouter(user, region, networkId);
-        PaasManagerUser user2 = openOperationUtil.getAdminUser(user);
+        OpenStackAccess openStackAccess = openStackRegion.getTokenAdmin();
 
-        log.debug("tenantid " + user2.getTenantId());
-        log.debug("token " + user2.getToken());
-        log.debug("user name " + user2.getUserName());
+        log.debug("tenantid " + openStackAccess.getTenantId());
+        log.debug("token " + openStackAccess.getToken());
 
         log.debug("Deleting an interface from network " + net.getNetworkName() + " to router " + idRouter);
         String response = null;
@@ -1052,8 +1081,8 @@ public class OpenStackUtilImpl implements OpenStackUtil {
             log.debug(payload);
 
             HttpUriRequest request = openOperationUtil.createQuantumPutRequest(RESOURCE_ROUTERS + "/" + idRouter + "/"
-                    + RESOURCE_REMOVE_INTERFACE, payload, APPLICATION_JSON, region, user2.getToken(),
-                    user2.getTenantId());
+                    + RESOURCE_REMOVE_INTERFACE, payload, APPLICATION_JSON, region, openStackAccess.getToken(),
+                    openStackAccess.getTenantId());
             response = openOperationUtil.executeNovaRequest(request);
 
         } catch (OpenStackException e) {

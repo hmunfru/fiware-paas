@@ -27,16 +27,17 @@ package com.telefonica.euro_iaas.paasmanager.claudia.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.claudia.NetworkClient;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
-import com.telefonica.euro_iaas.paasmanager.exception.OpenStackException;
+import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Network;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
@@ -362,6 +363,55 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
     }
 
     /**
+     * It loads all the subnets.
+     * @param claudiaData
+     * @param region
+     * @return
+     * @throws InfrastructureException
+     */
+    public List<SubNetworkInstance> loadAllSubNetworks(ClaudiaData claudiaData,
+                                                      String region)
+        throws InfrastructureException {
+        String token = claudiaData.getUser().getToken();
+        String vdc = claudiaData.getVdc();
+        log.info("Get subnetworks for user "
+            + claudiaData.getUser().getTenantName()
+            + " with token " + token + " and vdc " + vdc);
+        List<SubNetworkInstance> subNetworks =
+            new ArrayList<SubNetworkInstance>();
+        try {
+
+            String response = openStackUtil.
+                listSubNetworks(claudiaData.getUser(), region);
+            JSONObject lSubNetworkString = new JSONObject(response);
+            JSONArray jsonSubNetworks =
+                lSubNetworkString.getJSONArray("subnets");
+
+            for (int i = 0; i < jsonSubNetworks.length(); i++) {
+
+                JSONObject jsonSubNet = jsonSubNetworks.getJSONObject(i);
+                SubNetworkInstance subNetInst =
+                    SubNetworkInstance.fromJson(jsonSubNet, region);
+                subNetworks.add(subNetInst);
+
+            }
+
+        } catch (OpenStackException e) {
+            String msm = "Error to get the subnetworks in region " + region +
+                ": " + e.getMessage();
+            log.error(msm);
+            throw new InfrastructureException(msm, e);
+        } catch (JSONException e) {
+            String msm = "Error to process JSON in load subnetwork in region " +
+                region + ": " + e.getMessage();
+            log.error(msm);
+            throw new InfrastructureException(msm, e);
+        }
+        return subNetworks;
+    }
+
+
+    /**
      * It loads all networks.
      * 
      * @params claudiaData
@@ -424,6 +474,7 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
             }
             network.setIdNetwork(netId);
         }
+
         log.debug("Load network " + network.getIdNetwork() + " in region " + region + " vdc " + claudiaData.getVdc());
         String response = "";
         try {
@@ -463,17 +514,19 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
      * @return
      */
     public String getNetworkId (ClaudiaData claudiaData, NetworkInstance network, String region)  {
+        String networkId = null;
         try {
             List<NetworkInstance> loadAllNetworks = this.loadAllNetwork(claudiaData, region);
             for (NetworkInstance net : loadAllNetworks) {
-                if (net.getNetworkName().equals(network.getNetworkName())) {
-                    return net.getIdNetwork();
+                if (net.getNetworkName().equals(network.getNetworkName()) &&
+                    (net.getShared() || net.getTenantId().equals(claudiaData.getVdc()))) {
+                    networkId = net.getIdNetwork();
                 }
             }
         } catch (InfrastructureException e) {
-            return null;
+            return networkId;
         }
-        return null;
+        return networkId;
     }
 
     /**
@@ -517,7 +570,16 @@ public class OpenstackNetworkClientImpl implements NetworkClient {
      */
     public void deleteNetworkToPublicRouter(ClaudiaData claudiaData, NetworkInstance netInstance, String region)
             throws InfrastructureException {
-        log.info("Delete Interfact from net " + netInstance.getNetworkName() + " to public router in region " + region);
+        log.info("Delete Interfact from net " + netInstance.getNetworkName() +
+            " to public router in region " + region);
+
+        List<Port> ports = listPortsFromNetwork(claudiaData, region, netInstance.getIdNetwork());
+        if (ports.size() > 0) {
+            String mns = "Error to delete the interface from public router  " + netInstance.getNetworkName() +
+                " to the public router : They are still used ports";
+            log.warn(mns);
+            return;
+        }
 
         try {
             openStackUtil.deleteInterfaceToPublicRouter(claudiaData.getUser(), netInstance, region);

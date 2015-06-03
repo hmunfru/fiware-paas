@@ -26,8 +26,8 @@ package com.telefonica.euro_iaas.paasmanager.installator;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCClient;
 import com.telefonica.euro_iaas.paasmanager.installator.sdc.util.SDCUtil;
 import com.telefonica.euro_iaas.paasmanager.manager.InfrastructureManager;
 import com.telefonica.euro_iaas.paasmanager.manager.ProductReleaseManager;
@@ -53,10 +54,9 @@ import com.telefonica.euro_iaas.paasmanager.model.OS;
 import com.telefonica.euro_iaas.paasmanager.model.ProductInstance;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
 import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
-import com.telefonica.euro_iaas.sdc.client.SDCClient;
 import com.telefonica.euro_iaas.sdc.client.services.ProductInstanceService;
 import com.telefonica.euro_iaas.sdc.model.Task;
 import com.telefonica.euro_iaas.sdc.model.dto.ProductInstanceDto;
@@ -267,8 +267,7 @@ public class ProductInstallatorSdcImplTest {
         expectedProductInstance.setName("deploytm-contextbrokr-1_mongos_2.2.3");
         String name = installator.getProductInstanceName(data, expectedProductInstance);
         // make verifications
-        assertEquals(name,
-                "FIWARE.customers.60b4125450fc4a109f50357894ba2e28.services."
+        assertEquals(name, "FIWARE.customers.60b4125450fc4a109f50357894ba2e28.services."
                 + "deploytm.vees.contextbrokr.replicas.1_mongos_2.2.3");
 
         // only one product will be installed, the other one causes error.
@@ -367,6 +366,28 @@ public class ProductInstallatorSdcImplTest {
                 environmentInstance);
 
         assertEquals("111.111.111.111,222.222.222.222", newAtt.getValue());
+
+    }
+
+    @Test
+    public void testResolveMacroDefaultValue() {
+        ProductInstallatorSdcImpl installator = new ProductInstallatorSdcImpl();
+        com.telefonica.euro_iaas.sdc.model.Attribute att = new com.telefonica.euro_iaas.sdc.model.Attribute("key",
+            "default", "desc", "IP");
+        com.telefonica.euro_iaas.sdc.model.Attribute newAtt = installator.resolveAttributeTypeValue(att, tierInstance,
+            environmentInstance);
+        assertEquals("default", newAtt.getValue());
+
+    }
+
+    @Test
+    public void testResolveMacroWrongValue() {
+        ProductInstallatorSdcImpl installator = new ProductInstallatorSdcImpl();
+        com.telefonica.euro_iaas.sdc.model.Attribute att = new com.telefonica.euro_iaas.sdc.model.Attribute("key",
+            "IP(wrong", "desc", "IP");
+        com.telefonica.euro_iaas.sdc.model.Attribute newAtt = installator.resolveAttributeTypeValue(att, tierInstance,
+            environmentInstance);
+        assertEquals("IP(wrong", newAtt.getValue());
 
     }
 }

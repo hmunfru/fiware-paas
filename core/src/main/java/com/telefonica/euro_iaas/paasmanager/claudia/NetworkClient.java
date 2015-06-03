@@ -26,7 +26,7 @@ package com.telefonica.euro_iaas.paasmanager.claudia;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
@@ -122,13 +122,27 @@ public interface NetworkClient {
             throws InfrastructureException;
 
     /**
-     * Loads all network associated to a certain vdc.
+     * Loads all networks associated to a certain vdc.
      * 
      * @param claudiaData
      * @return List<Network>
      * @throws InfrastructureException
      */
-    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData, String region) throws InfrastructureException;
+    List<NetworkInstance> loadAllNetwork(ClaudiaData claudiaData,
+                                         String region)
+        throws InfrastructureException;
+
+    /**
+     * Loads all subnetwork associated to a certain vdc.
+     *
+     * @param claudiaData
+     * @return List<SubNetwork>
+     * @throws InfrastructureException
+     */
+    List<SubNetworkInstance> loadAllSubNetworks(ClaudiaData claudiaData,
+                                         String region)
+        throws InfrastructureException;
+
 
     /**
      * Load a Network from OpenStack.

@@ -100,3 +100,13 @@ Feature: Get the environments in a tenant
         And there is an environment in the list with data:
             | name                    | description              |
             | accountsqa5             | [STRING_WITH_LENGTH_150] |
+
+
+    Scenario: A Tenant creates an environment and other Tenant gets the list of environments of the first one
+        Given the paas manager is up and properly configured
+        And   an environment has already been created with data:
+              | name        | description |
+              | envqaother  | descqa      |
+        And   a token requested by other user
+        When  I request the list of existing environments
+        Then  I receive an "Forbidden" response

@@ -49,6 +49,11 @@ def before_each_scenario(feature):
     terrain_steps.init_products_in_sdc()
 
 
+@before.each_scenario
+def before_each_scenario(scenario):
+    world.headers = dict()
+
+
 @after.each_scenario
 def after_each_scenario(scenario):
     # Delete the environments created in the scenario.

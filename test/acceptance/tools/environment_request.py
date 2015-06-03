@@ -48,10 +48,13 @@ class EnvironmentRequest:
     def __get__token(self):
         return http.get_token(self.keystone_url + '/tokens', self.tenant, self.user, self.password)
 
-    def __add_environment(self, url, environment_payload):
-        headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
-                   'Content-Type': "application/xml"}
-        return http.post(url, headers, environment_payload)
+    def __add_environment(self, url, environment_payload, headers=None):
+        request_headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
+                           'Content-Type': "application/xml"}
+        if headers is not None:
+            request_headers.update(headers)
+
+        return http.post(url, request_headers, environment_payload)
 
     def __update_environment(self, url, environment_payload):
         headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
@@ -63,10 +66,12 @@ class EnvironmentRequest:
                    'Accept': "application/json"}
         return http.delete(url, headers)
 
-    def __get_environments(self, url):
-        headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
-                   'Accept': "application/json"}
-        return http.get(url, headers)
+    def __get_environments(self, url, headers=None):
+        request_headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
+                           'Accept': "application/json"}
+        if headers is not None:
+            request_headers.update(headers)
+        return http.get(url, request_headers)
 
     def __get_environment(self, url):
         headers = {'X-Auth-Token': self.token, 'Tenant-Id': self.vdc,
@@ -113,12 +118,14 @@ class EnvironmentRequest:
         except AttributeError:
             world.abstract_environments = [environment_name]
 
-    def add_environment(self, environment_name, environment_description, tiers=None):
+    def add_environment(self, environment_name, environment_description, tiers=None, headers=None):
         """
         Adds a new environment with the data provided.
         :param environment_name: Name of the environment.
         :param environment_description: Description of the environment.
         :param tiers: List of tiers of the environment.
+        :param headers: Headers to be sent in the "ADD Environment Request". Default headers will be
+        updated with that given headers (if not None).
         """
         url = "%s/%s/%s/%s/%s" % (self.paasmanager_url, "catalog/org/FIWARE",
                                   "vdc", self.vdc, "environment")
@@ -126,7 +133,7 @@ class EnvironmentRequest:
         env = Environment(environment_name, environment_description, tiers)
 
         payload = tostring(env.to_env_xml())
-        world.response = self.__add_environment(url, payload)
+        world.response = self.__add_environment(url, payload, headers=headers)
 
         """Store it in the world to tear it down later"""
         try:
@@ -189,14 +196,14 @@ class EnvironmentRequest:
 
         world.response = self.__get_environments(url)
 
-    def get_environments(self):
+    def get_environments(self, headers=None):
         """
         Gets the list of environments.
         """
         url = "%s/%s/%s/%s/%s" % (self.paasmanager_url, "catalog/org/FIWARE",
                                   "vdc", self.vdc, "environment")
 
-        world.response = self.__get_environments(url)
+        world.response = self.__get_environments(url, headers=headers)
 
     def get_abstract_environment(self, environment_name):
         url = "%s/%s/%s/%s" % (self.paasmanager_url, "catalog/org/FIWARE",
@@ -500,6 +507,17 @@ def check_environment_in_list(environments_list, environment_name,
             return
 
     assert False, "No environment found in the list with name %s" % (environment_name)
+
+
+def check_if_environment_not_in_list(environments_list, environment_name):
+    """
+    Check that a certain environment is NOT in the list of environments provided.
+    :param environments_list: List of environments to be checked.
+    :param environment_name: Name of the environment to look for.
+    """
+    for env in environments_list:
+        if env.name == environment_name:  # Expected environment found
+            assert False, "Environment {} is in the list and it shouldn't".format(env.name)
 
 
 def check_get_environment_response(response, expected_status_code,

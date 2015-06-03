@@ -26,9 +26,9 @@ package com.telefonica.euro_iaas.paasmanager.manager;
 
 import java.util.List;
 
-import com.telefonica.euro_iaas.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
-import com.telefonica.euro_iaas.commons.dao.InvalidEntityException;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.exception.IPNotRetrievedException;
 import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEnvironmentRequestException;
@@ -59,9 +59,8 @@ public interface EnvironmentInstanceManager {
 
     EnvironmentInstance create(ClaudiaData claudiaData, EnvironmentInstance environmentInstance)
             throws EntityNotFoundException, InvalidEntityException, AlreadyExistsEntityException,
-            NotUniqueResultException, InfrastructureException, IPNotRetrievedException, ProductInstallatorException,
-            InvalidEnvironmentRequestException, InvalidProductInstanceRequestException, InvalidOVFException,
-            InvalidVappException;
+            InfrastructureException, IPNotRetrievedException, ProductInstallatorException,
+            InvalidEnvironmentRequestException, InvalidProductInstanceRequestException;
 
     /**
      * Load an environentInstance
@@ -100,7 +99,7 @@ public interface EnvironmentInstanceManager {
      * 
      * @param envInstance
      * @param claudiaData
-     * @throws EntityNotF   oundException
+     * @throws EntityNotFoundException
      * @throws InfrastructureException
      * @throws Exception
      */

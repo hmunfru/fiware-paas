@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.telefonica.euro_iaas.commons.dao.AbstractBaseDao;
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.AbstractBaseDao;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
 import com.telefonica.euro_iaas.paasmanager.dao.TierDao;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
@@ -217,20 +217,23 @@ public class TierDaoJpaImpl extends AbstractBaseDao<Tier, String> implements Tie
 
     @Override
     public Tier loadComplete(Tier newTier) throws EntityNotFoundException {
-        Query query = getEntityManager()
-                .createQuery(
-                        "select p from Tier p fetch all properties where p.name = :name and p.vdc =:vdc and p.environmentname= :environmentname");
+        Query query = getEntityManager().createQuery(
+                "select p from Tier p fetch all"
+                        + " properties where p.name = :name and p.vdc =:vdc and p.environmentname= :environmentname");
         query.setParameter("name", newTier.getName());
         query.setParameter("vdc", newTier.getVdc());
         query.setParameter("environmentname", newTier.getEnviromentName());
         Tier tier = null;
         try {
             tier = (Tier) query.getResultList().get(0);
-            tier.getNetworks();
-            tier.getProductReleases();
-            tier.getSecurityGroup();
+            if (tier.getNetworks() != null) {
+                tier.getNetworks().size();
+            }
+            if (tier.getProductReleases() != null) {
+                tier.getProductReleases().size();
+            }
         } catch (Exception e) {
-            String message = " Tier don't exist in database ";
+            String message = " Tier does not exist in database ";
             throw new EntityNotFoundException(Tier.class, message, newTier.getName());
         }
         return tier;

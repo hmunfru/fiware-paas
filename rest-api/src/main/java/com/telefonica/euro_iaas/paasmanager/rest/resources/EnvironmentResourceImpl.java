@@ -37,14 +37,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import com.telefonica.euro_iaas.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.exception.InvalidEntityException;
 import com.telefonica.euro_iaas.paasmanager.manager.EnvironmentManager;
-import com.telefonica.euro_iaas.paasmanager.manager.impl.EnvironmentManagerImpl;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Environment;
 import com.telefonica.euro_iaas.paasmanager.model.dto.EnvironmentDto;
-import com.telefonica.euro_iaas.paasmanager.model.dto.PaasManagerUser;
+import com.telefonica.euro_iaas.paasmanager.rest.auth.OpenStackAuthenticationProvider;
 import com.telefonica.euro_iaas.paasmanager.rest.exception.APIException;
 import com.telefonica.euro_iaas.paasmanager.rest.validation.EnvironmentResourceValidator;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
@@ -71,7 +71,7 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
     @Autowired
     private EnvironmentResourceValidator environmentResourceValidator;
 
-    private static Logger log = LoggerFactory.getLogger(EnvironmentManagerImpl.class);
+    private static Logger log = LoggerFactory.getLogger(EnvironmentResourceImpl.class);
 
     /**
      * Delete an specific environment instance.
@@ -90,7 +90,7 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
         try {
             environmentResourceValidator.validateDelete(envName, vdc);
 
-            addCredentialsToClaudiaData(claudiaData);
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
 
             List<Environment> list = environmentManager.findByOrgAndVdcAndName(org, vdc, envName);
             environmentManager.destroy(claudiaData, list.get(0));
@@ -151,21 +151,6 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
     }
 
     /**
-     * Add PaasManagerUser to claudiaData.
-     * 
-     * @param claudiaData
-     */
-    public void addCredentialsToClaudiaData(ClaudiaData claudiaData) {
-        log.info(systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM));
-        if (systemPropertiesProvider.getProperty(SystemPropertiesProvider.CLOUD_SYSTEM).equals("FIWARE")) {
-            log.info("addCredentialsToClaudiaData to claudia ");
-            claudiaData.setUser(getCredentials());
-            claudiaData.getUser().setTenantId(claudiaData.getVdc());
-        }
-
-    }
-
-    /**
      * Insert a new environment resource.
      * 
      * @param org
@@ -183,13 +168,13 @@ public class EnvironmentResourceImpl implements EnvironmentResource {
                 + environmentDto.getVdc() + " " + environmentDto.getOrg() + " " + environmentDto.getTierDtos());
 
         try {
-            addCredentialsToClaudiaData(claudiaData);
+            OpenStackAuthenticationProvider.addCredentialsToClaudiaData(claudiaData);
             environmentResourceValidator.validateCreate(claudiaData, environmentDto, vdc);
 
             // try {
             environmentManager.create(claudiaData, environmentDto.fromDto(org, vdc));
         } catch (Exception e) {
-            log.info(e.getMessage());
+            log.warn(e.getMessage());
             throw new APIException(e);
         }
     }

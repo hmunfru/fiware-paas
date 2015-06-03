@@ -43,10 +43,12 @@ NAME=$(echo $(basename $0) | sed -e 's/^[SK][0-9]*//' -e 's/\.sh$//')
 # JAVA
 #   Command to invoke Java. If not set, java (from the PATH) will be used.
 #
-JAVA_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8585 -Dspring.profiles.active=fiware -Xmx1024m -Xms1024m"
+#JAVA_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8585 -Xmx1024m -Xms1024m"
+JAVA_OPTIONS="-Xmx1024m -Xms1024m"
 #   Extra options to pass to the JVM
 #
 # JETTY_HOME
+JETTY_HOME=/opt/fiware-paas
 #   Where Jetty is installed. If not set, the script will try go
 #   guess it by looking at the invocation path for the script
 #   The java system property "jetty.home" will be
@@ -62,9 +64,11 @@ JAVA_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8585
 #   Where the $NAME.pid file should be stored. It defaults to the
 #   first available of /var/run, /usr/var/run, JETTY_BASE and /tmp
 #   if not set.
+JETTY_RUN=$JETTY_HOME
 #
 # JETTY_PID
 #   The Jetty PID file, defaults to $JETTY_RUN/$NAME.pid
+JETTY_PID=$JETTY_RUN/jetty.pid
 #
 # JETTY_ARGS
 #   The default arguments to pass to jetty.
