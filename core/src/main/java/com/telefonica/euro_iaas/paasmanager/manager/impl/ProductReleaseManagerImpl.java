@@ -29,11 +29,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
-import com.telefonica.fiware.commons.dao.EntityNotFoundException;
-import com.telefonica.fiware.commons.dao.InvalidEntityException;
-import com.telefonica.euro_iaas.paasmanager.dao.MetadataDao;
 import com.telefonica.euro_iaas.paasmanager.dao.AttributeDao;
+import com.telefonica.euro_iaas.paasmanager.dao.MetadataDao;
 import com.telefonica.euro_iaas.paasmanager.dao.ProductReleaseDao;
 import com.telefonica.euro_iaas.paasmanager.dao.sdc.ProductReleaseSdcDao;
 import com.telefonica.euro_iaas.paasmanager.exception.SdcException;
@@ -42,6 +39,9 @@ import com.telefonica.euro_iaas.paasmanager.model.Attribute;
 import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
 import com.telefonica.euro_iaas.paasmanager.model.Metadata;
 import com.telefonica.euro_iaas.paasmanager.model.ProductRelease;
+import com.telefonica.fiware.commons.dao.AlreadyExistsEntityException;
+import com.telefonica.fiware.commons.dao.EntityNotFoundException;
+import com.telefonica.fiware.commons.dao.InvalidEntityException;
 
 /**
  * @author jesus.movilla
@@ -50,7 +50,7 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
 
     private ProductReleaseDao productReleaseDao;
     private ProductReleaseSdcDao productReleaseSdcDao;
-    private MetadataDao metadataDao; 
+    private MetadataDao metadataDao;
     private AttributeDao attributeDao;
     private static Logger log = LoggerFactory.getLogger(ProductReleaseManagerImpl.class);
 
@@ -60,19 +60,26 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
      */
     public ProductRelease load(String name, ClaudiaData data) throws EntityNotFoundException {
         log.info("Loading product release " + name);
-        // return productReleaseDao.load(name);
         ProductRelease productRelease = null;
-        String product = name.split("-")[0];
-        String version = name.split("-")[1];
-
+        String product, version;
         try {
+            product = name.split("-")[0];
+            version = name.split("-")[1];
+        } catch (Exception ex) {
+            String msg = "Entity with invalid name(" + name + "): use <productName>-<version> ";
+            log.warn(msg);
+            throw new EntityNotFoundException(ProductRelease.class, msg, name);
+
+        }
+        try {
+            log.info("Loading from sdc " + product + " " + version);
+
             productRelease = productReleaseDao.load(name);
 
         } catch (EntityNotFoundException e) {
-            // Buscar en el SDC y si existe darlo de alta en el paas-manager
+            // Go to SDC and search. After this, introduce product in database
             log.info("The product " + name + " is not in database");
             try {
-                log.info("Loading from sdc " + product + " " + version);
                 ProductRelease pRelease = productReleaseSdcDao.load(product, version, data);
                 productRelease = create(pRelease);
 
@@ -110,7 +117,7 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
             ProductRelease pRelease = productReleaseSdcDao.load(product, version, data);
             try {
                 productRelease = productReleaseDao.load(name);
-               
+
                 for (Attribute attribute : pRelease.getAttributes()) {
                     Attribute newAttribute = productRelease.getAttribute(attribute.getKey());
                     if (newAttribute == null) {
@@ -131,19 +138,19 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
                         newMetadata.setKey(metadata.getKey());
                         newMetadata.setValue(metadata.getValue());
                         newMetadata.setDescription(metadata.getDescription());
-                       	newMetadata = metadataDao.create(newMetadata);
+                        newMetadata = metadataDao.create(newMetadata);
 
-                       	productRelease.addMetadata(newMetadata);
+                        productRelease.addMetadata(newMetadata);
                         productReleaseDao.update(productRelease);
                     } else {
-                    	//if metadata Value has been modified in SDC
-                    	if (!(newMetadata.getValue().equals(metadata.getValue()))) {
+                        // if metadata Value has been modified in SDC
+                        if (!(newMetadata.getValue().equals(metadata.getValue()))) {
                             newMetadata.setValue(metadata.getValue());
                             newMetadata = metadataDao.update(newMetadata);
-                            
+
                             productRelease.addMetadata(newMetadata);
                             productRelease.deleteMetadata(metadata);
-                    	}
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -225,7 +232,7 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
     public void setProductReleaseSdcDao(ProductReleaseSdcDao productReleaseSdcDao) {
         this.productReleaseSdcDao = productReleaseSdcDao;
     }
-    
+
     /**
      * @param metadataDao
      *            the metadataDao to set
@@ -233,6 +240,7 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
     public void setMetadataDao(MetadataDao metadataDao) {
         this.metadataDao = metadataDao;
     }
+
     /**
      * @param attributeDao
      *            the attributeDao to set
@@ -240,6 +248,5 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
     public void setAttributeDao(AttributeDao attributeDao) {
         this.attributeDao = attributeDao;
     }
-
 
 }
