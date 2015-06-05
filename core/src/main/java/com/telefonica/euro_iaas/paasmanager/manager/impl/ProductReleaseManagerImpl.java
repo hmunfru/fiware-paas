@@ -24,6 +24,7 @@
 
 package com.telefonica.euro_iaas.paasmanager.manager.impl;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -116,43 +117,33 @@ public class ProductReleaseManagerImpl implements ProductReleaseManager {
             log.info("Loading from sdc " + product + " " + version);
             ProductRelease pRelease = productReleaseSdcDao.load(product, version, data);
             try {
+
                 productRelease = productReleaseDao.load(name);
 
+                HashSet<Attribute> attributesCopy = new HashSet<Attribute>(productRelease.getAttributes());
+                HashSet<Metadata> metatadasCopy = new HashSet<Metadata>(productRelease.getMetadatas());
+
+                productReleaseDao.removeAttributesAndMetadatas(productRelease);
+                // remove
+                for (Attribute attribute : attributesCopy) {
+                    attributeDao.remove(attribute);
+                }
+
+                for (Metadata metadata : metatadasCopy) {
+                    metadataDao.remove(metadata);
+                }
+
+                // add new attributes and metadatas
                 for (Attribute attribute : pRelease.getAttributes()) {
-                    Attribute newAttribute = productRelease.getAttribute(attribute.getKey());
-                    if (newAttribute == null) {
-                        newAttribute = new Attribute();
-                        newAttribute.setKey(attribute.getKey());
-                        newAttribute.setValue(attribute.getValue());
-                        newAttribute.setDescription(attribute.getDescription());
-                        newAttribute.setType(attribute.getType());
-                        newAttribute = attributeDao.create(newAttribute);
-                        productRelease.addAttribute(newAttribute);
-                    }
+                    Attribute newAttribute = attributeDao.create(attribute);
+                    productRelease.addAttribute(newAttribute);
                 }
 
                 for (Metadata metadata : pRelease.getMetadatas()) {
-                    Metadata newMetadata = productRelease.getMetadata(metadata.getKey());
-                    if (newMetadata == null) {
-                        newMetadata = new Metadata();
-                        newMetadata.setKey(metadata.getKey());
-                        newMetadata.setValue(metadata.getValue());
-                        newMetadata.setDescription(metadata.getDescription());
-                        newMetadata = metadataDao.create(newMetadata);
-
-                        productRelease.addMetadata(newMetadata);
-                        productReleaseDao.update(productRelease);
-                    } else {
-                        // if metadata Value has been modified in SDC
-                        if (!(newMetadata.getValue().equals(metadata.getValue()))) {
-                            newMetadata.setValue(metadata.getValue());
-                            newMetadata = metadataDao.update(newMetadata);
-
-                            productRelease.addMetadata(newMetadata);
-                            productRelease.deleteMetadata(metadata);
-                        }
-                    }
+                    Metadata newMetadata = metadataDao.create(metadata);
+                    productRelease.addMetadata(newMetadata);
                 }
+                productReleaseDao.update(productRelease);
             } catch (Exception ex) {
                 log.info("Product don't exist in database: creates");
                 productRelease = create(pRelease);
