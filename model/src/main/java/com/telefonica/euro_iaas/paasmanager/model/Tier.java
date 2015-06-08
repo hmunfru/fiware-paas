@@ -547,6 +547,7 @@ public class Tier {
                 pReleaseDto.setProductName(pRelease.getProduct());
                 pReleaseDto.setVersion(pRelease.getVersion());
                 pReleaseDto.setPrivateAttributes(pRelease.getAttributes());
+                pReleaseDto.setMetatadas(pRelease.getMetadatas());
 
                 if (pRelease.getDescription() != null) {
                     pReleaseDto.setProductDescription(pRelease.getDescription());
