@@ -273,7 +273,8 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
         String headerAccept = request.getHeader(HEADER_ACCEPT);
         if (headerAccept != null) {
             headerAccept = headerAccept.toLowerCase();
-            boolean someValidValue = headerAccept.equals("application/json") || headerAccept.equals("application/xml");
+            boolean someValidValue = headerAccept.equals("*/*") || headerAccept.equals("application/json")
+                    || headerAccept.equals("application/xml");
 
             if (!someValidValue) {
                 response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE,
