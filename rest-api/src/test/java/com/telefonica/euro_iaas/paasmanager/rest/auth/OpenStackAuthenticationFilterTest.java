@@ -179,18 +179,4 @@ public class OpenStackAuthenticationFilterTest {
 
     }
 
-    @Test
-    public void shouldReturn406WhenAcceptHeaderIsNull() throws IOException, ServletException {
-        // given
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-        HttpServletResponse servletResponse = mock(HttpServletResponse.class);
-        FilterChain filterChain = mock(FilterChain.class);
-        when(servletRequest.getHeader(OpenStackAuthenticationFilter.HEADER_ACCEPT)).thenReturn(null);
-
-        // when
-        openStackAuthenticationFilter.doFilter(servletRequest, servletResponse, filterChain);
-        // then
-        verify(servletResponse).sendError(eq(HttpServletResponse.SC_NOT_ACCEPTABLE), anyString());
-
-    }
 }
