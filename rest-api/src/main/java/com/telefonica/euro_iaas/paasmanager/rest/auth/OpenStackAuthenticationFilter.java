@@ -143,22 +143,12 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
         final HttpServletResponse response = (HttpServletResponse) res;
 
         String headerToken = request.getHeader(OPENSTACK_HEADER_TOKEN);
-        String headerAccept = request.getHeader(HEADER_ACCEPT);
         String pathInfo = request.getPathInfo();
         logger.debug(headerToken);
         logger.debug(pathInfo);
 
-        // first of all, check HTTP accept header
-        if (headerAccept == null) {
-            response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "'Accept' header is mandatory");
-            return;
-        }
-        headerAccept = headerAccept.toLowerCase();
-        boolean someValidValue = headerAccept.equals("application/json") || headerAccept.equals("application/xml");
-
-        if (!someValidValue) {
-            response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "'Accept' header should be application/xml or "
-                    + "application/json");
+        // first of all, check HTTP if exists accept header
+        if (!validateAcceptHeader(request, response)) {
             return;
         }
 
@@ -269,6 +259,29 @@ public class OpenStackAuthenticationFilter extends GenericFilterBean {
         // TODO jesuspg: question:add APIException
         chain.doFilter(request, response);
 
+    }
+
+    /**
+     * validate Accept Header
+     * 
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private boolean validateAcceptHeader(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String headerAccept = request.getHeader(HEADER_ACCEPT);
+        if (headerAccept != null) {
+            headerAccept = headerAccept.toLowerCase();
+            boolean someValidValue = headerAccept.equals("application/json") || headerAccept.equals("application/xml");
+
+            if (!someValidValue) {
+                response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE,
+                        "'Accept' header should be application/xml or " + "application/json");
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
