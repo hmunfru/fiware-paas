@@ -95,19 +95,12 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
      */
     public boolean existsVMReplica(ClaudiaData claudiaData, String tier, VM vm, String region) {
 
-        try {
-            String token = claudiaData.getUser().getToken();
-            String vdc = claudiaData.getVdc();
+        String token = claudiaData.getUser().getToken();
+        String vdc = claudiaData.getVdc();
 
-            boolean exists = openStackUtil.existsServerForDelete(vm.getVmid(), region, token, vdc);
+        boolean exists = openStackUtil.existsServerForDelete(vm.getVmid(), region, token, vdc);
 
-            if (!exists) {
-                return false;
-            }
-
-        } catch (Exception e) {
-            String errorMessage = "Error checking info from server " + vm.getVmid();
-            log.error(errorMessage);
+        if (!exists) {
             return false;
         }
 
