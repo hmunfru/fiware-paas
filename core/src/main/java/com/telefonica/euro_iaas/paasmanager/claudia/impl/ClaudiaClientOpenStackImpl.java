@@ -82,7 +82,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private TierInstanceManager tierInstanceManager = null;
     private SystemPropertiesProvider systemPropertiesProvider = null;
     private static final int POLLING_INTERVAL = 10000;
-    private static final int RETRIES = 10;        // TODO configurable parameter
 
     /**
      * Check if exists the vm.
@@ -416,7 +415,9 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     private void checkDeleteServerTaskStatus(TierInstance tierInstance, ClaudiaData claudiaData)
             throws InfrastructureException {
 
-        for (int i = 0; i < RETRIES; i++) {
+        int retries = systemPropertiesProvider.getIntProperty(SystemPropertiesProvider.OPENSTACK_RETRIES);
+
+        for (int i = 0; i < retries; i++) {
             try {
                 Thread.sleep(POLLING_INTERVAL);
             } catch (InterruptedException e) {
@@ -432,7 +433,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             }
 
         }
-        log.warn("After " + RETRIES + " retries, server " + tierInstance.getVM().getVmid() + " has not been deleted.");
+        log.warn("After " + retries + " retries, server " + tierInstance.getVM().getVmid() + " has not been deleted.");
     }
 
     /*
