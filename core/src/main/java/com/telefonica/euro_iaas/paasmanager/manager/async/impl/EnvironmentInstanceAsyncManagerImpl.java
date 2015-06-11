@@ -88,7 +88,8 @@ public class EnvironmentInstanceAsyncManagerImpl implements EnvironmentInstanceA
                 String errorMsg = "The Environment " + environmentInstance.getBlueprintName() + " is not in the System";
                 updateErrorTaskOnInstall(environmentInstance, claudiaData.getVdc(), task, errorMsg, enf);
             } catch (InvalidEntityException iee) {
-                String errorMsg = "The Environment " + environmentInstance.getBlueprintName() + " is Invalid";
+                String errorMsg = "The Environment " + environmentInstance.getBlueprintName() + " is Invalid: " +
+                    iee.getMessage();
                 updateErrorTaskOnInstall(environmentInstance, claudiaData.getVdc(), task, errorMsg, iee);
             } catch (AlreadyExistsEntityException aee) {
                 String errorMsg = "The Environment " + environmentInstance.getBlueprintName() + " already exists";

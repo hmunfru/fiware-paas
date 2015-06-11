@@ -123,9 +123,9 @@ public class TierInstanceManagerImpl implements TierInstanceManager {
             tierInstance.setTier(tierDB);
             createSecurityGroups(data, tierInstance);
         } catch (InvalidSecurityGroupRequestException isgre) {
-            String secGroupMen = "The securityGroupRequest creation is invalid"; 
+            String secGroupMen = "The securityGroupRequest creation is invalid " + isgre.getMessage();
             log.error(secGroupMen);
-            throw new InvalidEntityException(secGroupMen + " : " + isgre.getMessage());
+            throw new InvalidEntityException(secGroupMen, isgre);
         } catch (EntityNotFoundException enfe) {
             String men = "ProductRelease in tier " + tierInstance.getTier().getName() + "does not exist"; 
             log.error(men);
