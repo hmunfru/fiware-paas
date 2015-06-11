@@ -74,6 +74,10 @@ public class ClaudiaClientOpenStackImplTest {
     private SystemPropertiesProvider systemPropertiesProvider;
 
     public static String HOSTNAME = "puppet-master.lab.fi-ware.org";
+    String json = "{\n" +
+        "    \"Spain2\": \"key1\",\n" +
+        "    \"Node\": \"key2\"\n" +
+        "}";
 
     @Before
     public void setUp() throws Exception {
@@ -131,6 +135,9 @@ public class ClaudiaClientOpenStackImplTest {
                 + "     pluginsync: true\n" + "\n" + "\n" + "\n" + " # Capture all subprocess output into a logfile\n"
                 + "# Useful for troubleshooting cloud-init issues\n"
                 + "output: {all: '| tee -a /var/log/cloud-init-output.log'}\n";
+
+        FileUtilsImpl fileUtil = new FileUtilsImpl();
+       // userData = fileUtil.readFile("src/test/resources/userdata");
 
         PaasManagerUser user = new PaasManagerUser("username", "myToken");
         user.setTenantName("FIWARE");
@@ -237,6 +244,22 @@ public class ClaudiaClientOpenStackImplTest {
 
         String result = claudiaClientOpenStack.getUserData(claudiaData, tierInstance);
         assertNotNull(result);
+
+    }
+
+    @Test
+    public void testGetSupportKey() throws Exception {
+        when(fileUtils.readFile(anyString())).thenReturn(json);
+        String key= claudiaClientOpenStack.getSupportKey("Spain2");
+        assertEquals(key, "key1");
+
+    }
+
+    @Test
+    public void testGetSupportKeyNoValid() throws Exception {
+        when(fileUtils.readFile(anyString())).thenReturn(json);
+        String key= claudiaClientOpenStack.getSupportKey("novalid");
+        assertEquals(key, "");
 
     }
 
