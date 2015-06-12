@@ -231,6 +231,11 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
     }
 
+    /**
+     * It obtains the support key to be included in the user data.
+     * @param region
+     * @return
+     */
     public String getSupportKey (String region)  {
         String key = null;
         try {
