@@ -33,8 +33,6 @@ import java.util.List;
 import net.sf.json.JSONArray;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,8 +194,6 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             return file;
         }
 
-        String key = this.getSupportKey(tierInstance.getTier().getRegion());
-
         try {
             chefServerUrl = openStackRegion.getChefServerEndPoint(tierInstance.getTier().getRegion());
 
@@ -224,29 +220,10 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
 
         file = file.replace("{node_name}", hostname).replace("{server_url}", chefServerUrl)
                 .replace("{validation_key}", chefValidationKey).replace("{networks}", writeInterfaces(tierInstance))
-                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetHostname)
-                .replace("{support_key}", key);
+                .replace("{if_up}", generateIfUp(tierInstance)).replace("{puppet_master}", puppetHostname);
         log.debug("payload " + file);
         return file;
 
-    }
-
-    /**
-     * It obtains the support key to be included in the user data.
-     * @param region
-     * @return
-     */
-    public String getSupportKey (String region)  {
-        String key = null;
-        try {
-
-            String keyHash = fileUtils.readFile(systemPropertiesProvider.getProperty("support_key"));
-            JSONObject jsonKeys = new JSONObject(keyHash);
-            key = (String)jsonKeys.get(region);
-        } catch (Exception e) {
-            key ="";
-        }
-        return key;
     }
 
     /**
