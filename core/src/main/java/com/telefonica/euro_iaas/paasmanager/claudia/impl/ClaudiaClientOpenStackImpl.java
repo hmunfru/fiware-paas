@@ -33,7 +33,6 @@ import java.util.List;
 import net.sf.json.JSONArray;
 
 import org.apache.commons.codec.binary.Base64;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
