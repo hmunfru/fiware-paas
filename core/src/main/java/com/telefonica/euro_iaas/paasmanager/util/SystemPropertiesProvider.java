@@ -54,6 +54,8 @@ public interface SystemPropertiesProvider {
     /** Path for the user data **/
     String USER_DATA_PATH = "user_data_path";
 
+    String SUPPORT_KEY = "support_key";
+
     String AVAILABLE_ATTRIBUTE_TYPES = "available.attribute.types";
 
     /**

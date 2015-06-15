@@ -33,7 +33,6 @@ import java.util.List;
 import net.sf.json.JSONArray;
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,7 +239,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         String key = null;
         try {
 
-            String keyHash = fileUtils.readFile(systemPropertiesProvider.getProperty("support_key"));
+            String keyHash = fileUtils.readFile(systemPropertiesProvider.getProperty(SystemPropertiesProvider.SUPPORT_KEY));
             JSONObject jsonKeys = new JSONObject(keyHash);
             key = (String)jsonKeys.get(region);
         } catch (Exception e) {
