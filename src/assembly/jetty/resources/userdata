@@ -14,70 +14,21 @@
 
 {if_up}
 
-users:
-- default
-- name: support
-  gecos: Support user
-  lock-passwd: false
-  ssh-authorized-keys:
-  - {support_key}
-  sudo: ALL=(ALL) NOPASSWD:ALL
+chefkey: |
+{validation_key}
 
-ssh_pwauth: False
+fiware-support:
+   sshkey: {ssh_key}
+
+   gpgkey: |
+      {gpg_key}
 
 # Start daemonized chef-client and DEM monitoring
 # Key from http://apt.opscode.com/packages@opscode.com.gpg.key
 runcmd:
- - OHAI_TIME_DIR="$(find / -name ohai_time.rb)"
- - sed -i 's/ohai_time Time.now.to_f/ohai_time Time.now/' ${OHAI_TIME_DIR}
- - chef-client -d -i 60 -s 6 -L /var/log/chef/client.log
- - curl -L -s -k https://xifisvn.esl.eng.it/wp3/software/DEM_Adapter/install.sh | bash
-
-chef:
- # boolean to run or not run chef
- exec: false
-
- # Valid values are 'gems' and 'packages' and 'omnibus'
- install_type: "omnibus"
-
- # 'omnibus', change the url to download
- omnibus_url: "http://repositories.testbed.fi-ware.org/webdav/chef/install.sh"
-
- # Boolean: run 'install_type' code even if chef-client
- #          appears already installed.
- force_install: false
- node_name: {node_name}
- # Chef settings
- server_url: {server_url}
- # Node Name
- # Defaults to the instance-id if not present
- validation_name: "chef-validator"
- # Node Name
- # Defaults to the instance-id if not present
-
- # Default validation name is chef-validator
- validation_key: |
-{validation_key}
-
-puppet:
- # Every key present in the conf object will be added to puppet.conf:
- # [name]
- # subkey=value
- #
- # For example the configuration below will have the following section
- # added to puppet.conf:
- # [puppetd]
- # server=puppetmaster.example.org
- # certname=i-0123456.ip-X-Y-Z.cloud.internal
- #
- # The puppmaster ca certificate will be available in
- # /var/lib/puppet/ssl/certs/ca.pem
- conf:
-   agent:
-     server: "{puppet_master}"
-     runinterval: "60"
-     pluginsync: true
+  - curl http://repositories.testbed.fi-ware.org/webdav/installconflang.sh  | bash  -s {server_url} {puppet_master} /etc/validation.pem
 
 # Capture all subprocess output into a logfile
 # Useful for troubleshooting cloud-init issues
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
+
