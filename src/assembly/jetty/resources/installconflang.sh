@@ -1,5 +1,30 @@
 #!/bin/sh
 
+# This file is used for installing and configuring
+# chef and puppet inside a VM. The input parameters are:
+# - chef server url
+# - puppet master url
+# - validation key path
+#
+# - install.sh should be true to ohai and should not remap
+#   platform or platform versions.
+#
+# - remapping platform and mangling platform version numbers is
+#   now the complete responsibility of the server-side endpoints
+#
+
+# Input parameters
+CHEF_SERVER=$1
+PUPPET_SERVER=$2
+VALIDATION=$3
+
+# We obtain the VM hostname
+hostname_var=`hostname`
+hostname_ip=`hostname  -I | cut -f1 -d' '`
+echo "$hostname_ip $hostname_var" >> /etc/hosts
+HOSTNAME_VAR=$hostname_var
+
+# We obtain the Operative system distribution
 if test -f "/etc/lsb-release" && grep -q DISTRIB_ID /etc/lsb-release; then
   platform=`grep DISTRIB_ID /etc/lsb-release | cut -d "=" -f 2 | tr '[A-Z]' '[a-z]'`
   platform_version=`grep DISTRIB_RELEASE /etc/lsb-release | cut -d "=" -f 2`
@@ -13,15 +38,7 @@ elif test -f "/etc/redhat-release"; then
   echo $platform_version
 fi
 
-#
-# NOTE: platform manging in the install.sh is DEPRECATED
-#
-# - install.sh should be true to ohai and should not remap
-#   platform or platform versions.
-#
-# - remapping platform and mangling platform version numbers is
-#   now the complete responsibility of the server-side endpoints
-#
+# We obtain the Operative system version
 
 major_version=`echo $platform_version | cut -d. -f1`
 case $platform in
@@ -61,25 +78,16 @@ if test "x$platform" = "xsolaris2"; then
   export PATH
 fi
 
-hostname_var=`hostname`
-hostname_ip=`hostname  -I | cut -f1 -d' '`
-echo "$hostname_ip $hostname_var" >> /etc/hosts
-
-CHEF_SERVER=$1
-HOSTNAME_VAR=$hostname_var
-VALIDATION=$3
-PUPPET_SERVER=$2
-echo $PUPPET_SERVER
-echo $CHEF_SERVER
-echo $HOSTNAME_VAR
-echo $VALIDATION
-
+# We obtain the chef validation key
 curl -L http://repositories.testbed.fi-ware.org/webdav/user_data_script.py | python
-### installing chef
+
+## installing chef
 mkdir /etc/chef
 mkdir /var/log/chef
 curl -L https://www.opscode.com/chef/install.sh | bash 
 OHAI_TIME_DIR="$(find / -name ohai_time.rb)"
+
+### Configuring Chef
 sed -i 's/ohai_time Time.now.to_f/ohai_time Time.now/' ${OHAI_TIME_DIR}
 echo 'log_level              :info
 log_location           "/var/log/chef.log"
@@ -96,16 +104,13 @@ file_backup_path       "/var/backups/chef"
 pid_file               "/var/run/chef/client.pid"
 Chef::Log::Formatter.show_time = true' > /etc/chef/client.rb
 
-#sed -i 's/{CHEF_URL}/$CHEF_SERVER/g' /etc/chef/client.rb
-#sed -i 's/{HOSTNAME}/"${HOSTNAME_VAR}"/g' /etc/chef/client.rb
-
 echo '{}' > /etc/chef/firstboot.json
 cp $VALIDATION /etc/chef/validation.pem 
 chef-client -d -i 60 -s 6 -L /var/log/chef/client.log &
 
 
-#### installing puppet
-#### repository
+## Installing puppet
+### repository
 echo ${platform}
 if [ ${platform:0:6} == 'centos' ]; then
     echo $platform_version
@@ -123,70 +128,27 @@ else
     apt-get -y install puppet
 fi
 
-echo "[main]
-rundir = /var/run/puppet
-logdir = /var/log/puppet
-ssldir = $vardir/ssl
+## Configuring puppet
 
-[agent]
-classfile = $vardir/classes.txt
-server = "'${PUPPET_SERVER}'"
-runinterval = 60
-pluginsync = True
-localconfig = $vardir/localconfig">text
+echo '[main]
+        rundir = /var/run/puppet
+        logdir = /var/log/puppet
+        ssldir = $vardir/ssl
 
-PUPPET_CONF=`cat text`
+        [agent]
+        classfile = $vardir/classes.txt
+        server = "'${PUPPET_SERVER}'"
+        runinterval = 60
+        pluginsync = True
+        localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf
 
-echo $PUPPET_CONF
 if [ ${platform:0:6} == 'centos' ]; then
-    if [[ ${platform_version:0:1} = "7" ]]; then
-        echo '[main]
-        rundir = /var/run/puppet
-        logdir = /var/log/puppet
-        ssldir = $vardir/ssl
-
-        [agent]
-        classfile = $vardir/classes.txt
-        server = "'${PUPPET_SERVER}'"
-        runinterval = 60
-        pluginsync = True
-        localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf
-#        cd /opt/puppetlabs/puppet/bin/
-        puppet agent --enable
-        service puppet restart
-    fi
-    if [[ ${platform_version:0:1} = "6" ]]; then
-        echo '[main]
-        rundir = /var/run/puppet
-        logdir = /var/log/puppet
-        ssldir = $vardir/ssl
-    
-        [agent]
-        classfile = $vardir/classes.txt
-        server = "'${PUPPET_SERVER}'"
-        runinterval = 60
-        pluginsync = True
-        localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf       
-        puppet agent --enable
-        service puppet restart
-    fi
+    puppet agent --enable
+    service puppet restart
 else
-    echo '[main]
-        rundir = /var/run/puppet
-        logdir = /var/log/puppet
-        ssldir = $vardir/ssl
-    
-        [agent]
-        classfile = $vardir/classes.txt
-        server = "'${PUPPET_SERVER}'"
-        runinterval = 60
-        pluginsync = True
-        localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf
-
      echo 'START=yes
            DAEMON_OPTS=""' > /etc/default/puppet
-
-        puppet agent --enable
-        service puppet restart
+     puppet agent --enable
+     service puppet restart
 fi
 

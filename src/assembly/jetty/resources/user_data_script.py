@@ -1,3 +1,9 @@
+#
+# This file obtain the validation chef key from the
+# the user data. This information is defined in the
+# chefkey resource
+#
+
 #!/usr/bin/python
 import yaml
 import urllib2

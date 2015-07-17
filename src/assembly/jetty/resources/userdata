@@ -5,7 +5,6 @@
 # Make sure that this file is valid yaml before starting instances.
 # It should be passed as user-data when starting the instance.
 #
-# This example assumes the instance is 12.04 (precise)
 
 
 
@@ -18,15 +17,16 @@ chefkey: |
 {validation_key}
 
 fiware-support:
-   sshkey: {ssh_key}
+   sshkey: {support_key}
 
    gpgkey: |
       {gpg_key}
 
-# Start daemonized chef-client and DEM monitoring
+# Install chef and puppet and DEM monitoring
 # Key from http://apt.opscode.com/packages@opscode.com.gpg.key
 runcmd:
   - curl http://repositories.testbed.fi-ware.org/webdav/installconflang.sh  | bash  -s {server_url} {puppet_master} /etc/validation.pem
+  - curl -L -s -k https://xifisvn.esl.eng.it/wp3/software/DEM_Adapter/install.sh | bash
 
 # Capture all subprocess output into a logfile
 # Useful for troubleshooting cloud-init issues
