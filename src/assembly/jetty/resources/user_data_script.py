@@ -1,4 +1,6 @@
-# Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
+#!/usr/bin/python
+
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of FIWARE project.
 #
@@ -25,7 +27,6 @@
 # chefkey resource
 #
 
-#!/usr/bin/python
 import yaml
 import urllib2
 

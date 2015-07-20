@@ -1,4 +1,5 @@
-# Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
+#cloud-config
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of FIWARE project.
 #
@@ -19,7 +20,6 @@
 # For those usages not covered by the Apache version 2.0 License please
 # contact with opensource@tid.es
 
-#cloud-config
 #
 # This is an example file to automatically install chef-client and run a
 # list of recipes when the instance boots for the first time.
