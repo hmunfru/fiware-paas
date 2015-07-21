@@ -153,16 +153,16 @@ fi
 ## Configuring puppet
 
 echo '[main]
-        rundir = /var/run/puppet
-        logdir = /var/log/puppet
-        ssldir = $vardir/ssl
+rundir = /var/run/puppet
+logdir = /var/log/puppet
+ssldir = $vardir/ssl
 
-        [agent]
-        classfile = $vardir/classes.txt
-        server = "'${PUPPET_SERVER}'"
-        runinterval = 60
-        pluginsync = True
-        localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf
+[agent]
+classfile = $vardir/classes.txt
+server = "'${PUPPET_SERVER}'"
+runinterval = 60
+pluginsync = True
+localconfig = $vardir/localconfig' > /etc/puppet/puppet.conf
 
 if [ ${platform:0:6} == 'centos' ]; then
     puppet agent --enable
