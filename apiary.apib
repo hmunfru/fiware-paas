@@ -1,0 +1,254 @@
+FORMAT: 1A
+
+# fiware-paas
+Notes API is a *short texts saving* service similar to its physical paper presence on your table.
+
+# Group Notes
+Notes related resources of the **Notes API**
+
+## Notes Collection [/notes]
+### Get the Abstract Environment list from the catalogue [GET]
++ Request
+
+    + Headers
+    
+            X-Auth-Token: 756cfb31e062216544215f54447e2716
+            Tenant-Id: your-tenant-id
++ Response 200 (application/json)
+
+        [
+          {
+            "tierDtos": [
+              {
+                "name": "tiernameqac",
+                "flavour": "2",
+                "image": "6e2519b8-1b36-4669-b6fe-ed2e77815b9f",
+                "maximumNumberInstances": 1,
+                "minimumNumberInstances": 1,
+                "initialNumberInstances": 1,
+                "icono": "",
+                "securityGroup": "",
+                "keypair": "default",
+                "floatingip": "false",
+                "affinity": "None",
+                "region": "Trento"
+              },
+              {
+                "name": "tier1",
+                "flavour": "2",
+                "image": "775761ba-67e5-4481-81f0-72eb04d0d13c",
+                "maximumNumberInstances": 1,
+                "minimumNumberInstances": 1,
+                "initialNumberInstances": 1,
+                "productReleaseDtos": {
+                  "productName": "apache2",
+                  "version": "1.10.5",
+                  "attributes": {
+                    "key": "listen_port",
+                    "value": "80",
+                    "type": "Plain"
+                  },
+                  "metatadas": [
+                    {
+                      "key": "image",
+                      "value": ""
+                    },
+                    {
+                      "key": "tenant_id",
+                      "value": "00000000000000000000000000000129"
+                    },
+                    {
+                      "key": "open_ports",
+                      "value": "22 80"
+                    },
+                    {
+                      "key": "cookbook_url",
+                      "value": ""
+                    },
+                    {
+                      "key": "cloud",
+                      "value": "yes"
+                    },
+                    {
+                      "key": "installator",
+                      "value": "chef"
+                    }
+                  ]
+                },
+                "icono": "",
+                "securityGroup": "",
+                "keypair": "",
+                "floatingip": "false",
+                "affinity": "None",
+                "region": "Spain"
+              }
+            ],
+            "name": "envTest11",
+            "description": "envTest desc"
+          },
+          {
+            "tierDtos": [
+              {
+                "name": "tiernameqac",
+                "flavour": "2",
+                "image": "6e2519b8-1b36-4669-b6fe-ed2e77815b9f",
+                "maximumNumberInstances": 1,
+                "minimumNumberInstances": 1,
+                "initialNumberInstances": 1,
+                "icono": "",
+                "securityGroup": "",
+                "keypair": "default",
+                "floatingip": "false",
+                "affinity": "None",
+                "region": "Trento"
+              },
+              {
+                "name": "testjesuspg",
+                "flavour": "2",
+                "image": "422128fe-02a2-44ca-b9a7-67ec69809e5e",
+                "maximumNumberInstances": 1,
+                "minimumNumberInstances": 1,
+                "initialNumberInstances": 1,
+                "productReleaseDtos": {
+                  "productName": "mysql",
+                  "version": "1.2.4",
+                  "attributes": {
+                    "key": "ssl_port",
+                    "value": "8443",
+                    "description": "The ssl listen port",
+                    "type": "Plain"
+                  },
+                  "metatadas": [
+                    {
+                      "key": "nid",
+                      "value": "855",
+                      "description": "mysql nid"
+                    },
+                    {
+                      "key": "installator",
+                      "value": "chef",
+                      "description": "ChefServer Recipe required"
+                    }
+                  ]
+                },
+                "icono": "",
+                "securityGroup": "",
+                "keypair": "",
+                "floatingip": "false",
+                "affinity": "None",
+                "region": "Spain"
+              }
+            ],
+            "name": "envjesuspg",
+            "description": "desc"
+          },
+          {
+            "tierDtos": {
+              "name": "tier1",
+              "flavour": "2",
+              "image": "775761ba-67e5-4481-81f0-72eb04d0d13c",
+              "maximumNumberInstances": 1,
+              "minimumNumberInstances": 1,
+              "initialNumberInstances": 1,
+              "productReleaseDtos": {
+                "productName": "nodejs",
+                "version": "0.6.15",
+                "metatadas": {
+                  "key": "installator",
+                  "value": "chef",
+                  "description": "ChefServer Recipe required"
+                }
+              },
+              "icono": "",
+              "securityGroup": "",
+              "keypair": "",
+              "floatingip": "false",
+              "affinity": "None",
+              "region": "Spain"
+            },
+            "name": "envTest",
+            "description": "envTest desc"
+          },
+          {
+            "tierDtos": {
+              "name": "tier1",
+              "flavour": "2",
+              "image": "775761ba-67e5-4481-81f0-72eb04d0d13c",
+              "maximumNumberInstances": 1,
+              "minimumNumberInstances": 1,
+              "initialNumberInstances": 1,
+              "productReleaseDtos": {
+                "productName": "apache2",
+                "version": "1.10.5",
+                "attributes": {
+                  "key": "listen_port",
+                  "value": "80",
+                  "type": "Plain"
+                },
+                "metatadas": [
+                  {
+                    "key": "image",
+                    "value": ""
+                  },
+                  {
+                    "key": "tenant_id",
+                    "value": "00000000000000000000000000000129"
+                  },
+                  {
+                    "key": "open_ports",
+                    "value": "22 80"
+                  },
+                  {
+                    "key": "cookbook_url",
+                    "value": ""
+                  },
+                  {
+                    "key": "cloud",
+                    "value": "yes"
+                  },
+                  {
+                    "key": "installator",
+                    "value": "chef"
+                  }
+                ]
+              },
+              "icono": "",
+              "securityGroup": "",
+              "keypair": "",
+              "floatingip": "false",
+              "affinity": "None",
+              "region": "Spain"
+            },
+            "name": "envTest1",
+            "description": "envTest desc"
+          }
+        ]
+
+### Create a Note [POST]
++ Request (application/json)
+
+        { "title": "Buy cheese and bread for breakfast." }
+
++ Response 201 (application/json)
+
+        { "id": 3, "title": "Buy cheese and bread for breakfast." }
+
+## Note [/notes/{id}]
+A single Note object with all its details
+
++ Parameters
+    + id (required, number, `1`) ... Numeric `id` of the Note to perform action with. Has example value.
+
+### Retrieve a Note [GET]
++ Response 200 (application/json)
+
+    + Header
+
+            X-My-Header: The Value
+
+    + Body
+
+            { "id": 2, "title": "Pick-up posters from post-office" }
+
+### Remove a Note [DELETE]
++ Response 204
