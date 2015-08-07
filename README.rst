@@ -43,7 +43,7 @@ Documentation
 
 -   `User and Programmers Guide <doc/user_guide.rst>`_
 -   `Installation and Administration Guide <doc/admin_guide.rst>`_
-
+-   `API (apiary) <https://jsapi.apiary.io/apis/fiwarepaas/reference.html>`_
 
 .. IMAGES
 
