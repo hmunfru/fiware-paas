@@ -1,5 +1,5 @@
-FI-WARE PaaS Manager
-====================
+FI-WARE SDC
+============
 
 | |Build Status| |Coverage Status| |help stackoverflow|
 
