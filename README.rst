@@ -1,7 +1,7 @@
 FI-WARE PaaS Manager
 ====================
 
-| |Build Status| |Coverage Status| |help stackoverflow|
+| |Build Status| |Coverage Status| |StackOverflow|
 
 Introduction
 =======================
@@ -151,7 +151,7 @@ There, it is required to configure::
     $ openstack-tcloud.keystone.user: the admin user
     $ openstack-tcloud.keystone.password: the admin password
     $ openstack-tcloud.keystone.tenant: the admin tenant
-    $ paas_manager_url: the final url, mainly https://paas-ip:8443/paas
+    $ paas_manager_url: the final url, mainly https://paas-ip:8443/paasmanager
 
 
 
@@ -202,7 +202,7 @@ here a quick testing to check that everything is up and running. It involves to 
 the product information storaged in the catalogue. With it, we test that the service
 is running and the database configure correctly::
 
-   https://{PaaS Manager\_IP}:{port}/sdc/rest
+   https://{PaaS Manager\_IP}:{port}/paasmanager/rest
 
 The request to test it in the testbed should be::
 
@@ -222,11 +222,10 @@ Advanced topics
 - `Installation and administration <doc/installation-guide.rst>`_
 
   * `Software requirements <doc/admin-guide.rst#requirements>`_
-  * `Building from sources <doc/admin-guide.rst/#install-sdc-from-source>`_
+  * `Building from sources <doc/admin-guide.rst/#install-paas-from-source>`_
   * `Resources & I/O Flows <doc/admin-guide.rst#resource-availability>`_
 
 - `User and programmers guide <doc/user_guide.rst>`_
-
 
 
 License
@@ -255,4 +254,3 @@ License
    :target: https://coveralls.io/r/telefonicaid/fiware-paas
 .. |StackOverflow| image:: http://b.repl.ca/v1/help-stackoverflow-orange.png
    :target: https://travis-ci.org/telefonicaid/fiware-paas
-  
