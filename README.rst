@@ -1,5 +1,5 @@
-FI-WARE SDC
-============
+FI-WARE PaaS Manager
+====================
 
 | |Build Status| |Coverage Status| |help stackoverflow|
 
@@ -247,39 +247,6 @@ License
 .. _FIWARE SDC: https://github.com/telefonicaid/fiware-sdc
 
 
-
-
-
-
-
-.. IMAGES
-
-.. |Build Status| image:: https://travis-ci.org/telefonicaid/fiware-sdc.svg
-   :target: https://travis-ci.org/telefonicaid/fiware-sdc
-.. |Coverage Status| image:: https://coveralls.io/repos/telefonicaid/fiware-sdc/badge.png?branch=develop
-   :target: https://coveralls.io/r/telefonicaid/fiware-sdc
-.. |help stackoverflow| image:: http://b.repl.ca/v1/help-stackoverflow-orange.png
-   :target: http://www.stackoverflow.com
-
-
-PaaS Manager - Overview
-____________________________
-
-
-| |Build Status| |Coverage Status| |StackOverflow|
-
-What you get
-============
-
-T
-
-Documentation
-=============
-
--   `User and Programmers Guide <doc/user_guide.rst>`_
--   `Installation and Administration Guide <doc/admin_guide.rst>`_
--   `API (apiary) <https://jsapi.apiary.io/apis/fiwarepaas/reference.html>`_
-
 .. IMAGES
 
 .. |Build Status| image::  https://travis-ci.org/telefonicaid/fiware-paas.svg
@@ -288,9 +255,4 @@ Documentation
    :target: https://coveralls.io/r/telefonicaid/fiware-paas
 .. |StackOverflow| image:: http://b.repl.ca/v1/help-stackoverflow-orange.png
    :target: https://travis-ci.org/telefonicaid/fiware-paas
-   
-.. REFERENCES
-
-.. _FIWARE.OpenSpecification.Cloud.PaaS: http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.OpenSpecification.Cloud.PaaS
-.. _PaaS_Open_RESTful_API_Specification_(PRELIMINARY): http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/PaaS_Open_RESTful_API_Specification_(PRELIMINARY)
-.. _PaaS_Manager_-_Installation_and_Administration_Guide: http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/PaaS_Manager_-_Installation_and_Administration_Guide
+  
