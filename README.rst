@@ -13,8 +13,6 @@ of the PaaS Manager GE.
 This project is part of FIWARE_. Check also the
 `FIWARE Catalogue - PaaS Manager GE`_.
 
-.. contents:: :local:
-
 Any feedback on this documentation is highly welcome, including bugs, typos
 or things you think should be included but aren't. You can use `FIWARE PaaS Manager - GitHub issues`_
 to provide feedback.
