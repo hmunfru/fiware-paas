@@ -1,10 +1,9 @@
-FI-WARE PaaS Manager
-====================
+===========================
+FIWARE PaaS Manager | Pegasus
+===========================
 
 | |Build Status| |Coverage Status| |StackOverflow|
 
-Introduction
-=======================
 This is the code repository for FIWARE Pegasus, the reference implementation
 of the PaaS Manager GE.
 
@@ -81,16 +80,15 @@ Using FIWARE package repository (recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Refer to the documentation of your Linux distribution to set up the URL of the
-repository where FIWARE packages are available (and update cache, if needed):
+repository where FIWARE packages are available (and update cache, if needed)::
 
     http://repositories.testbed.fiware.org/repo/rpm/x86_64
 
-
-Then, use the proper tool to install the packages
+Then, use the proper tool to install the packages::
 
     $ sudo yum install fiware-paas
 
-and the latest version will be installed. In order to install a specific version
+and the latest version will be installed. In order to install a specific version::
 
     $ sudo yum install fiware-paas-{version}-1.noarch
 
@@ -115,6 +113,20 @@ be execute. To do that, it just needed to execute::
 
     psql -U postgres -d $db_name << EOF
     \i db-changelog.sql
+
+Using installation script
+~~~~~~~~~~~~~~~~~~~~~~~~~
+The installation of fiware-paas can be done in the easiest way by executing the script::
+
+  scripts/bootstrap/centos.sh
+
+The script will ask you the following data to configure the configuration properties:
+
+- The database name for the fiware-paas
+- The postgres password of the database
+- the keystone url to connect fiware-paas for the authentication process
+- the admin keystone user for the authentication process
+- the admin password for the authentication process
 
 
 Running
@@ -153,7 +165,21 @@ There, it is required to configure::
     $ openstack-tcloud.keystone.tenant: the admin tenant
     $ paas_manager_url: the final url, mainly https://paas-ip:8443/paasmanager
 
+In addition, to configue the PaaS Manager application inside the webserver, it is needed to change the context file.
+To do that, change paasmanager.xml found in distribution file and store it in folder $PAASMANAGER_HOME/webapps/::
 
+  <New id="sdc" class="org.eclipse.jetty.plus.jndi.Resource">
+    <Arg>jdbc/paasmanager</Arg>
+    <Arg>
+        <New class="org.postgresql.ds.PGSimpleDataSource">
+            <Set name="User"> <database user> </Set>
+            <Set name="Password"> <database password> </Set>
+            <Set name="DatabaseName"> <database name>   </Set>
+            <Set name="ServerName"> <IP/hostname> </Set>
+            <Set name="PortNumber">5432</Set>
+        </New>
+    </Arg>
+  </New>
 
 Checking status
 ---------------
@@ -168,6 +194,19 @@ In order to check the status of the service, use the following command
 
 API Overview
 ============
+The PaaS Manager offers a REST API, which can be used for both
+managing deploying virtual infrastructure and install software
+on top of it.
+
+For instance, it is possible to obtain the template list in the catalogue::
+
+  $ curl -v -H "Content-Type: application/json" -H "Accept: application/xml" -H "X-Auth-Token: your-token-id" -H "Tenant-Id: your-tenant-id"
+    -X GET "https://pegasus.lab.fi-ware.org:8443/paasmanager/rest/catalog/org/FIWARE/environment"
+
+Please have a look at the API Reference Documentation section bellow and at the programmer guide.
+
+API Reference Documentation
+---------------------------
 
 - `FIWARE PaaS Manager v1 (Apiary) <https://jsapi.apiary.io/apis/fiwarepaas/reference.html>`_
 
