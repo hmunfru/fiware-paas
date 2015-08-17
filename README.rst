@@ -4,6 +4,8 @@ FIWARE PaaS Manager | Pegasus
 
 | |Build Status| |Coverage Status| |StackOverflow|
 
+.. contents:: :local:
+
 Introduction
 ============
 
@@ -22,8 +24,6 @@ public wiki:
 
 - `FIWARE PaaS Manager - Installation and Administration Guide`_
 - `FIWARE PaaS Manager - User and Programmers Guide`_
-
-.. contents:: :local:
 
 GEi overall description
 =======================
