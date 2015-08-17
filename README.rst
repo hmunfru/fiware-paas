@@ -218,7 +218,9 @@ Unit tests
 ----------
 
 The ``test`` target for each module in the PaaS Manager is used for running the unit tests in both components of
-PaaS Manager GE:
+PaaS Manager GE. To execute the unit tests you just need to execute::
+
+    mvn test
 
 Please have a look at the section `building from source code
 <doc/admin-guide.rst#install-paas-from-source>`_ in order to get more
@@ -233,6 +235,12 @@ In the following path you will find a set of tests related to the
 end-to-end funtionalities.
 
 - `PaaS Manager Aceptance Tests <https://github.com/telefonicaid/fiware-paas/tree/develop/test>`_
+
+To execute the acceptance tests, go to the test/acceptance folder of the project and run::
+
+  lettuce_tools --tags=-skip.
+
+This command will execute all acceptance tests (see available params with the -h option)
 
 End to End testing
 ------------------
