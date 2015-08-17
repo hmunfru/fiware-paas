@@ -4,12 +4,14 @@ FIWARE PaaS Manager | Pegasus
 
 | |Build Status| |Coverage Status| |StackOverflow|
 
+Introduction
+------------
+
 This is the code repository for FIWARE Pegasus, the reference implementation
 of the PaaS Manager GE.
 
 This project is part of FIWARE_. Check also the
 `FIWARE Catalogue - PaaS Manager GE`_.
-
 
 Any feedback on this documentation is highly welcome, including bugs, typos
 or things you think should be included but aren't. You can use `FIWARE PaaS Manager - GitHub issues`_
@@ -21,6 +23,7 @@ public wiki:
 - `FIWARE PaaS Manager - Installation and Administration Guide`_
 - `FIWARE PaaS Manager - User and Programmers Guide`_
 
+.. contents:: :local:
 
 GEi overall description
 =======================
