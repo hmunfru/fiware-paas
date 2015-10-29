@@ -38,7 +38,7 @@ import org.junit.Test;
 
 /**
  * Test for environmetn instances.
- * 
+ *
  * @author henar
  */
 public class EnvironmentInstanceTest extends TestCase {
@@ -117,26 +117,64 @@ public class EnvironmentInstanceTest extends TestCase {
 
     /**
      * Test for create environment dto.
-     * 
+     *
      * @throws Exception
      */
     @Test
     public void testCreateEnvironmentToPDto() throws Exception {
 
-        EnvironmentInstancePDto enviromentIsntanceDto = envIns.toPDto();
+        ProductRelease productRelease = new ProductRelease("product", "2.0");
+        List<ProductRelease> productReleases = new ArrayList<ProductRelease>();
+        productReleases.add(productRelease);
 
-        assertEquals(enviromentIsntanceDto.getTiers().size(), envResult.getTiers().size());
-        assertEquals(enviromentIsntanceDto.getTiers().get(0).getProductReleaseDtos().size(), 1);
-        assertEquals(enviromentIsntanceDto.getTiers().get(1).getTierInstances().size(), 1);
-        assertEquals(enviromentIsntanceDto.getTiers().get(1).getTierInstances().get(0).getTierInstanceName(),
+        Tier tier = new Tier();
+        tier.setInitialNumberInstances(new Integer(1));
+        tier.setMaximumNumberInstances(new Integer(5));
+        tier.setMinimumNumberInstances(new Integer(1));
+        tier.setName("tierName");
+        tier.setProductReleases(productReleases);
+        tier.setFlavour("3");
+        tier.setFloatingip("true");
+        tier.setImage("image");
+
+        Set<Tier> tiers = new HashSet<Tier>();
+        tiers.add(tier);
+
+        Environment environment = new Environment();
+        environment.setName("environmentName");
+        environment.setTiers(tiers);
+
+        EnvironmentInstance environmentInstance = new EnvironmentInstance("blue", "description");
+
+        environmentInstance.setEnvironment(environment);
+
+        VM vm = new VM("fqn", "ip", "hostname", "domain");
+        ProductInstance productInstance = new ProductInstance();
+        productInstance.setName("produInst");
+        productInstance.setProductRelease(productRelease);
+        TierInstance tierInstance = new TierInstance(tier, "ovf", "tierInstance", vm);
+        List<ProductInstance> lProductInstance = new ArrayList<ProductInstance>();
+        lProductInstance.add(productInstance);
+        tierInstance.setProductInstances(lProductInstance);
+        List<TierInstance> tieInstances = new ArrayList<TierInstance>();
+        tieInstances.add(tierInstance);
+
+        environmentInstance.setTierInstances(tieInstances);
+
+        EnvironmentInstancePDto environmentInstancePDto = environmentInstance.toPDto();
+
+        assertEquals(environmentInstancePDto.getTiers().size(), environment.getTiers().size());
+        assertEquals(environmentInstancePDto.getTiers().get(0).getProductReleaseDtos().size(), 1);
+        assertEquals(environmentInstancePDto.getTiers().get(0).getTierInstances().size(), 1);
+        assertEquals(environmentInstancePDto.getTiers().get(0).getTierInstances().get(0).getTierInstanceName(),
                 "tierInstance");
-        assertEquals(enviromentIsntanceDto.getTiers().get(1).getTierInstances().get(0).getVM().getFqn(), "fqn");
+        assertEquals(environmentInstancePDto.getTiers().get(0).getTierInstances().get(0).getVM().getFqn(), "fqn");
 
     }
 
     /**
      * Create an environment without vm.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -152,7 +190,7 @@ public class EnvironmentInstanceTest extends TestCase {
         //        "tierInstance");
 
     }
-    
-    
+
+
 
 }

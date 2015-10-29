@@ -594,7 +594,7 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
     public List<String> getIP(ClaudiaData claudiaData, String tierName, int replica, VM vm, String region)
             throws InfrastructureException {
         List<String> ips = new ArrayList<String>();
-        String response = "";
+        String response ="";
 
         try {
             String token = claudiaData.getUser().getToken();
@@ -612,12 +612,13 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
                     ips.add(childJSONObject.getString("addr"));
                 }
             }
+
         } catch (OpenStackException oes) {
             String errorMessage = "Error interacting getting ip from OpenStack ";
             log.error(errorMessage);
             throw new InfrastructureException(errorMessage);
         } catch (JSONException e) {
-            String errorMessage = "Error with json " + response;
+            String errorMessage = "Error with Json ";
             log.error(errorMessage);
         }
         return ips;
@@ -690,13 +691,14 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
             checkDeleteServerTaskStatus(tierInstance, claudiaData);
             log.debug("Undeployed VM replica " + tierInstance.getName() + " for region " + region + " and user "
                     + tierInstance.getTier().getVdc());
-
+            
             if (tierInstance.getTier().getFloatingip().equals("true")) {
                 log.debug("Delete floating ip ");
-                openStackUtil.disAllocateFloatingIP(region, tokenAdminId, tenantAdminId, tierInstance.getVM()
+                openStackUtil.disAllocateFloatingIP(region, claudiaData.getUser().getToken(), 
+                		claudiaData.getUser().getTenantId(), tierInstance.getVM()
                         .getFloatingIp());
             }
-
+            
         } catch (OpenStackException oes) {
             String errorMessage = "Error deleting serverId: " + tierInstance.getVM().getVmid();
             log.error(errorMessage);
@@ -726,3 +728,4 @@ public class ClaudiaClientOpenStackImpl implements ClaudiaClient {
         this.openStackRegion = openStackRegion;
     }
 }
+
