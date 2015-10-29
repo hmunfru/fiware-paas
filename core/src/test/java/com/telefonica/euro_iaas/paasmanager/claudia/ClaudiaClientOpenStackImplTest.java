@@ -36,21 +36,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 
+import com.telefonica.euro_iaas.paasmanager.exception.InfrastructureException;
+import com.telefonica.euro_iaas.paasmanager.model.*;
 import com.telefonica.fiware.commons.openstack.auth.OpenStackAccess;
 import com.telefonica.fiware.commons.openstack.auth.exception.OpenStackException;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.telefonica.euro_iaas.paasmanager.bean.PaasManagerUser;
 import com.telefonica.euro_iaas.paasmanager.claudia.impl.ClaudiaClientOpenStackImpl;
 import com.telefonica.euro_iaas.paasmanager.manager.NetworkInstanceManager;
-import com.telefonica.euro_iaas.paasmanager.model.ClaudiaData;
-import com.telefonica.euro_iaas.paasmanager.model.Network;
-import com.telefonica.euro_iaas.paasmanager.model.NetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.RouterInstance;
-import com.telefonica.euro_iaas.paasmanager.model.SubNetworkInstance;
-import com.telefonica.euro_iaas.paasmanager.model.Tier;
-import com.telefonica.euro_iaas.paasmanager.model.TierInstance;
 import com.telefonica.euro_iaas.paasmanager.model.dto.VM;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtils;
 import com.telefonica.euro_iaas.paasmanager.util.FileUtilsImpl;
@@ -58,6 +54,10 @@ import com.telefonica.euro_iaas.paasmanager.util.OpenStackRegion;
 import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 import com.telefonica.euro_iaas.paasmanager.util.SystemPropertiesProvider;
 import org.mockito.Mockito;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author jesus.movilla
@@ -433,6 +433,42 @@ public class ClaudiaClientOpenStackImplTest {
         FileUtilsImpl fileUtil = new FileUtilsImpl();
         assertNotNull(fileUtil.readFile("src/test/resources/userdata"));
         assertNotNull(fileUtil.readFile("src/test/resources/userdata", "."));
+    }
+
+    @Test
+    public void testGetIps() throws Exception {
+        String response = "{\n" +
+            "    \"server\": {\n" +
+            "        \"status\": \"ACTIVE\",\n" +
+            "        \"updated\": \"2015-10-29T11:31:01Z\",\n" +
+            "        \"hostId\": \"a811787538cb3e6dd9\",\n" +
+            "        \"addresses\": {\n" +
+            "            \"node-int-net-01\": [\n" +
+            "                {\n" +
+            "                    \"OS-EXT-IPS-MAC:mac_addr\": \"fa:16:3e:79:9b:f1\",\n" +
+            "                    \"version\": 4,\n" +
+            "                    \"addr\": \"192.168.217.180\",\n" +
+            "                    \"OS-EXT-IPS:type\": \"fixed\"\n" +
+            "                }\n" +
+            "            ],\n" +
+            "            \" net\": [\n" +
+            "                {\n" +
+            "                    \"OS-EXT-IPS-MAC:mac_addr\": \"fa:16:3e:3b:42:00\",\n" +
+            "                    \"version\": 4,\n" +
+            "                    \"addr\": \"10.2.95.4\",\n" +
+            "                    \"OS-EXT-IPS:type\": \"fixed\"\n" +
+            "                }\n" +
+            "            ]\n" +
+            "        },\n" +
+            "    }\n" +
+            "}";
+
+        VM vm = new VM();
+        vm.setVmid("ID");
+        when(openStackUtil.getServer(anyString(), anyString(), anyString(),
+            anyString())).thenReturn(response);
+        List<String> ips = claudiaClientOpenStack.getIP(claudiaData, "name", 1, vm, "Spain2");
+        assertEquals(ips.size(), 2);
     }
 
 }

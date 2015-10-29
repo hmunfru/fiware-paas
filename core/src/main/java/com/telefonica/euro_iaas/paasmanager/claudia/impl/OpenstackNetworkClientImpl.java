@@ -49,7 +49,8 @@ import com.telefonica.euro_iaas.paasmanager.util.OpenStackUtil;
 /**
  * @author henar.munoz
  */
-public class OpenstackNetworkClientImpl implements NetworkClient {
+public class
+    OpenstackNetworkClientImpl implements NetworkClient {
 
     private OpenStackUtil openStackUtil = null;
     private static Logger log = LoggerFactory.getLogger(OpenstackNetworkClientImpl.class);

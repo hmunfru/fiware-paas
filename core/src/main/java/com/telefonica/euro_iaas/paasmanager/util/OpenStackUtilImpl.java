@@ -723,7 +723,7 @@ public class OpenStackUtilImpl implements OpenStackUtil {
         String response = null;
 
         try {
-            HttpUriRequest request = openOperationUtil.createNovaGetRequest("/" + RESOURCE_FLOATINGIP, APPLICATION_XML,
+            HttpUriRequest request = openOperationUtil.createNovaGetRequest("/" + RESOURCE_FLOATINGIP, APPLICATION_JSON,
                     region, token, vdc);
 
             response = openOperationUtil.executeNovaRequest(request);
@@ -846,7 +846,7 @@ public class OpenStackUtilImpl implements OpenStackUtil {
         // "http://10.95.171.115:8774/v2/30c60771b6d144d2861b21e442f0bef9/servers/88y6ga216ad4s33ra6asd5fgrg7"
 
         HttpUriRequest request = openOperationUtil.createNovaGetRequest(RESOURCE_SERVERS + "/" + serverId,
-                APPLICATION_XML, region, token, vdc);
+                APPLICATION_JSON, region, token, vdc);
 
         String response = null;
 
